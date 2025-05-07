@@ -8,23 +8,23 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.3.0",
-    "@trpc/server": "^11.0.0",
     "@trpc/client": "^11.0.0",
+    "@trpc/server": "^11.0.0",
     "mongoose": "^8.14.0",
-    "stripe": "^14.11.0",
+    "next": "15.3.0",
     "nodemailer": "^6.9.8",
     "openai": "^4.28.0",
-    "puppeteer": "^21.7.0"
+    "puppeteer": "^21.7.0",
+    "stripe": "^18.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^19",
-    "typescript": "^5",
     "@types/nodemailer": "^6.4.14",
+    "@types/react": "^19",
     "eslint": "^8.56.0",
     "eslint-config-next": "15.3.0",
     "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "typescript": "^5"
   }
 }
