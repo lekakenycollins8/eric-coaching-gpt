@@ -1,5 +1,5 @@
 import "../index.css";
-import { Providers } from "./providers";
+import { Providers } from '@/app/providers';
 
 export const metadata = {
   title: "Eric GPT Coaching Platform",

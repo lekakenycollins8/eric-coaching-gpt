@@ -11,14 +11,12 @@
 *   Create GitHub repo & project board
 *   Scaffold Next.js + TypeScript + Tailwind + ESLint/Prettier
 *   Install dependencies: NextAuth, Stripe, OpenAI SDK, React Hook Form, Puppeteer
-*   Configure environment variables in Vercel (MONGODB_URI, NEXTAUTH_SECRET, STRIPE_SECRET_KEY, OPENAI_API_KEY, MAILGUN_API_KEY)
+*   Configure environment variables in Vercel
 *   Connect Windsurf IDE with repo
-*   Write “Hello World” smoke test in CI to verify pipeline
 
 ### Deliverables
 
 *   Barebones Next.js project deployed to staging
-*   Passing CI “hello world” test
 
 ## Sprint 1: Authentication & Billing Integration
 
@@ -28,7 +26,7 @@
 
 ### Tasks
 
-*   NextAuth.js email/magic-link setup; User model in MongoDB
+*   NextAuth.js email/magic-link We will use nodemailersetup; User model in MongoDB
 *   Stripe plan definitions (solo/pro/vip monthly & annual) in code
 *   /api/stripe/create-checkout-session & webhook handler (/api/stripe/webhook)
 *   Profile page skeleton displaying plan & usage placeholders

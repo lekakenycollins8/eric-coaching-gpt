@@ -8,13 +8,13 @@
 | Frontend | Next.js (React + TypeScript) | Component-driven UI, server-side rendering, fast navigation |
 | Styling | Tailwind CSS, Shadcn | Utility-first, consistent design, rapid UI development |
 | Forms & State | React Hook Form | Declarative, performant form management and validation |
-| Auth | NextAuth.js (+ Mailgun magic-link) | Secure email login, session management |
+| Auth | NextAuth.js (+ Nodemailer magic-link) | Secure email login, session management |
 | API Layer | Next.js API Routes | Unified serverless functions for business logic |
 | Database | MongoDB Atlas | Flexible document storage for users, submissions, trackers |
 | AI | OpenAI GPT-4 API | Chat-completion engine for personalized coaching feedback |
 | Billing | Stripe (Checkout & Webhooks) | Subscription management, plan enforcement |
 | PDF Export | Puppeteer (serverless) | Render HTML to branded PDF for downloads |
-| Email | Mailgun | Magic-link delivery, system notifications |
+| Email | Nodemailer | Magic-link delivery, system notifications |
 | Deployment | Vercel | Automatic CI/CD, environment management, global CDN |
 | Monitoring | Sentry, Vercel Analytics | Error tracking, performance monitoring |
 
@@ -22,7 +22,7 @@
 
 #### Authentication & Sessions
 
-NextAuth.js handles email magic-links via Mailgun.
+NextAuth.js handles email magic-links via Nodemailer.
 
 Session JWTs include user ID and subscription state.
 
@@ -74,7 +74,7 @@ Invite tokens allow secure onboarding into an Org.
 | AI Hallucinations | Off-brand or incorrect feedback | Rigorous prompt templates, prompt QA with real examples |
 | OCR / Upload Complexity (Deferred) | Not applicable | N/A (we removed PDF upload) |
 | Quota Bypass or Race Conditions | Unauthorized usage | Atomic DB updates, strong middleware checks |
-| Email Delivery Failures | Login/notifications broken | Use Mailgun’s delivery analytics, fallback retry logic |
+| Email Delivery Failures | Login/notifications broken | Use Nodemailer’s delivery analytics, fallback retry logic |
 | PDF Rendering Flakiness | Inconsistent PDFs | Pre-test Puppeteer templates, version-lock Chromium |
 | Scalability Under Load | Slow response times | Vercel autoscaling, Edge caching for static assets |
 

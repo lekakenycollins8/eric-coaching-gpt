@@ -1,4 +1,4 @@
-{{ ... }}
+
 /**
  * Type definitions for the Eric GPT Coaching Platform
  */
@@ -35,4 +35,3 @@ export interface Field {
   options?: string[];
   required: boolean;
 }
-{{ ... }}
