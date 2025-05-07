@@ -11,6 +11,6 @@ connectToDatabase().catch((error) => {
 });
 
 // Export the database client for use in API routes
-const client = mongoose.connection.getClient().db("eric_gpt_db");
+const client = mongoose.connection.getClient().db("eric-coaching-gpt");
 
 export { client };
