@@ -89,27 +89,46 @@ export default function SubscriptionPage() {
   };
 
   const handleSubscribe = async (planId: PlanId) => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) {
+      console.log('No user ID found in session', session);
+      return;
+    }
     
     try {
+      console.log('Subscribing to plan:', planId);
+      console.log('User ID:', session.user.id);
+      console.log('Email:', session.user.email);
+      
+      const payload = {
+        planId,
+        userId: session.user.id,
+        email: session.user.email,
+        successUrl: window.location.origin + '/dashboard/subscription?success=true',
+        cancelUrl: window.location.origin + '/dashboard/subscription?canceled=true',
+      };
+      
+      console.log('Request payload:', payload);
+      
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          planId,
-          userId: session.user.id,
-          email: session.user.email,
-          successUrl: window.location.origin + '/dashboard/subscription?success=true',
-          cancelUrl: window.location.origin + '/dashboard/subscription?canceled=true',
-        }),
+        body: JSON.stringify(payload),
       });
       
+      console.log('Response status:', response.status);
+      
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (data.url) {
+        console.log('Redirecting to:', data.url);
         window.location.href = data.url;
+      } else {
+        console.error('No URL returned from checkout API');
+        setErrorMessage('Failed to create checkout session. No redirect URL returned.');
+        setTimeout(() => setErrorMessage(''), 5000);
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);

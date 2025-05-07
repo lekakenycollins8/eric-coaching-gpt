@@ -10,8 +10,13 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: Request) {
   try {
+    console.log('Received checkout session request');
+    
     // Parse the request body
-    const { planId, userId, email, successUrl, cancelUrl, couponId } = await request.json();
+    const body = await request.json();
+    const { planId, userId, email, successUrl, cancelUrl, couponId } = body;
+    
+    console.log('Request body:', JSON.stringify(body, null, 2));
 
     // Validate the required parameters
     if (!planId || !userId || !email || !successUrl || !cancelUrl) {
@@ -23,7 +28,12 @@ export async function POST(request: Request) {
 
     // Get the plan details
     const plan = getPlanById(planId);
+    console.log('Looking for plan with ID:', planId);
+    console.log('Available plans:', Object.values(STRIPE_PLANS).map(p => p.id));
+    console.log('Found plan:', plan);
+    
     if (!plan) {
+      console.error('Invalid plan ID:', planId);
       return NextResponse.json(
         { error: 'Invalid plan ID' },
         { status: 400 }
@@ -32,6 +42,8 @@ export async function POST(request: Request) {
 
     // Initialize Stripe
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    console.log('Stripe secret key exists:', !!stripeSecretKey);
+    
     if (!stripeSecretKey) {
       console.error('Missing Stripe secret key');
       return NextResponse.json(
@@ -45,7 +57,10 @@ export async function POST(request: Request) {
     });
 
     // Create a checkout session
-    const checkoutSession = await stripe.checkout.sessions.create({
+    console.log('Creating checkout session with price ID:', plan.priceId);
+    
+    try {
+      const checkoutSession = await stripe.checkout.sessions.create({
       customer_email: email,
       client_reference_id: userId,
       payment_method_types: ['card'],
@@ -68,9 +83,22 @@ export async function POST(request: Request) {
       cancel_url: cancelUrl,
     });
 
-    return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
+      console.log('Checkout session created successfully:', {
+        id: checkoutSession.id,
+        url: checkoutSession.url
+      });
+      
+      return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
+    } catch (stripeError) {
+      console.error('Stripe error creating checkout session:', stripeError);
+      return NextResponse.json(
+        { error: stripeError.message || 'Failed to create Stripe checkout session' },
+        { status: 500 }
+      );
+    }
   } catch (error: any) {
     console.error('Error creating checkout session:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json(
       { error: error.message || 'Failed to create checkout session' },
       { status: 500 }

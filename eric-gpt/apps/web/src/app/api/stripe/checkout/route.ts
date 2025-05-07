@@ -10,9 +10,14 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: Request) {
   try {
+    console.log('Web app: Received checkout request');
+    
     // Verify the user is authenticated
     const session = await getServerSession(authOptions);
+    console.log('Web app: User session:', !!session?.user);
+    
     if (!session?.user) {
+      console.error('Web app: Unauthorized - no user session');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -21,10 +26,15 @@ export async function POST(request: Request) {
 
     // Parse the request body
     const body = await request.json();
+    console.log('Web app: Request body:', JSON.stringify(body, null, 2));
 
     // Forward the request to the server application
-    const serverUrl = process.env.SERVER_URL || 'http://localhost:3000';
-    const response = await fetch(`${serverUrl}/api/stripe/create-checkout-session`, {
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+    console.log('Web app: Forwarding to server URL:', serverUrl);
+    
+    const serverEndpoint = `${serverUrl}/api/stripe/create-checkout-session`;
+    console.log('Web app: Full server endpoint:', serverEndpoint);
+    const response = await fetch(serverEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,10 +43,15 @@ export async function POST(request: Request) {
     });
 
     // Return the response from the server
+    console.log('Web app: Server response status:', response.status);
+    
     const data = await response.json();
+    console.log('Web app: Server response data:', JSON.stringify(data, null, 2));
+    
     return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
-    console.error('Error creating checkout session:', error);
+    console.error('Web app: Error creating checkout session:', error);
+    console.error('Web app: Error stack:', error.stack);
     return NextResponse.json(
       { error: error.message || 'Failed to create checkout session' },
       { status: 500 }

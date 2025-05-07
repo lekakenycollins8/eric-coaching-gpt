@@ -9,13 +9,13 @@ export const STRIPE_PLANS = {
     id: "solo_monthly",
     name: "Solo Leader Monthly",
     limit: 10,
-    priceId: "price_solo_monthly", // Replace with actual Stripe price ID
+    priceId: "price_1RMCyVP1DJ8H8ccarTX30pgj", // Solo Monthly Plan Price ID
   },
   SOLO_YEARLY: {
     id: "solo_yearly",
     name: "Solo Leader Yearly",
     limit: 10,
-    priceId: "price_solo_yearly", // Replace with actual Stripe price ID
+    priceId: "price_1RMCyVP1DJ8H8ccaFG3rYjz9", // Solo Yearly Plan Price ID
   },
   
   // Pro Builder Plan
@@ -24,14 +24,14 @@ export const STRIPE_PLANS = {
     name: "Pro Builder Monthly",
     limit: 40,
     teamSize: 5,
-    priceId: "price_pro_monthly", // Replace with actual Stripe price ID
+    priceId: "price_1RMD3MP1DJ8H8ccaRa5Mc4TR", // Pro Monthly Plan Price ID
   },
   PRO_YEARLY: {
     id: "pro_yearly",
     name: "Pro Builder Yearly",
     limit: 40,
     teamSize: 5,
-    priceId: "price_pro_yearly", // Replace with actual Stripe price ID
+    priceId: "price_1RMD4AP1DJ8H8ccaKSuVZrNR", // Pro Yearly Plan Price ID
   },
   
   // Executive VIP Plan
@@ -39,13 +39,13 @@ export const STRIPE_PLANS = {
     id: "vip_monthly",
     name: "Executive VIP Monthly",
     limit: null, // Unlimited
-    priceId: "price_vip_monthly", // Replace with actual Stripe price ID
+    priceId: "price_1RMD4jP1DJ8H8ccaYCqHj8t4", // VIP Monthly Plan Price ID
   },
   VIP_YEARLY: {
     id: "vip_yearly",
     name: "Executive VIP Yearly",
     limit: null, // Unlimited
-    priceId: "price_vip_yearly", // Replace with actual Stripe price ID
+    priceId: "price_1RMD5AP1DJ8H8ccaJ5QrFOzq", // VIP Yearly Plan Price ID
   },
 };
 
