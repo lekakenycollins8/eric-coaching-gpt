@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
+import { connectToDatabase } from "./connection";
 
-await mongoose.connect(process.env.DATABASE_URL || "").catch((error) => {
-  console.log("Error connecting to database:", error);
+// Export the connection function
+export { connectToDatabase };
+
+// Connect to the database when this module is imported
+connectToDatabase().catch((error) => {
+  console.error("Error connecting to database:", error);
+  process.exit(1);
 });
 
-const client = mongoose.connection.getClient().db("myDB");
+// Export the database client for use in API routes
+const client = mongoose.connection.getClient().db("eric_gpt_db");
 
 export { client };
