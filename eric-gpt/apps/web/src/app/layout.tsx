@@ -1,4 +1,5 @@
 import "../index.css";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "Eric GPT Coaching Platform",
@@ -13,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

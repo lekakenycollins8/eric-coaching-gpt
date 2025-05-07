@@ -1,0 +1,118 @@
+[
+  {
+    "id": "pillar1_mindset_shift",
+    "title": "Pillar 1: Mindset Shift",
+    "description": "Transform your leadership mindset from reactive to proactive.",
+    "systemPromptKey": "pillar1_prompt",
+    "fields": [
+      {
+        "name": "current_challenge",
+        "label": "What is your current leadership challenge?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "desired_outcome",
+        "label": "What outcome would you like to achieve?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "limiting_beliefs",
+        "label": "What limiting beliefs might be holding you back?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "reframing",
+        "label": "How could you reframe these beliefs to be more empowering?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps",
+        "label": "What three action steps will you take to move forward?",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "pillar2_communication",
+    "title": "Pillar 2: Effective Communication",
+    "description": "Enhance your communication skills for better team alignment.",
+    "systemPromptKey": "pillar2_prompt",
+    "fields": [
+      {
+        "name": "communication_style",
+        "label": "Describe your current communication style:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "improvement_areas",
+        "label": "Which areas would you like to improve?",
+        "type": "multiselect",
+        "options": ["Clarity", "Active Listening", "Feedback", "Difficult Conversations"],
+        "required": true
+      },
+      {
+        "name": "specific_scenario",
+        "label": "Describe a specific communication scenario you'd like to improve:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "desired_outcome",
+        "label": "What would a successful outcome look like?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "new_approach",
+        "label": "What new approach will you try?",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "pillar3_team_building",
+    "title": "Pillar 3: Team Building",
+    "description": "Develop strategies for building high-performing teams.",
+    "systemPromptKey": "pillar3_prompt",
+    "fields": [
+      {
+        "name": "team_strengths",
+        "label": "What are your team's greatest strengths?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "team_challenges",
+        "label": "What challenges is your team currently facing?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "team_dynamics",
+        "label": "How would you describe your team's current dynamics?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "improvement_areas",
+        "label": "Which areas need the most improvement?",
+        "type": "multiselect",
+        "options": ["Trust", "Conflict Resolution", "Commitment", "Accountability", "Results Focus"],
+        "required": true
+      },
+      {
+        "name": "action_plan",
+        "label": "What specific actions will you take to address these areas?",
+        "type": "textarea",
+        "required": true
+      }
+    ]
+  }
+]
