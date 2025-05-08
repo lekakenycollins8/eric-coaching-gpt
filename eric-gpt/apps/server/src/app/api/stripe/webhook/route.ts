@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { getPlanById } from '../../../../config/stripe';
+import { connectToDatabase } from '../../../../db/connection';
+import User from '../../../../models/User';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,7 +61,25 @@ export async function POST(request: Request) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log(`Checkout completed for user: ${session.client_reference_id}`);
+        const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+        const userId = session.client_reference_id as string;
+        console.log(`Webhook received customerId: ${customerId} and userId: ${userId}`);
+
+        console.log(`Checkout completed for user: ${userId} with customer ID: ${customerId}`);
+        console.log(`Storing customer ID ${customerId} for user ${userId} in database`);
+
+        // Update the user's record in the database
+        await connectToDatabase();
+        const user = await User.findById(userId);
+        console.log(`Webhook found user: ${JSON.stringify(user)}`);
+
+        if (user) {
+          user.stripeCustomerId = customerId;
+          await user.save();
+          console.log(`Successfully updated user ${userId} with customer ID ${customerId} in database`);
+        } else {
+          console.error(`User not found with ID: ${userId}`);
+        }
         break;
       }
 
@@ -76,14 +96,16 @@ export async function POST(request: Request) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
-        console.log(`Payment succeeded for subscription: ${invoice.subscription}`);
+        const invoice = event.data.object as any;
+        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+        console.log(`Payment succeeded for subscription: ${subscriptionId}`);
         break;
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
-        console.log(`Payment failed for subscription: ${invoice.subscription}`);
+        const invoice = event.data.object as any;
+        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+        console.log(`Payment failed for subscription: ${subscriptionId}`);
         break;
       }
 

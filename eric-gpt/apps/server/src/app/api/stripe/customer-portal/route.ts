@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { connectToDatabase } from '../../../../db/connection';
+import User from '../../../../models/User';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 /**
  * API route for creating a Stripe customer portal session
@@ -11,6 +15,7 @@ export async function POST(request: Request) {
   try {
     // Parse the request body
     const { userId, returnUrl } = await request.json();
+    console.log(`Received userId: ${userId} and returnUrl: ${returnUrl}`);
 
     // Validate the required parameters
     if (!userId || !returnUrl) {
@@ -34,21 +39,24 @@ export async function POST(request: Request) {
       apiVersion: '2025-04-30.basil', // Use the latest stable API version
     });
 
-    // Find the user's Stripe customer ID
-    // In a real implementation, this would query the database
-    // For Sprint 1, we'll use a placeholder approach
-    const mockDb = {
-      async findUser(userId: string) {
-        console.log(`Looking up user ${userId} in mock database`);
-        return {
-          id: userId,
-          stripeCustomerId: process.env.STRIPE_TEST_CUSTOMER_ID || 'cus_placeholder',
-        };
-      }
-    };
+    // Find the user's Stripe customer ID from the database
 
-    const user = await mockDb.findUser(userId);
-    if (!user.stripeCustomerId) {
+    await connectToDatabase();
+
+    const user = await User.findById(userId);
+    console.log(`Finding user with ID: ${userId}`);
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const stripeCustomerId = user.stripeCustomerId;
+    console.log(`Found user with ID: ${userId} and customer ID: ${stripeCustomerId}`);
+
+    if (!stripeCustomerId) {
       return NextResponse.json(
         { error: 'User does not have an active subscription' },
         { status: 400 }
@@ -57,7 +65,7 @@ export async function POST(request: Request) {
 
     // Create a customer portal session
     const session = await stripe.billingPortal.sessions.create({
-      customer: user.stripeCustomerId,
+      customer: stripeCustomerId,
       return_url: returnUrl,
     });
 
