@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     console.log('Web app: Request body:', JSON.stringify(body, null, 2));
 
     // Forward the request to the server application
-    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     console.log('Web app: Forwarding to server URL:', serverUrl);
     
     const serverEndpoint = `${serverUrl}/api/stripe/create-checkout-session`;

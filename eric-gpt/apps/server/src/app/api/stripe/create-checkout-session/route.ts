@@ -90,9 +90,10 @@ export async function POST(request: Request) {
       
       return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
     } catch (stripeError) {
-      console.error('Stripe error creating checkout session:', stripeError);
+      const error = stripeError as Stripe.StripeRawError;
+      console.error('Stripe error creating checkout session:', error);
       return NextResponse.json(
-        { error: stripeError.message || 'Failed to create Stripe checkout session' },
+        { error: error.message || 'Failed to create Stripe checkout session' },
         { status: 500 }
       );
     }
