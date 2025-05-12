@@ -4,57 +4,83 @@
 
 ### Dates: Apr 30 – May 6
 
-### Goals: Core infra in place, Windsurf connected
+### Goals: Core infrastructure setup and Windsurf integration
 
 ### Tasks
 
-*   Create GitHub repo & project board
-*   Scaffold Next.js + TypeScript + Tailwind + ESLint/Prettier
-*   Install dependencies: NextAuth, Stripe, OpenAI SDK, React Hook Form, Puppeteer
-*   Configure environment variables in Vercel
-*   Connect Windsurf IDE with repo
+* Create GitHub repo and enable Issues + Projects board for task tracking
+* Scaffold a Next.js app using TypeScript, Tailwind CSS, ESLint, Prettier
+* Install and configure required dependencies:
+  - `next-auth` for authentication with magic link
+  - `nodemailer` for email delivery
+  - `stripe` for billing
+  - `openai` for GPT integration
+  - `react-hook-form` for dynamic forms
+  - `puppeteer` for PDF generation
+* Setup `.env` and secure environment variable management in Vercel
+* Connect Windsurf AI with repo and set up workspace index
+* Deploy staging environment to Vercel
 
 ### Deliverables
 
-*   Barebones Next.js project deployed to staging
+* Cleanly bootstrapped Next.js app deployed on staging
+* All critical tools installed and wired
+* Vercel hosting and environment ready for future sprints
+* Windsurf properly integrated with doc and source files indexed
+
+---
 
 ## Sprint 1: Authentication & Billing Integration
 
 ### Dates: May 7 – May 13
 
-### Goals: Secure login and subscription system
+### Goals: Enable secure user login and enforce subscription-based access
 
 ### Tasks
 
-*   NextAuth.js email/magic-link We will use nodemailersetup; User model in MongoDB
-*   Stripe plan definitions (solo/pro/vip monthly & annual) in code
-*   /api/stripe/create-checkout-session & webhook handler (/api/stripe/webhook)
-*   Profile page skeleton displaying plan & usage placeholders
-*   Unit tests for Auth routes and Stripe webhook logic
+* Implement `next-auth` with magic link login via `nodemailer`
+* Build user model in MongoDB with support for subscription metadata (plan, usage, dates)
+* Define 6 pricing plans in Stripe (solo/pro/vip – monthly & annual)
+* Implement `/api/stripe/create-checkout-session` to initiate billing
+* Add Stripe webhook handler at `/api/stripe/webhook` to update user subscription status in DB
+* Display current plan & quota usage on the `/profile` route
+* Secure auth routes, session token persistence, and verify redirect flow
+* Write unit tests for auth API routes, Stripe event handling, and DB updates
 
 ### Deliverables
 
-*   Users can sign up/in and start a subscription
-*   Webhook correctly updates User.subscription in DB
-*   All Auth + Billing unit tests passing
+* Fully functioning login/signup with magic link
+* Stripe payments working end-to-end with live webhooks
+* Plans reflected on frontend with user subscription + quota data
+* Unit tests for all auth and billing logic
+
+---
 
 ## Sprint 2: Worksheet Metadata & Dynamic Forms
 
 ### Dates: May 14 – May 20
 
-### Goals: Render forms for the first 4 worksheets
+### Goals: Render all 12 Pillars worksheets as dynamic interactive forms
 
 ### Tasks
 
-*   Load /data/worksheets.json into /api/worksheets endpoints
-*   Build WorksheetForm component to render fields by metadata
-*   Client-side validation for required fields
-*   Integration test: fetch metadata → render form → validate error states
+* Upload finalized `worksheets.json` file derived from Pillar 1–12 content
+* Create `/api/worksheets` endpoint to serve worksheet metadata from local JSON or MongoDB
+* Build `WorksheetForm.tsx` component to render all fields by metadata including:
+  - Input types: `text`, `textarea`, `rating`, `checkbox`, etc.
+  - Display types: `info` fields for case studies, reflection blocks
+* Add support for optional vs required fields
+* Use `react-hook-form` to manage state, validation, and form submission
+* Ensure instructional fields are rendered using `type: "info"`
+* Build logic to ignore `info` fields when submitting data
+* Write integration tests to ensure each form renders properly and validates required input
 
 ### Deliverables
 
-*   12 working worksheet forms (Pillars 1–12) with validation
-*   Automated integration test for form rendering
+* All 12 worksheets render cleanly via metadata-driven form engine
+* Instructional content blocks included (`info` fields)
+* Client-side validation for required inputs
+* Integration tests for dynamic field rendering
 
 ## Sprint 3: AI Feedback & Prompt QA
 
