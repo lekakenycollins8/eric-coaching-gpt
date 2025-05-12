@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import { type PlanId } from '../lib/stripe/plans';
+import { STRIPE_PLANS, formatPrice, type PlanId } from '../lib/stripe/plans';
 
 export interface Subscription {
   id: string;
@@ -10,6 +10,16 @@ export interface Subscription {
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
   submissionsThisPeriod: number;
+}
+
+export interface ProratedPrice {
+  currentPlan: string;
+  newPlan: string;
+  proratedAmount: number;
+  daysRemaining: number;
+  totalDays: number;
+  isUpgrade: boolean;
+  effectiveDate: Date;
 }
 
 export function useSubscription() {
@@ -176,6 +186,50 @@ export function useSubscription() {
     });
   };
 
+  // Calculate prorated price for changing subscription plans
+  const calculateProratedPrice = (newPlanId: PlanId): ProratedPrice | null => {
+    if (!subscription) return null;
+    
+    // Get current and new plan details
+    const currentPlan = STRIPE_PLANS[subscription.planId];
+    const newPlan = STRIPE_PLANS[newPlanId];
+    
+    if (!currentPlan || !newPlan) return null;
+    
+    // Calculate days remaining in current billing period
+    const now = new Date();
+    const endDate = subscription.currentPeriodEnd;
+    const startDate = subscription.currentPeriodStart;
+    
+    const totalDays = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    
+    // Calculate prorated amount
+    const currentDailyRate = currentPlan.price / totalDays;
+    const newDailyRate = newPlan.price / totalDays;
+    
+    const remainingValueCurrent = currentDailyRate * daysRemaining;
+    const remainingValueNew = newDailyRate * daysRemaining;
+    
+    // If upgrading, customer pays the difference immediately
+    // If downgrading, customer gets credit on next billing cycle
+    const proratedAmount = remainingValueNew - remainingValueCurrent;
+    const isUpgrade = proratedAmount > 0;
+    
+    // Calculate effective date (immediate for upgrades, next billing cycle for downgrades)
+    const effectiveDate = isUpgrade ? now : new Date(endDate);
+    
+    return {
+      currentPlan: currentPlan.name,
+      newPlan: newPlan.name,
+      proratedAmount: Math.abs(proratedAmount),
+      daysRemaining,
+      totalDays,
+      isUpgrade,
+      effectiveDate
+    };
+  };
+
   return {
     subscription,
     hasStripeCustomerId,
@@ -185,6 +239,7 @@ export function useSubscription() {
     authStatus,
     handleManageSubscription,
     handleSubscribe,
-    formatDate
+    formatDate,
+    calculateProratedPrice
   };
 }

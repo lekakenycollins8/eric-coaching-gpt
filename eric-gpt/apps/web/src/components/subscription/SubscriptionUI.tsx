@@ -1,6 +1,7 @@
 import React from 'react';
 import { STRIPE_PLANS, formatPrice, type PlanId } from '../../lib/stripe/plans';
-import type { Subscription } from '../../hooks/useSubscription';
+import type { Subscription, ProratedPrice } from '../../hooks/useSubscription';
+import { SubscriptionButton } from './SubscriptionButton';
 
 interface SubscriptionUIProps {
   subscription: Subscription | null;
@@ -11,6 +12,7 @@ interface SubscriptionUIProps {
   handleManageSubscription: () => Promise<void>;
   handleSubscribe: (planId: PlanId) => Promise<void>;
   formatDate: (date: Date) => string;
+  calculateProratedPrice?: (planId: PlanId) => ProratedPrice | null;
 }
 
 export function SubscriptionUI({
@@ -21,8 +23,10 @@ export function SubscriptionUI({
   errorMessage,
   handleManageSubscription,
   handleSubscribe,
-  formatDate
+  formatDate,
+  calculateProratedPrice
 }: SubscriptionUIProps) {
+
   if (loading) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center">
@@ -115,8 +119,22 @@ export function SubscriptionUI({
                 <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
                   <circle cx="4" cy="4" r="3" />
                 </svg>
-                <div>
-                  Status: <span className={`font-medium ${subscription.status === 'active' ? 'text-green-600' : subscription.status === 'past_due' ? 'text-yellow-600' : 'text-red-600'}`}>
+                <div className="flex items-center">
+                  Status: 
+                  <span className={`ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    subscription.status === 'active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : subscription.status === 'past_due' 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-red-100 text-red-800'
+                  }`}>
+                    <span className={`mr-1.5 h-2 w-2 rounded-full ${
+                      subscription.status === 'active' 
+                        ? 'bg-green-500' 
+                        : subscription.status === 'past_due' 
+                          ? 'bg-yellow-500' 
+                          : 'bg-red-500'
+                    }`}></span>
                     {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                   </span>
                 </div>
@@ -226,20 +244,13 @@ export function SubscriptionUI({
                           </li>
                         ))}
                       </ul>
-                      <div className="mt-6">
-                        <button
-                          type="button"
-                          onClick={() => handleSubscribe(plan.id as PlanId)}
-                          className={`w-full inline-flex justify-center items-center px-4 py-2 border text-sm font-medium rounded-md shadow-sm ${
-                            subscription?.planId === plan.id
-                              ? 'border-green-600 text-green-600 bg-white'
-                              : 'border-transparent text-white bg-green-600 hover:bg-green-700'
-                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
-                          disabled={subscription?.planId === plan.id}
-                        >
-                          {subscription?.planId === plan.id ? 'Current Plan' : 'Subscribe'}
-                        </button>
-                      </div>
+                      <SubscriptionButton
+                        planId={plan.id as PlanId}
+                        isCurrentPlan={subscription?.planId === plan.id}
+                        handleSubscribe={handleSubscribe}
+                        calculateProratedPrice={calculateProratedPrice}
+                        formatDate={formatDate}
+                      />
                     </div>
                   </div>
                 ))}
@@ -270,20 +281,13 @@ export function SubscriptionUI({
                           </li>
                         ))}
                       </ul>
-                      <div className="mt-6">
-                        <button
-                          type="button"
-                          onClick={() => handleSubscribe(plan.id as PlanId)}
-                          className={`w-full inline-flex justify-center items-center px-4 py-2 border text-sm font-medium rounded-md shadow-sm ${
-                            subscription?.planId === plan.id
-                              ? 'border-green-600 text-green-600 bg-white'
-                              : 'border-transparent text-white bg-green-600 hover:bg-green-700'
-                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
-                          disabled={subscription?.planId === plan.id}
-                        >
-                          {subscription?.planId === plan.id ? 'Current Plan' : 'Subscribe'}
-                        </button>
-                      </div>
+                      <SubscriptionButton
+                        planId={plan.id as PlanId}
+                        isCurrentPlan={subscription?.planId === plan.id}
+                        handleSubscribe={handleSubscribe}
+                        calculateProratedPrice={calculateProratedPrice}
+                        formatDate={formatDate}
+                      />
                     </div>
                   </div>
                 ))}

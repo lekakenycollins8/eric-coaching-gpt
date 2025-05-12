@@ -25,7 +25,8 @@ export default function SubscriptionPage() {
     authStatus,
     handleManageSubscription,
     handleSubscribe,
-    formatDate
+    formatDate,
+    calculateProratedPrice
   } = useSubscription();
 
   // If still loading auth or subscription data, show loading spinner
@@ -49,6 +50,7 @@ export default function SubscriptionPage() {
       handleManageSubscription={handleManageSubscription}
       handleSubscribe={handleSubscribe}
       formatDate={formatDate}
+      calculateProratedPrice={calculateProratedPrice}
     />
   );
 }

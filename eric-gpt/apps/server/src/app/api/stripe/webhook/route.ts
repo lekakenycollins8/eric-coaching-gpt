@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import mongoose from 'mongoose';
 import { getPlanById } from '../../../../config/stripe';
 import { connectToDatabase } from '../../../../db/connection';
 import User from '../../../../models/User';
@@ -29,11 +30,15 @@ export async function POST(request: Request) {
     const signature = request.headers.get('stripe-signature');
 
     if (!signature) {
+      console.error('Missing Stripe signature in webhook request');
       return NextResponse.json(
         { error: 'Missing Stripe signature' },
         { status: 400 }
       );
     }
+    
+    // Store the raw body for signature verification
+    const rawBody = body;
 
     // Initialize Stripe
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -51,16 +56,48 @@ export async function POST(request: Request) {
       apiVersion: '2025-04-30.basil', // Use the latest stable API version
     });
 
-    // Verify the event
+    // Verify the event with enhanced error handling
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     } catch (err: any) {
       console.error(`Webhook signature verification failed: ${err.message}`);
       return NextResponse.json(
         { error: `Webhook signature verification failed: ${err.message}` },
         { status: 400 }
       );
+    }
+    
+    // Implement idempotency handling to prevent duplicate processing
+    const eventId = event.id;
+    
+    // Check if we've already processed this event
+    try {
+      await connectToDatabase();
+      const ProcessedEvent = mongoose.model('ProcessedEvent', new mongoose.Schema({
+        eventId: { type: String, required: true, unique: true },
+        eventType: { type: String, required: true },
+        processedAt: { type: Date, default: Date.now }
+      }), 'processed_events');
+      
+      // Check if this event has already been processed
+      const existingEvent = await ProcessedEvent.findOne({ eventId });
+      if (existingEvent) {
+        console.log(`Event ${eventId} has already been processed, skipping`);
+        return NextResponse.json({ received: true, idempotent: true });
+      }
+      
+      // Mark this event as processed
+      await new ProcessedEvent({ 
+        eventId, 
+        eventType: event.type,
+        processedAt: new Date() 
+      }).save();
+      
+    } catch (error) {
+      console.error('Error checking for duplicate event:', error);
+      // Continue processing even if idempotency check fails
+      // It's better to risk duplicate processing than missing an event
     }
 
     // Log the event for debugging
@@ -145,8 +182,26 @@ export async function POST(request: Request) {
             }
           }
           
-          await user.save();
-          console.log(`Successfully updated user ${userId} with customer ID ${customerId} and subscription in database`);
+          // Use a database session with transaction to ensure data consistency
+          const dbSession = await mongoose.startSession();
+          try {
+            dbSession.startTransaction();
+            
+            // Save within the transaction
+            await user.save({ session: dbSession });
+            
+            // Commit the transaction
+            await dbSession.commitTransaction();
+            console.log(`Successfully updated user ${userId} with customer ID ${customerId} and subscription in database`);
+          } catch (error) {
+            // If an error occurs, abort the transaction
+            await dbSession.abortTransaction();
+            console.error(`Transaction failed for user ${userId}:`, error);
+            throw error; // Re-throw to be caught by the outer try/catch
+          } finally {
+            // End the session
+            dbSession.endSession();
+          }
         } else {
           console.error(`User not found with ID: ${userId}`);
         }
