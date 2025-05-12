@@ -6,6 +6,16 @@ import User from '../../../../models/User';
 
 export const dynamic = 'force-dynamic';
 
+// Define interfaces for better type safety
+interface StripeSubscriptionWithDates extends Stripe.Subscription {
+  current_period_start: number;
+  current_period_end: number;
+}
+
+interface StripeInvoiceWithSubscription extends Stripe.Invoice {
+  subscription?: string | Stripe.Subscription;
+}
+
 /**
  * API route for handling Stripe webhooks
  * This updates the user's subscription status when events occur
@@ -56,8 +66,7 @@ export async function POST(request: Request) {
     // Log the event for debugging
     console.log(`Received event type: ${event.type}`);
     
-    // In Sprint 1, we'll implement the database updates
-    // For now, we'll just log the events we're interested in
+    // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -74,9 +83,70 @@ export async function POST(request: Request) {
         console.log(`Webhook found user: ${JSON.stringify(user)}`);
 
         if (user) {
+          // Store the Stripe customer ID
           user.stripeCustomerId = customerId;
+          
+          // Get the plan ID from the checkout session metadata or line items
+          let planId = '';
+          if (session.metadata && session.metadata.planId) {
+            planId = session.metadata.planId;
+          } else if (session.line_items) {
+            // Try to get plan from line items if available
+            console.log('Line items available in session');
+          } else {
+            // Try to retrieve the subscription to get the plan ID
+            try {
+              // If session has a subscription, get its details
+              if (session.subscription) {
+                const subscriptionId = typeof session.subscription === 'string' ? 
+                  session.subscription : session.subscription.id;
+                  
+                if (subscriptionId) {
+                  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+                  const priceId = subscription.items.data[0]?.price.id;
+                  if (priceId) {
+                    // Look up the plan by price ID
+                    const plan = getPlanById(priceId);
+                    if (plan) {
+                      planId = plan.id;
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error retrieving subscription details:', error);
+            }
+          }
+          
+          // If we still don't have a plan ID, try to get it from the session URL
+          if (!planId && session.url) {
+            // Extract plan ID from URL if possible
+            const urlParams = new URL(session.url).searchParams;
+            const planFromUrl = urlParams.get('plan');
+            if (planFromUrl) {
+              planId = planFromUrl;
+            }
+          }
+          
+          // Set up the subscription with available information
+          if (!user.subscription) {
+            user.subscription = {
+              planId: planId || 'pro_monthly', // Default to pro_monthly if we couldn't determine the plan
+              status: 'active',
+              currentPeriodStart: new Date(),
+              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+              submissionsThisPeriod: 0
+            };
+          } else {
+            // Update existing subscription
+            user.subscription.status = 'active';
+            if (planId) {
+              user.subscription.planId = planId;
+            }
+          }
+          
           await user.save();
-          console.log(`Successfully updated user ${userId} with customer ID ${customerId} in database`);
+          console.log(`Successfully updated user ${userId} with customer ID ${customerId} and subscription in database`);
         } else {
           console.error(`User not found with ID: ${userId}`);
         }
@@ -115,11 +185,30 @@ export async function POST(request: Request) {
           }
           
           // Update the user's subscription
+          // Safely convert Unix timestamps to Date objects
+          // Use type assertion to handle Stripe API type issues
+          const subWithDates = subscription as unknown as StripeSubscriptionWithDates;
+          const startTimestamp = subWithDates.current_period_start || Math.floor(Date.now() / 1000);
+          const endTimestamp = subWithDates.current_period_end || Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000);
+          
+          const currentPeriodStart = new Date(startTimestamp * 1000);
+          const currentPeriodEnd = new Date(endTimestamp * 1000);
+            
+          // Log the dates for debugging
+          console.log('Period start timestamp:', startTimestamp);
+          console.log('Period end timestamp:', endTimestamp);
+          console.log('Converted start date:', currentPeriodStart);
+          console.log('Converted end date:', currentPeriodEnd);
+          
+          // Get plan ID from our config if possible
+          const plan = getPlanById(priceId);
+          const planId = plan?.id || priceId;
+          
           user.subscription = {
-            planId: priceId,
+            planId: planId, // Use our plan ID if available
             status: status,
-            currentPeriodStart: new Date(subscription.current_period_start * 1000),
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            currentPeriodStart: currentPeriodStart,
+            currentPeriodEnd: currentPeriodEnd,
             submissionsThisPeriod: user.subscription?.submissionsThisPeriod || 0
           };
           
@@ -158,9 +247,16 @@ export async function POST(request: Request) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as StripeInvoiceWithSubscription;
         const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
-        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+        
+        // Get subscription ID safely using type casting
+        let subscriptionId: string | undefined;
+        if (invoice.subscription) {
+          subscriptionId = typeof invoice.subscription === 'string' ? 
+            invoice.subscription : 
+            (invoice.subscription as Stripe.Subscription).id;
+        }
         
         console.log(`Payment succeeded for subscription: ${subscriptionId}`);
         
@@ -177,9 +273,14 @@ export async function POST(request: Request) {
         const user = await User.findOne({ stripeCustomerId: customerId });
         
         if (user && user.subscription) {
+          // Safely get period timestamps
+          const subWithDates = subscription as unknown as StripeSubscriptionWithDates;
+          const startTimestamp = subWithDates.current_period_start || Math.floor(Date.now() / 1000);
+          const endTimestamp = subWithDates.current_period_end || Math.floor((Date.now() + 30 * 24 * 60 * 60 * 1000) / 1000);
+          
           // Update the subscription period dates
-          user.subscription.currentPeriodStart = new Date(subscription.current_period_start * 1000);
-          user.subscription.currentPeriodEnd = new Date(subscription.current_period_end * 1000);
+          user.subscription.currentPeriodStart = new Date(startTimestamp * 1000);
+          user.subscription.currentPeriodEnd = new Date(endTimestamp * 1000);
           user.subscription.status = 'active'; // Ensure status is active after successful payment
           user.subscription.submissionsThisPeriod = 0; // Reset submissions counter for new billing period
           
@@ -192,9 +293,16 @@ export async function POST(request: Request) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object as StripeInvoiceWithSubscription;
         const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
-        const subscriptionId = typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription?.id;
+        
+        // Get subscription ID safely using type casting
+        let subscriptionId: string | undefined;
+        if (invoice.subscription) {
+          subscriptionId = typeof invoice.subscription === 'string' ? 
+            invoice.subscription : 
+            (invoice.subscription as Stripe.Subscription).id;
+        }
         
         console.log(`Payment failed for subscription: ${subscriptionId}`);
         

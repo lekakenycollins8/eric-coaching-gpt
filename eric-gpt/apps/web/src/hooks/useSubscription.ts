@@ -59,12 +59,14 @@ export function useSubscription() {
       // Check if the user has a Stripe customer ID
       setHasStripeCustomerId(!!data.stripeCustomerId);
       
-      if (data.subscription) {
+      // Only process subscription data if the user actually has a subscription
+      // with valid data (has a status field at minimum)
+      if (data.subscription && data.subscription.status) {
         // Convert date strings to Date objects and handle potential invalid dates
         const subscription = {
           ...data.subscription,
-          // Ensure planId exists with a fallback
-          planId: data.subscription.planId || 'solo_monthly', // Default to solo_monthly if missing
+          // Only use planId if it exists, don't add a default for new accounts
+          planId: data.subscription.planId || '',
           // Safely convert dates with validation
           currentPeriodStart: data.subscription.currentPeriodStart ? 
             new Date(data.subscription.currentPeriodStart) : 

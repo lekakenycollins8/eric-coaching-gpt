@@ -51,27 +51,23 @@ export function SubscriptionUI({
       )}
 
       {/* Current Subscription */}
-      {subscription ? (
+      {subscription && subscription.status ? (
         <div className="bg-white shadow sm:rounded-lg mb-8">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900">Current Subscription</h3>
             
             {/* Add plan name and billing cycle as a prominent element */}
             <div className="mt-2">
-              {/* Debug information - remove after fixing */}
-              <div className="text-xs text-gray-500 mb-2">
-                Plan ID: {subscription.planId || 'No plan ID'} | 
-                Available Plans: {Object.keys(STRIPE_PLANS).join(', ')}
-              </div>
               <h4 className="text-xl font-semibold text-green-600">
                 {(() => {
+                  // Only try to display a plan name if we have a planId
+                  if (!subscription.planId) return 'No Plan Selected';
+                  
                   // Try to find the plan by exact ID match
                   const plan = STRIPE_PLANS[subscription.planId];
                   if (plan) return plan.name;
                   
                   // If no exact match, try to find a plan with a similar ID
-                  // This handles cases where the stored ID might be slightly different
-                  // (e.g., if the server uses a different ID format)
                   const planId = subscription.planId || '';
                   if (planId.includes('solo')) return 'Solo Leader';
                   if (planId.includes('pro')) return 'Pro Builder';
@@ -80,21 +76,45 @@ export function SubscriptionUI({
                   // Fallback
                   return 'Active Plan';
                 })()}
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  {(() => {
-                    const plan = STRIPE_PLANS[subscription.planId];
-                    if (plan) return `(${plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'} billing)`;
-                    
-                    // Fallback if we can't determine the billing cycle
-                    const planId = subscription.planId || '';
-                    return planId.includes('yearly') ? '(Annual billing)' : '(Monthly billing)';
-                  })()}
-                </span>
+                {subscription.planId && (
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    {(() => {
+                      const plan = STRIPE_PLANS[subscription.planId];
+                      if (plan) return `(${plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'} billing)`;
+                      
+                      // Fallback if we can't determine the billing cycle
+                      const planId = subscription.planId || '';
+                      return planId.includes('yearly') ? '(Annual billing)' : '(Monthly billing)';
+                    })()}
+                  </span>
+                )}
               </h4>
             </div>
             
             <div className="mt-4">
               <div className="mt-1 text-sm text-gray-600 sm:flex sm:items-center">
+                <div>
+                  <span className="font-medium">Plan: </span>
+                  <span className="text-gray-900">
+                    {(() => {
+                      // Try to find the plan by exact ID match
+                      const plan = STRIPE_PLANS[subscription.planId];
+                      if (plan) return plan.name;
+                      
+                      // If no exact match, try to find a plan with a similar ID
+                      const planId = subscription.planId || '';
+                      if (planId.includes('solo')) return 'Solo Leader';
+                      if (planId.includes('pro')) return 'Pro Builder';
+                      if (planId.includes('vip')) return 'Executive VIP';
+                      
+                      // Fallback
+                      return 'Active Plan';
+                    })()}
+                  </span>
+                </div>
+                <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
+                  <circle cx="4" cy="4" r="3" />
+                </svg>
                 <div>
                   Status: <span className={`font-medium ${subscription.status === 'active' ? 'text-green-600' : subscription.status === 'past_due' ? 'text-yellow-600' : 'text-red-600'}`}>
                     {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
