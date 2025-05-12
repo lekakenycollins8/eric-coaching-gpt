@@ -4,6 +4,7 @@ export interface ISubmission extends Document {
   userId: Schema.Types.ObjectId;
   orgId?: Schema.Types.ObjectId;
   worksheetId: string;
+  worksheetTitle?: string;
   answers: Record<string, any>;
   aiFeedback: string;
   tokensUsed: {
@@ -19,6 +20,7 @@ const SubmissionSchema: Schema = new Schema(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     orgId: { type: Schema.Types.ObjectId, ref: "Organization" },
     worksheetId: { type: String, required: true },
+    worksheetTitle: { type: String },
     answers: { type: Schema.Types.Mixed, required: true },
     aiFeedback: { type: String, required: true },
     tokensUsed: {

@@ -22,7 +22,7 @@ const FieldSchema: Schema = new Schema({
   type: { 
     type: String, 
     required: true,
-    enum: ["text", "textarea", "checkbox", "multiselect", "rating", "table"]
+    enum: ["info", "text", "textarea", "checkbox", "multiselect", "rating", "table"]
   },
   options: [{ type: String }],
   required: { type: Boolean, default: false }

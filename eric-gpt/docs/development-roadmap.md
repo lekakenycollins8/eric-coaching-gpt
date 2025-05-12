@@ -53,7 +53,7 @@
 
 ### Deliverables
 
-*   Four working worksheet forms (Pillars 1–4) with validation
+*   12 working worksheet forms (Pillars 1–12) with validation
 *   Automated integration test for form rendering
 
 ## Sprint 3: AI Feedback & Prompt QA
