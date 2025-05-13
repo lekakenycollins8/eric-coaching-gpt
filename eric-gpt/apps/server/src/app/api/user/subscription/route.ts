@@ -5,7 +5,74 @@ import User from '../../../../models/User';
 export const dynamic = 'force-dynamic';
 
 /**
- * API route for fetching a user's subscription data
+ * @swagger
+ * /api/user/subscription:
+ *   get:
+ *     summary: Get user subscription information
+ *     description: Retrieves the current user's subscription details
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User subscription data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 subscription:
+ *                   type: object
+ *                   properties:
+ *                     planId:
+ *                       type: string
+ *                       description: ID of the subscription plan
+ *                     status:
+ *                       type: string
+ *                       enum: [active, past_due, canceled]
+ *                       description: Current status of the subscription
+ *                     currentPeriodStart:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Start date of the current billing period
+ *                     currentPeriodEnd:
+ *                       type: string
+ *                       format: date-time
+ *                       description: End date of the current billing period
+ *                     submissionsThisPeriod:
+ *                       type: integer
+ *                       description: Number of submissions used in the current period
+ *                 stripeCustomerId:
+ *                   type: string
+ *                   description: Stripe customer ID for the user
+ *       401:
+ *         description: Unauthorized - Missing or invalid authorization
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
 export async function GET(request: Request) {
   try {

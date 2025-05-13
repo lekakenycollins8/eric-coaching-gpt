@@ -1,5 +1,75 @@
 import { NextResponse } from 'next/server';
 
+/**
+ * @swagger
+ * /api/worksheets:
+ *   get:
+ *     summary: Get available worksheets
+ *     description: Retrieves a list of all available worksheets with their metadata and form fields
+ *     tags:
+ *       - Worksheets
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of worksheets retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 worksheets:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: Unique identifier for the worksheet
+ *                       title:
+ *                         type: string
+ *                         description: Title of the worksheet
+ *                       description:
+ *                         type: string
+ *                         description: Brief description of the worksheet
+ *                       systemPromptKey:
+ *                         type: string
+ *                         description: Key for the system prompt used for this worksheet
+ *                       fields:
+ *                         type: array
+ *                         description: Form fields for the worksheet
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                               description: Field name/identifier
+ *                             label:
+ *                               type: string
+ *                               description: Display label for the field
+ *                             type:
+ *                               type: string
+ *                               enum: [text, textarea, select, multiselect, checkbox]
+ *                               description: Type of form field
+ *                             required:
+ *                               type: boolean
+ *                               description: Whether the field is required
+ *                             options:
+ *                               type: array
+ *                               items:
+ *                                 type: string
+ *                               description: Options for select/multiselect fields
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+
 // This is a placeholder for the worksheets API
 // It will be fully implemented in Sprint 2
 export async function GET() {

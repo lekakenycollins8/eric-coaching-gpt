@@ -18,8 +18,59 @@ interface StripeInvoiceWithSubscription extends Stripe.Invoice {
 }
 
 /**
- * API route for handling Stripe webhooks
- * This updates the user's subscription status when events occur
+ * @swagger
+ * /api/stripe/webhook:
+ *   post:
+ *     summary: Handle Stripe webhook events
+ *     description: Processes Stripe webhook events for subscription management
+ *     tags:
+ *       - Stripe
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: header
+ *         name: stripe-signature
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Stripe signature for webhook verification
+ *     responses:
+ *       200:
+ *         description: Webhook event processed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 received:
+ *                   type: boolean
+ *                   example: true
+ *                 idempotent:
+ *                   type: boolean
+ *                   description: Indicates if this event was already processed
+ *       400:
+ *         description: Bad request - missing or invalid signature
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
 export async function POST(request: Request) {
   try {

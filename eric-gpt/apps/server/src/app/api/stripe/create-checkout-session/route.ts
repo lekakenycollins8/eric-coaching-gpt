@@ -5,8 +5,80 @@ import { STRIPE_PLANS, getPlanById } from '../../../../config/stripe';
 export const dynamic = 'force-dynamic';
 
 /**
- * API route for creating a Stripe checkout session
- * This allows users to subscribe to a plan
+ * @swagger
+ * /api/stripe/create-checkout-session:
+ *   post:
+ *     summary: Create a Stripe checkout session
+ *     description: Creates a checkout session for subscribing to a plan
+ *     tags:
+ *       - Stripe
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - planId
+ *               - userId
+ *               - email
+ *               - successUrl
+ *               - cancelUrl
+ *             properties:
+ *               planId:
+ *                 type: string
+ *                 description: ID of the plan to subscribe to
+ *               userId:
+ *                 type: string
+ *                 description: ID of the user
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Email of the user
+ *               successUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to redirect to after successful payment
+ *               cancelUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to redirect to if payment is cancelled
+ *               couponId:
+ *                 type: string
+ *                 description: Optional coupon ID for discount
+ *     responses:
+ *       200:
+ *         description: Checkout session created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 sessionId:
+ *                   type: string
+ *                   description: ID of the created checkout session
+ *                 url:
+ *                   type: string
+ *                   format: uri
+ *                   description: URL to redirect the user to for payment
+ *       400:
+ *         description: Bad request - missing or invalid parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
 export async function POST(request: Request) {
   try {

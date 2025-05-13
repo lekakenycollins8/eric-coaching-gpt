@@ -8,8 +8,69 @@ export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 /**
- * API route for creating a Stripe customer portal session
- * This allows users to manage their subscriptions directly
+ * @swagger
+ * /api/stripe/customer-portal:
+ *   post:
+ *     summary: Create a Stripe customer portal session
+ *     description: Creates a customer portal session for managing subscriptions
+ *     tags:
+ *       - Stripe
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - returnUrl
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: ID of the user
+ *               returnUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to redirect to after managing subscription
+ *     responses:
+ *       200:
+ *         description: Customer portal session created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   format: uri
+ *                   description: URL to redirect the user to for subscription management
+ *       400:
+ *         description: Bad request - missing parameters or user has no subscription
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  */
 export async function POST(request: Request) {
   try {
