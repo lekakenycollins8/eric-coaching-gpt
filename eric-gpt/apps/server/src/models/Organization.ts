@@ -16,5 +16,6 @@ const OrganizationSchema: Schema = new Schema(
 );
 
 // Check if the model already exists to prevent overwriting during hot reloads
+// Use a consistent collection name
 export default mongoose.models.Organization || 
-  mongoose.model<IOrganization>("Organization", OrganizationSchema);
+  mongoose.model<IOrganization>('organizations', OrganizationSchema);

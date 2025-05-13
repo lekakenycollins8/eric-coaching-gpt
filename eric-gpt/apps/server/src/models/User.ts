@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
+  name: string;
   email: string;
-  name?: string;
-  createdAt: Date;
-  authProvider: string;
+  image?: string;
+  emailVerified?: Date;
+  orgId?: Schema.Types.ObjectId;
   stripeCustomerId?: string;
+  isActive: boolean;
   subscription?: {
     planId: string;
     status: string;
@@ -13,15 +15,17 @@ export interface IUser extends Document {
     currentPeriodEnd: Date;
     submissionsThisPeriod: number;
   };
-  orgId?: Schema.Types.ObjectId;
 }
 
 const UserSchema: Schema = new Schema(
   {
+    name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    name: { type: String },
-    authProvider: { type: String, required: true, default: "email" },
+    image: String,
+    emailVerified: Date,
+    orgId: { type: Schema.Types.ObjectId, ref: "Organization" },
     stripeCustomerId: { type: String },
+    isActive: { type: Boolean, default: true },
     subscription: {
       planId: { type: String },
       status: { 
@@ -33,10 +37,19 @@ const UserSchema: Schema = new Schema(
       currentPeriodEnd: { type: Date },
       submissionsThisPeriod: { type: Number, default: 0 },
     },
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization" },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
+// Add indexes for frequent queries
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ stripeCustomerId: 1 });
+UserSchema.index({ isActive: 1 });
+
 // Check if the model already exists to prevent overwriting during hot reloads
-export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+import { Collections } from '../db/config.js';
+
+// Use the configured collection name
+export default mongoose.models.User || mongoose.model<IUser>(Collections.USERS, UserSchema);

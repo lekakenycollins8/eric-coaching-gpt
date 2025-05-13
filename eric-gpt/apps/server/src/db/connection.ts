@@ -1,4 +1,9 @@
 import mongoose from "mongoose";
+import { config } from 'dotenv';
+import { dbOptions, DATABASE_NAME } from './config.js';
+
+// Load environment variables
+config();
 
 /**
  * MongoDB connection utility with proper error handling and connection pooling
@@ -40,10 +45,12 @@ export async function connectToDatabase() {
 
   if (!cached.promise) {
     const opts = {
+      ...dbOptions,
       bufferCommands: false,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log(`Connected to database: ${DATABASE_NAME}`);
       return mongoose;
     });
   }
