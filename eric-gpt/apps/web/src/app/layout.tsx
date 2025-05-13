@@ -3,6 +3,7 @@ import { Providers } from '@/app/providers';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import type { Session } from "next-auth";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Eric GPT Coaching Platform",
@@ -19,7 +20,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers session={session}>{children}</Providers>
+        <Providers session={session}>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

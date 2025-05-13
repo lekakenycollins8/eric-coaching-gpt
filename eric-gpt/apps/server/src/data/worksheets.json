@@ -1,0 +1,1903 @@
+[{
+
+  "id": "pillar1_leadership_mindset",
+  "title": "Leadership Mindset",
+  "description": "Your mindset as a leader sets the tone for everything else—your confidence, your decisions, your team's morale. Mastering it is the first step toward becoming a Crystal Clear Leader.",
+  "systemPromptKey": "pillar1_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Your mindset as a leader sets the tone for everything else—your confidence, your decisions, your team's morale. Mastering it is the first step toward becoming a Crystal Clear Leader.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You've just received news that your top performer is leaving the company unexpectedly. It's a blow to morale, and you're feeling personally deflated. Your team looks to you for direction—but you're struggling to stay focused and optimistic.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "mindset_default",
+      "label": "What would your current mindset default be in this moment?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_growth_mindset",
+      "label": "I maintain a growth mindset under pressure (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_resilience",
+      "label": "I model resilience when things go wrong (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_internal_dialogue",
+      "label": "I actively manage my internal dialogue (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "Why did you rate yourself this way? What came up as you thought about each one?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following mindset actions:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_morning_affirmation",
+      "label": "Start each morning with a 2-minute leadership affirmation",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_limiting_belief",
+      "label": "Identify and write down 1 limiting belief to replace with a growth belief",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_mindset_reset",
+      "label": "Conduct a 15-minute mindset reset with my team or colleague",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Tamika is a new department head who constantly second-guesses her decisions, especially around senior staff. She finds herself apologizing frequently and tends to rework plans even when they were solid.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What belief about herself might be driving Tamika's behavior? How could you coach her to shift it using leadership mindset tools?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Self-Talk Reframing Tool",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "original_thought",
+      "label": "Original Thought:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "reframed_statement",
+      "label": "Reframed Leadership Mindset Statement:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about improving your leadership mindset, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What mindset shift are you committing to this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "accountability",
+      "label": "How will you hold yourself accountable?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar2_goal_setting",
+  "title": "Goal Setting",
+  "description": "Setting clear, measurable goals isn't just about checking boxes—it's about aligning your daily actions with your long-term leadership vision. The most effective leaders turn their intentions into reality by mastering the art of goal clarity.",
+  "systemPromptKey": "pillar2_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Setting clear, measurable goals isn't just about checking boxes—it's about aligning your daily actions with your long-term leadership vision. The most effective leaders turn their intentions into reality by mastering the art of goal clarity.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You've been asked to lead a new project with a tight deadline, a cross-functional team, and unclear deliverables. The success of this project could elevate your reputation—or hurt it. You know the first step is to set strong goals, but you're not sure where to start.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "goal_setting_approach",
+      "label": "How would you begin setting goals for yourself and your team in this situation?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_measurable_goals",
+      "label": "I set goals that are measurable and trackable (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_goal_alignment",
+      "label": "I align my personal goals with my team's and company's direction (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_follow_through",
+      "label": "I follow through on my stated goals consistently (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "Why did you give yourself those ratings? What's one goal you set recently that went off course?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_smart_goal",
+      "label": "Set one SMART goal and break it into 3 actionable steps",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_peer_accountability",
+      "label": "Share one of my goals with a peer for accountability",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_realign_goal",
+      "label": "Review and realign one long-term goal with my current daily actions",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Marcus has big dreams for his department—he wants to double revenue by next year and improve team morale. However, his team is overwhelmed and unclear about their weekly targets. Projects are started and abandoned quickly, and morale is dropping instead of rising.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What's missing in Marcus's goal-setting approach? What would you advise him to do differently using the Crystal Clear Goal Setting Method?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Goal Breakdown Tool",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "main_goal",
+      "label": "Main Goal:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_1",
+      "label": "Subgoal 1:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_1_date",
+      "label": "by date:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_2",
+      "label": "Subgoal 2:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_2_date",
+      "label": "by date:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_3",
+      "label": "Subgoal 3:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "subgoal_3_date",
+      "label": "by date:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about setting or achieving goals more effectively, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What goal are you fully committing to this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "support_needed",
+      "label": "What support or resources do you need to follow through?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar3_communication_mastery",
+  "title": "Communication Mastery",
+  "description": "Effective communication isn't about talking more—it's about connecting deeply, listening actively, and leading clearly. The most successful leaders use communication as a tool to build trust, reduce friction, and drive performance.",
+  "systemPromptKey": "pillar3_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Effective communication isn't about talking more—it's about connecting deeply, listening actively, and leading clearly. The most successful leaders use communication as a tool to build trust, reduce friction, and drive performance.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You've just led a team meeting to announce a new strategic initiative. But afterward, several team members seem confused, and two are even resistant. You realize your message may not have landed the way you intended.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "communication_approach",
+      "label": "How would you clarify your message and rebuild alignment? What communication mistakes might you have made?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_clarity_confidence",
+      "label": "I communicate with clarity and confidence under pressure (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_active_listening",
+      "label": "I listen as actively as I speak (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_message_adaptation",
+      "label": "I adapt my message based on who I'm speaking to (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What's one recent communication moment you'd like to do over? What would you change?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_feedback",
+      "label": "Ask 3 team members for honest feedback on my communication clarity",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_active_listening",
+      "label": "Use active listening in at least one difficult conversation",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_pause_reflect",
+      "label": "Pause before responding in conversations to reflect and clarify",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Elena is a passionate project leader who tends to speak in long-winded monologues. Her updates are thorough—but her team often tunes out, missing key points. They've stopped asking questions, and miscommunications are piling up.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What specific strategies could help Elena improve clarity and engagement in her communication?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear \"Less is More\" Message Filter",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "original_message",
+      "label": "Original Message:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "simplified_message",
+      "label": "Simplified Message:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about improving communication as a leader, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What's one communication habit you're committing to improve this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "accountability",
+      "label": "Who will you ask for feedback or accountability?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar4_time_mastery",
+  "title": "Time Mastery",
+  "description": "Time is your most valuable asset as a leader—and the most easily lost. Mastering your time means mastering your priorities, energy, and focus. This Pillar will help you stop reacting and start directing how your time is used.",
+  "systemPromptKey": "pillar4_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Time is your most valuable asset as a leader—and the most easily lost. Mastering your time means mastering your priorities, energy, and focus. This Pillar will help you stop reacting and start directing how your time is used.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You're constantly in motion—calls, meetings, emails, follow-ups. Yet, at the end of each day, your most important leadership tasks remain untouched. You know you're busy—but not productive.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "time_recovery_action",
+      "label": "What's pulling you off course? What time recovery action could you take today to regain focus?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_protect_time",
+      "label": "I protect time for my most important leadership work (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_say_no",
+      "label": "I say no to distractions and low-value requests (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_plan_day",
+      "label": "I plan my day with clarity and structure (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What is your biggest time-waster during the workday? What keeps showing up and stealing your time?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_identify_distractions",
+      "label": "Use the 4-Column Exercise to identify distractions and eliminate one time-wasting task",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_deep_work",
+      "label": "Block 90 minutes for uninterrupted deep work each day",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_boundaries",
+      "label": "Communicate clear availability boundaries to my team or clients",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Derek is a team lead who's constantly responding to urgent issues, putting out fires left and right. He's available to everyone, all the time—but his strategic initiatives are months behind.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What mindset and schedule shifts would help Derek reclaim his focus? How could the Jackier Method help him regain control?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear 4-Column Exercise",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "only_i_can_do",
+      "label": "Only I Can Do This:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "can_be_delegated",
+      "label": "Needs to Be Done but Can Be Delegated:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "can_be_outsourced",
+      "label": "Routine – Can Be Outsourced Later:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "should_be_eliminated",
+      "label": "Should Be Eliminated:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "delegate_remove",
+      "label": "What will you delegate or remove this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about reclaiming your time or handling distractions, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What time recovery strategy are you committing to implement this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "distractions_eliminate",
+      "label": "What distractions will you eliminate or reduce?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar5_strategic_thinking",
+  "title": "Strategic Thinking",
+  "description": "Tactical leaders solve problems. Strategic leaders prevent them. Strategic thinking is the ability to pause, assess, and plan with clarity—so that you're not just busy, but intentionally moving your team and business forward.",
+  "systemPromptKey": "pillar5_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Tactical leaders solve problems. Strategic leaders prevent them. Strategic thinking is the ability to pause, assess, and plan with clarity—so that you're not just busy, but intentionally moving your team and business forward.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You're leading a team that consistently hits short-term goals but seems disconnected from the company's larger mission. They're productive—but not purposeful. You've realized they're working hard, but not strategically.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "strategic_approach",
+      "label": "How would you help your team see the bigger picture and align their daily work with the broader vision?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_long_term",
+      "label": "I take time each week to reflect and think long-term (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_bigger_impact",
+      "label": "I ask 'what's the bigger impact?' before committing to new work (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_align_vision",
+      "label": "I align short-term actions with long-term vision (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "When was the last time you stepped back to think instead of react? What did you learn?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_strategic_hour",
+      "label": "Schedule a 'strategic hour' for big-picture thinking",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_connect_dots",
+      "label": "Connect three daily tasks to larger strategic goals",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_opportunity_cost",
+      "label": "Consider opportunity cost before saying 'yes' to new requests",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Michael is a talented director who excels at execution but struggles with anticipating market shifts. His team consistently delivers on current projects but has been blindsided twice by competitor moves that changed their industry.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What strategic thinking practices would help Michael become more forward-looking? How could he balance execution with anticipation?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Strategic Filter",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "current_priority",
+      "label": "Current Priority/Project:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "strategic_alignment",
+      "label": "How does this align with our long-term vision?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "opportunity_cost",
+      "label": "What am I NOT doing because of this priority?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "six_month_impact",
+      "label": "Six-month impact if successful:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about improving your strategic thinking, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What strategic thinking practice are you committing to this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "accountability",
+      "label": "How will you make space for this practice in your schedule?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar6_emotional_intelligence",
+  "title": "Emotional Intelligence",
+  "description": "Emotional Intelligence (EQ) is the ability to recognize and regulate your emotions—and to understand and influence the emotions of others. Great leaders don't just lead with intellect. They lead with insight, empathy, and control.",
+  "systemPromptKey": "pillar6_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Emotional Intelligence (EQ) is the ability to recognize and regulate your emotions—and to understand and influence the emotions of others. Great leaders don't just lead with intellect. They lead with insight, empathy, and control.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You're in a team meeting when a colleague unexpectedly challenges your decision in front of others. You feel defensive, even a bit angry. Everyone is watching to see how you'll respond.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "emotional_response",
+      "label": "What's your internal response? How would an emotionally intelligent leader handle this situation?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_calm_focused",
+      "label": "I stay calm and focused in emotionally charged situations (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_body_language",
+      "label": "I am aware of how my tone and body language affect others (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_emotional_triggers",
+      "label": "I recognize emotional triggers and manage them effectively (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "When was the last time your emotions took over in a leadership moment? What was the result?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_identify_trigger",
+      "label": "Identify one emotional trigger and track it for 3 days",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_pause_response",
+      "label": "Practice 'pause before response' in all feedback conversations",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_ask_colleague",
+      "label": "Ask a trusted colleague how they experience my emotional leadership",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Jared is a passionate, high-performing manager—but his emotions often get the best of him. He interrupts people, reacts defensively to feedback, and shows visible frustration when things go off track. His team respects his skills but fears his moods.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "How could Jared improve his emotional intelligence without losing his passion or energy?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Emotional Awareness Tool",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "trigger_situation",
+      "label": "Trigger Situation:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "physical_response",
+      "label": "Physical Response:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "thought_pattern",
+      "label": "Thought Pattern:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "regulation_strategy",
+      "label": "Regulation Strategy:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about improving your emotional intelligence as a leader, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What emotional intelligence skill are you committing to develop this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "accountability",
+      "label": "How will you track your progress?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar7_delegation_empowerment",
+  "title": "Delegation and Team Empowerment",
+  "description": "Delegation isn't giving tasks away—it's giving others a chance to rise. Empowered leaders build empowered teams by assigning responsibility, setting expectations, and allowing others to succeed (and sometimes fail) without micromanagement.",
+  "systemPromptKey": "pillar7_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Delegation isn't giving tasks away—it's giving others a chance to rise. Empowered leaders build empowered teams by assigning responsibility, setting expectations, and allowing others to succeed (and sometimes fail) without micromanagement.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You're managing a large project and realize you're the bottleneck—every major task flows through you. You feel pressure to maintain control but you're falling behind, and your team feels underutilized.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "delegation_blockers",
+      "label": "What's stopping you from delegating more effectively? Who on your team could grow if given the chance?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_trust_team",
+      "label": "I trust my team to complete important tasks without me (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_delegate_responsibilities",
+      "label": "I delegate responsibilities—not just tasks (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_coach_support",
+      "label": "I coach and support instead of micromanaging (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What's one task you're holding onto that someone else could own—and why haven't you let it go yet?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_identify_task",
+      "label": "Identify one task I currently do that I will delegate by end of week",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_ask_team_member",
+      "label": "Ask a team member what responsibility they'd like to grow into",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_provide_expectations",
+      "label": "Provide clear expectations and check-in milestones for a delegated assignment",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Lena is known for high standards and flawless work. But her team is disengaged—she redoes their work, takes on too much, and doesn't trust others to execute. Her department is stuck, and Lena is exhausted.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What mindset shift would help Lena delegate effectively? What systems could help her empower her team without sacrificing quality?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Delegation Planner",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "recurring_task",
+      "label": "Choose one recurring task you handle each week:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "task_essential",
+      "label": "Is this task essential to me or could someone else own it?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "training_needed",
+      "label": "What training or context would they need?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "follow_up",
+      "label": "How will I follow up without micromanaging?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "delegation_plan",
+      "label": "Create a short delegation plan with a timeline and check-in point:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about improving delegation or empowering your team, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What's one delegation step you're committing to take this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "measure_success",
+      "label": "How will you measure whether the task was delegated successfully?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar8_change_uncertainty",
+  "title": "Leading Through Change and Uncertainty",
+  "description": "Uncertainty reveals leadership. Great leaders don't always have the answers—but they do provide stability, direction, and reassurance. Mastering this Pillar means learning to lead with clarity even when the path ahead is unclear.",
+  "systemPromptKey": "pillar8_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Uncertainty reveals leadership. Great leaders don't always have the answers—but they do provide stability, direction, and reassurance. Mastering this Pillar means learning to lead with clarity even when the path ahead is unclear.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: Your company just announced a major organizational shift. Morale is shaken. People are whispering, productivity is dropping, and everyone's waiting for your reaction.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "first_move",
+      "label": "What's your first move? How do you lead your team through uncertainty—even if you don't have all the answers?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_steady_calm",
+      "label": "I remain steady and calm when things around me are changing (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_communicate_clearly",
+      "label": "I communicate clearly even when outcomes are unknown (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_optimism_transparency",
+      "label": "I lead with optimism and transparency in uncertain times (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "Think back to the last time you experienced major change. What did you do well as a leader—and what would you do differently now?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_host_checkin",
+      "label": "Host a 10-minute check-in to address my team's biggest questions",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_acknowledge_unknown",
+      "label": "Acknowledge what I *don't* know—and share what I *do* know",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_model_calm",
+      "label": "Choose one new challenge to model calm, clarity, and flexibility",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Raj avoids conflict and change like the plague. When a crisis hits, he either shuts down or disappears into work, avoiding tough conversations. His team feels abandoned and anxious whenever something shifts.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What new behaviors would help Raj grow into a leader who thrives during change?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Change Clarity Framework",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "current_change",
+      "label": "Identify a current or upcoming change affecting your role or team:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "know_for_sure",
+      "label": "What do I know for sure?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "dont_know_yet",
+      "label": "What don't I know (yet)?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "team_needs",
+      "label": "What does my team need to hear from me right now?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "lead_with_stability",
+      "label": "How can I lead with stability this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "team_message",
+      "label": "Craft a short, calming message you can share with your team:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about leading confidently through uncertainty, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What's one step you'll take this week to lead with confidence during change?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "team_remember",
+      "label": "What do you want your team to remember about how you showed up?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar9_conflict_resolution",
+  "title": "Conflict Resolution and Difficult Conversations",
+  "description": "Conflict avoided is leadership postponed. Great leaders don't fear difficult conversations—they master them. This Pillar gives you the tools to address friction, create clarity, and lead through tension instead of around it.",
+  "systemPromptKey": "pillar9_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Conflict avoided is leadership postponed. Great leaders don't fear difficult conversations—they master them. This Pillar gives you the tools to address friction, create clarity, and lead through tension instead of around it.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: Two key team members aren't speaking after a disagreement. One has come to you for support; the other is disengaged and distant. You know you need to step in—but you're not sure how to start.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "conflict_handling",
+      "label": "How would you handle this conflict as a leader? What's your first step in restoring trust and resolving the tension?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_address_conflict",
+      "label": "I address conflict directly and respectfully (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_create_space",
+      "label": "I create space for others to express disagreement (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_stay_calm",
+      "label": "I stay calm and focused during tense conversations (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What's one conversation you've avoided—and what's the cost of continuing to avoid it?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_schedule_conversation",
+      "label": "Schedule one conversation I've been putting off",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_neutral_language",
+      "label": "Use neutral language to describe behavior, not character",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_active_listening",
+      "label": "Practice active listening and summarize what I hear before responding",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Carlos is respected and kind—but he avoids hard conversations. When team members underperform or create tension, he says nothing. As a result, standards slide, resentment builds, and his credibility suffers.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What scripts or tools could help Carlos step into conflict instead of sidestepping it?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Difficult Conversation Prep Sheet",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "unresolved_conflict",
+      "label": "Identify one unresolved conflict or tense relationship:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "issue",
+      "label": "What is the issue?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "desired_outcome",
+      "label": "What outcome do I want from the conversation?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "other_person_needs",
+      "label": "What does the other person need to hear from me?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "i_need_to_hear",
+      "label": "What do I need to hear from them?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "opening_sentences",
+      "label": "Plan the opening 2–3 sentences you'll use to begin the conversation:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about handling conflict or tough conversations, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What difficult conversation are you committing to have this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "build_trust",
+      "label": "How will you ensure the conversation builds—not breaks—trust?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar10_high_performance",
+  "title": "Creating a High-Performance Environment",
+  "description": "High-performing teams don't happen by chance—they're built with intention. Leaders shape the environment. They set clear expectations, celebrate effort and excellence, and model what success looks like.",
+  "systemPromptKey": "pillar10_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "High-performing teams don't happen by chance—they're built with intention. Leaders shape the environment. They set clear expectations, celebrate effort and excellence, and model what success looks like.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: Your team is talented—but their performance is inconsistent. Some are exceeding expectations, while others are coasting. You know it's time to raise the bar without creating burnout or fear.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "reset_standards",
+      "label": "How do you reset standards, energize your team, and create a culture of excellence?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_model_standards",
+      "label": "I consistently model high standards and focus (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_accountability",
+      "label": "I hold others accountable in a constructive, clear way (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_feedback",
+      "label": "I provide regular feedback that promotes growth (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What's one standard you've let slide? How is that affecting team performance?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_define_excellence",
+      "label": "Define and share my expectations for 'excellence' with my team",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_recognize_team_member",
+      "label": "Recognize one team member for going above and beyond",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_revisit_underperforming",
+      "label": "Revisit one underperforming area and communicate a performance reset",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Brittany is friendly and well-liked by her team—but avoids confrontation and rarely enforces performance standards. Her team enjoys working for her, but their results are mediocre. She wants to be liked more than respected.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "How can Brittany raise standards and still maintain positive team relationships?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Team Environment Check",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "top_behaviors",
+      "label": "List the top 3 behaviors you expect from a high-performing team:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "behavior_assessment",
+      "label": "Assess how consistently your team demonstrates those behaviors:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "behavior_spotlight",
+      "label": "Choose one behavior to spotlight and reinforce this week—through feedback, recognition, or action:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about building a high-performance team environment, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What's one change you'll make this week to raise performance across your team?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "reinforcement",
+      "label": "How will you reinforce that change consistently moving forward?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar11_decision_making",
+  "title": "Decision-Making with Clarity and Confidence",
+  "description": "Leadership is decision-making. Every choice you make shapes your influence, your results, and your team's trust in you. When you make decisions rooted in clarity, confidence, and consistency, you create momentum and credibility—even in uncertainty.",
+  "systemPromptKey": "pillar11_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "Leadership is decision-making. Every choice you make shapes your influence, your results, and your team's trust in you. When you make decisions rooted in clarity, confidence, and consistency, you create momentum and credibility—even in uncertainty.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You're facing a big decision: two strong paths, each with pros and cons. One feels safer, the other bolder. You're getting mixed feedback, and your team is waiting for clarity.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "decision_approach",
+      "label": "How do you move forward without second-guessing yourself? What decision-making tools or principles will guide you?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_timely_decisions",
+      "label": "I make timely decisions without overthinking (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_data_intuition",
+      "label": "I base decisions on data and intuition (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_explain_decisions",
+      "label": "I explain my decisions with clarity and confidence (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What's one recent decision you've struggled with—and what made it difficult?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_identify_decision",
+      "label": "Identify one decision I've delayed—and make it within 24 hours",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_use_tool",
+      "label": "Use a structured tool to evaluate a current choice",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_communicate_decision",
+      "label": "Communicate one decision with clarity to my team",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Alvin is thoughtful, smart, and careful—but he's known for dragging out decisions. He constantly asks for more input, changes his mind, and misses windows of opportunity. His team is losing confidence in his leadership.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What structure or mindset shift would help Alvin make faster, clearer decisions without sacrificing quality?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear 4-Question Decision Framework",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "real_options",
+      "label": "What are my two (or more) real options?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "long_term_impact",
+      "label": "What is the best long-term impact of each?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "fear_assessment",
+      "label": "What am I afraid of—and is that fear justified?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "leadership_look",
+      "label": "What does leadership look like in this situation?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about decision-making as a leader, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What decision will you make and communicate this week?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "build_clarity",
+      "label": "How will you ensure that decision builds clarity and momentum?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+},
+{
+  "id": "pillar12_execution_results",
+  "title": "Execution: Turning Plans Into Results",
+  "description": "A brilliant plan means nothing without follow-through. Leaders who execute consistently turn goals into outcomes, vision into momentum, and effort into measurable success. This Pillar is about doing the work that matters—on time and with purpose.",
+  "systemPromptKey": "pillar12_prompt",
+  "fields": [
+    {
+      "name": "intro",
+      "label": "A brilliant plan means nothing without follow-through. Leaders who execute consistently turn goals into outcomes, vision into momentum, and effort into measurable success. This Pillar is about doing the work that matters—on time and with purpose.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "scenario_challenge",
+      "label": "Leadership Scenario Challenge: You've created a detailed strategy and your team is fired up. But two weeks in, progress has stalled. Deadlines are slipping. Everyone agrees the plan is great—but no one seems to be executing it consistently.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "missing_link",
+      "label": "What's the missing link? How do you reestablish execution and drive your plan across the finish line?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "rate_follow_through",
+      "label": "I follow through consistently on the most important tasks (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_track_progress",
+      "label": "I track progress and hold myself/team accountable to deadlines (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "rate_break_goals",
+      "label": "I break big goals into manageable, time-bound action steps (1-10):",
+      "type": "rating",
+      "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "required": true
+    },
+    {
+      "name": "reflection",
+      "label": "What is one plan or project you've started but not finished—and why did execution break down?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action_steps_info",
+      "label": "This week, I will commit to the following:",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "action_schedule_steps",
+      "label": "Choose one priority and schedule the next three action steps on my calendar",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_clarify_roles",
+      "label": "Clarify team roles and deadlines for one stalled project",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_use_tracker",
+      "label": "Use a visual tracker or checklist to monitor execution this week",
+      "type": "checkbox",
+      "required": false
+    },
+    {
+      "name": "action_optional",
+      "label": "Optional action step",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "case_study",
+      "label": "Mini Case Study: Tasha is full of ideas—she sets big goals and inspires others easily. But execution often breaks down after kickoff. She's easily distracted, struggles to follow through, and finds herself apologizing for missed milestones.",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "case_study_response",
+      "label": "What structure, tools, or accountability would help Tasha become an execution-driven leader?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "challenge_info",
+      "label": "15-Minute Challenge: Crystal Clear Execution Snapshot",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "goal_project",
+      "label": "Pick one goal or project in progress:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "action1",
+      "label": "Action 1:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "deadline1",
+      "label": "Deadline for Action 1:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "action2",
+      "label": "Action 2:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "deadline2",
+      "label": "Deadline for Action 2:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "action3",
+      "label": "Action 3:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "deadline3",
+      "label": "Deadline for Action 3:",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "ask_eric_info",
+      "label": "If you could ask Eric GPT one question about getting things done as a leader, what would it be?",
+      "type": "info",
+      "required": false
+    },
+    {
+      "name": "ask_eric",
+      "label": "Write your question here:",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "commitment",
+      "label": "What key action will you complete this week to move something forward?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "ensure_completion",
+      "label": "What will you do to make sure it gets done—not just started?",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "revisit_date",
+      "label": "Date to revisit this worksheet:",
+      "type": "text",
+      "required": true
+    }
+  ]
+}]
