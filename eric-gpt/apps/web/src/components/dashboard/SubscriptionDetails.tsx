@@ -20,7 +20,7 @@ export default function SubscriptionDetails({ subscription, userId }: Subscripti
   
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch('/api/stripe/customer-portal', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/customer-portal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export default function SubscriptionDetails({ subscription, userId }: Subscripti
 
   const handleSubscribe = async (planId: string) => {
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -51,7 +51,7 @@ export function useSubscription() {
       setLoading(true);
       
       // Fetch the user's actual subscription data from the API
-      const response = await fetch('/api/user/subscription', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/subscription`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export function useSubscription() {
     if (!session?.user?.id) return;
     
     try {
-      const response = await fetch('/api/stripe/customer-portal', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/customer-portal`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export function useSubscription() {
         cancelUrl: window.location.origin + '/dashboard/subscription?canceled=true',
       };
       
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

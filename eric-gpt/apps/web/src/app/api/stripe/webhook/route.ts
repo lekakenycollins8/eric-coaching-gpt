@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     });
 
     // Forward the webhook to the server application
-    const serverUrl = process.env.SERVER_URL || 'http://localhost:3000';
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const response = await fetch(`${serverUrl}/api/stripe/webhook`, {
       method: 'POST',
       headers: {
