@@ -186,27 +186,82 @@ export async function POST(request: Request) {
           
           // Get the plan ID from the checkout session metadata or line items
           let planId = '';
+          let priceId = '';
+          
+          console.log('Attempting to extract plan ID from session:', session.id);
+          
+          // First check metadata (this is the most reliable source)
           if (session.metadata && session.metadata.planId) {
+            console.log('Found planId in session metadata:', session.metadata.planId);
             planId = session.metadata.planId;
-          } else if (session.line_items) {
-            // Try to get plan from line items if available
-            console.log('Line items available in session');
-          } else {
-            // Try to retrieve the subscription to get the plan ID
+          }
+          
+          // If no plan ID in metadata, try to get it from line items
+          if (!planId && session.line_items) {
+            console.log('Checking line items in session');
+            // We need to expand the line_items to access them
             try {
-              // If session has a subscription, get its details
-              if (session.subscription) {
-                const subscriptionId = typeof session.subscription === 'string' ? 
-                  session.subscription : session.subscription.id;
+              // Retrieve the session with expanded line_items
+              const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
+                expand: ['line_items.data.price']
+              });
+              
+              if (expandedSession.line_items && expandedSession.line_items.data.length > 0) {
+                const lineItem = expandedSession.line_items.data[0];
+                if (lineItem.price && lineItem.price.id) {
+                  priceId = lineItem.price.id;
+                  console.log('Found price ID in line items:', priceId);
                   
-                if (subscriptionId) {
-                  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-                  const priceId = subscription.items.data[0]?.price.id;
-                  if (priceId) {
-                    // Look up the plan by price ID
-                    const plan = getPlanById(priceId);
-                    if (plan) {
-                      planId = plan.id;
+                  // Look up the plan by price ID
+                  const plan = getPlanById(priceId);
+                  if (plan) {
+                    planId = plan.id;
+                    console.log('Mapped price ID to plan ID:', planId);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error retrieving expanded session:', error);
+            }
+          }
+          
+          // If still no plan ID, try to get it from the subscription
+          if (!planId && session.subscription) {
+            console.log('Checking subscription in session');
+            try {
+              const subscriptionId = typeof session.subscription === 'string' ? 
+                session.subscription : session.subscription.id;
+                
+              if (subscriptionId) {
+                console.log('Found subscription ID:', subscriptionId);
+                const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+                  expand: ['items.data.price']
+                });
+                
+                if (subscription.items.data.length > 0) {
+                  priceId = subscription.items.data[0].price.id;
+                  console.log('Found price ID in subscription:', priceId);
+                  
+                  // Look up the plan by price ID
+                  const plan = getPlanById(priceId);
+                  if (plan) {
+                    planId = plan.id;
+                    console.log('Mapped price ID to plan ID:', planId);
+                  } else {
+                    // If we couldn't map the price ID to a plan, use a default naming convention
+                    // Extract the plan name from the price ID (e.g., price_1NxYZ -> plan_name)
+                    const priceParts = priceId.split('_');
+                    if (priceParts.length > 1) {
+                      // Use the last part of the price ID as a fallback plan identifier
+                      const priceSuffix = priceParts[priceParts.length - 1].toLowerCase();
+                      if (priceSuffix.includes('monthly')) {
+                        planId = 'pro_monthly';
+                      } else if (priceSuffix.includes('yearly')) {
+                        planId = 'pro_yearly';
+                      } else {
+                        planId = 'pro_monthly'; // Default fallback
+                      }
+                      console.log('Created fallback plan ID from price:', planId);
                     }
                   }
                 }
@@ -218,31 +273,60 @@ export async function POST(request: Request) {
           
           // If we still don't have a plan ID, try to get it from the session URL
           if (!planId && session.url) {
-            // Extract plan ID from URL if possible
-            const urlParams = new URL(session.url).searchParams;
-            const planFromUrl = urlParams.get('plan');
-            if (planFromUrl) {
-              planId = planFromUrl;
+            console.log('Checking session URL for plan ID');
+            try {
+              const urlParams = new URL(session.url).searchParams;
+              const planFromUrl = urlParams.get('plan');
+              if (planFromUrl) {
+                planId = planFromUrl;
+                console.log('Found plan ID in URL:', planId);
+              }
+            } catch (error) {
+              console.error('Error parsing session URL:', error);
             }
+          }
+          
+          // If we still don't have a plan ID, use a default
+          if (!planId) {
+            planId = 'pro_monthly'; // Default to pro_monthly as a last resort
+            console.log('Using default plan ID:', planId);
           }
           
           console.log('Plan ID after extraction:', planId);
 
+          console.log('Final planId after all extraction attempts:', planId);
+          
           // Set up the subscription with available information
           if (!user.subscription) {
+            // Create new subscription object with proper dates
+            const currentPeriodStart = new Date();
+            const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+            
+            console.log('Creating new subscription with:');
+            console.log('- planId:', planId);
+            console.log('- currentPeriodStart:', currentPeriodStart);
+            console.log('- currentPeriodEnd:', currentPeriodEnd);
+            
             user.subscription = {
-              planId: planId || 'pro_monthly', // Default to pro_monthly if we couldn't determine the plan
+              planId: planId, // Use the extracted plan ID, no default fallback
               status: 'active',
-              currentPeriodStart: new Date(),
-              currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+              currentPeriodStart: currentPeriodStart,
+              currentPeriodEnd: currentPeriodEnd,
               submissionsThisPeriod: 0
             };
           } else {
             // Update existing subscription
+            console.log('Updating existing subscription with planId:', planId);
             user.subscription.status = 'active';
+            
+            // Always update the plan ID if we have one
             if (planId) {
               user.subscription.planId = planId;
             }
+            
+            // Update the period dates
+            user.subscription.currentPeriodStart = new Date();
+            user.subscription.currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
           }
           
           // Use a database session with transaction to ensure data consistency

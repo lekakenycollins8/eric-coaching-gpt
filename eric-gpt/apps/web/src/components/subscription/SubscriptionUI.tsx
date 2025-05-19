@@ -1,5 +1,5 @@
 import React from 'react';
-import { STRIPE_PLANS, formatPrice, type PlanId, getPlanByStripePriceId } from '../../lib/stripe/plans';
+import { STRIPE_PLANS, formatPrice, type PlanId, getPlanByStripePriceId, getPlanById } from '../../lib/stripe/plans';
 import type { Subscription, ProratedPrice } from '../../hooks/useSubscription';
 import { SubscriptionButton } from './SubscriptionButton';
 
@@ -64,7 +64,10 @@ export function SubscriptionUI({
             <h3 className="text-lg leading-6 font-medium text-gray-900">Current Subscription</h3>
             
             {(() => {
-              const plan = getPlanByStripePriceId(subscription.planId);
+              // Use getPlanById instead of getPlanByStripePriceId since we're storing plan IDs, not price IDs
+              const plan = getPlanById(subscription.planId as PlanId);
+              console.log('Looking up plan with ID:', subscription.planId);
+              console.log('Found plan:', plan);
               if (plan) {
                 return (
                   <>
