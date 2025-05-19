@@ -1,5 +1,5 @@
 import React from 'react';
-import { STRIPE_PLANS, formatPrice, type PlanId } from '../../lib/stripe/plans';
+import { STRIPE_PLANS, formatPrice, type PlanId, getPlanByStripePriceId } from '../../lib/stripe/plans';
 import type { Subscription, ProratedPrice } from '../../hooks/useSubscription';
 import { SubscriptionButton } from './SubscriptionButton';
 
@@ -36,6 +36,9 @@ export function SubscriptionUI({
     );
   }
 
+  console.log('Subscription:', subscription);
+  console.log('STRIPE_PLANS:', STRIPE_PLANS);
+
   return (
     <div>
       <div className="mb-5 flex justify-between items-center">
@@ -60,153 +63,116 @@ export function SubscriptionUI({
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg leading-6 font-medium text-gray-900">Current Subscription</h3>
             
-            {/* Add plan name and billing cycle as a prominent element */}
-            <div className="mt-2">
-              <h4 className="text-xl font-semibold text-green-600">
-                {(() => {
-                  // Only try to display a plan name if we have a planId
-                  if (!subscription.planId) return 'No Plan Selected';
-                  
-                  // Try to find the plan by exact ID match
-                  const plan = STRIPE_PLANS[subscription.planId];
-                  if (plan) return plan.name;
-                  
-                  // If no exact match, try to find a plan with a similar ID
-                  const planId = subscription.planId || '';
-                  if (planId.includes('solo')) return 'Solo Leader';
-                  if (planId.includes('pro')) return 'Pro Builder';
-                  if (planId.includes('vip')) return 'Executive VIP';
-                  
-                  // Fallback
-                  return 'Active Plan';
-                })()}
-                {subscription.planId && (
-                  <span className="ml-2 text-sm font-normal text-gray-500">
-                    {(() => {
-                      const plan = STRIPE_PLANS[subscription.planId];
-                      if (plan) return `(${plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'} billing)`;
-                      
-                      // Fallback if we can't determine the billing cycle
-                      const planId = subscription.planId || '';
-                      return planId.includes('yearly') ? '(Annual billing)' : '(Monthly billing)';
-                    })()}
-                  </span>
-                )}
-              </h4>
-            </div>
-            
-            <div className="mt-4">
-              <div className="mt-1 text-sm text-gray-600 sm:flex sm:items-center">
-                <div>
-                  <span className="font-medium">Plan: </span>
-                  <span className="text-gray-900">
-                    {(() => {
-                      // Try to find the plan by exact ID match
-                      const plan = STRIPE_PLANS[subscription.planId];
-                      if (plan) return plan.name;
-                      
-                      // If no exact match, try to find a plan with a similar ID
-                      const planId = subscription.planId || '';
-                      if (planId.includes('solo')) return 'Solo Leader';
-                      if (planId.includes('pro')) return 'Pro Builder';
-                      if (planId.includes('vip')) return 'Executive VIP';
-                      
-                      // Fallback
-                      return 'Active Plan';
-                    })()}
-                  </span>
-                </div>
-                <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
-                  <circle cx="4" cy="4" r="3" />
-                </svg>
-                <div className="flex items-center">
-                  Status: 
-                  <span className={`ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    subscription.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : subscription.status === 'past_due' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-red-100 text-red-800'
-                  }`}>
-                    <span className={`mr-1.5 h-2 w-2 rounded-full ${
-                      subscription.status === 'active' 
-                        ? 'bg-green-500' 
-                        : subscription.status === 'past_due' 
-                          ? 'bg-yellow-500' 
-                          : 'bg-red-500'
-                    }`}></span>
-                    {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                  </span>
-                </div>
-                <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
-                  <circle cx="4" cy="4" r="3" />
-                </svg>
-                <div>
-                  Renews: <span className="font-medium">{formatDate(subscription.currentPeriodEnd)}</span>
-                </div>
-              </div>
-              <div className="mt-4 flex">
-                {hasStripeCustomerId && (
-                  <div className="mt-4 sm:mt-0 sm:flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={handleManageSubscription}
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      Manage subscription
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="mt-5">
-              <h4 className="text-sm font-medium text-gray-500">USAGE</h4>
-              <div className="mt-2">
-                <div className="bg-gray-50 rounded-md p-4">
-                  <div className="sm:flex sm:items-center sm:justify-between">
-                    <div className="text-sm text-gray-900">
-                      Submissions this period: <span className="font-medium">{subscription.submissionsThisPeriod}</span>
+            {(() => {
+              const plan = getPlanByStripePriceId(subscription.planId);
+              if (plan) {
+                return (
+                  <>
+                    {/* Add plan name and billing cycle as a prominent element */}
+                    <div className="mt-2">
+                      <h4 className="text-xl font-semibold text-green-600">
+                        {plan.name}
+                        <span className="ml-2 text-sm font-normal text-gray-500">
+                          ({plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'} billing)
+                        </span>
+                      </h4>
                     </div>
-                    {STRIPE_PLANS[subscription.planId]?.features && (
-                      <div className="mt-2 sm:mt-0 text-sm text-gray-900">
-                        {/* Extract submission limit from features */}
-                        {(() => {
-                          const feature = STRIPE_PLANS[subscription.planId]?.features.find(f => f.includes('submissions'));
-                          const limit = feature?.match(/\d+/)?.[0];
-                          return limit ? (
-                            <>Limit: <span className="font-medium">{limit}</span></>
-                          ) : null;
-                        })()}
-                      </div>
-                    )}
-                  </div>
-                  {/* Progress bar for submissions */}
-                  {(() => {
-                    const feature = STRIPE_PLANS[subscription.planId]?.features.find(f => f.includes('submissions'));
-                    const limit = parseInt(feature?.match(/\d+/)?.[0] || '0');
-                    if (limit > 0) {
-                      return (
-                        <div className="mt-3">
-                          <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
-                            <div
-                              style={{
-                                width: `${Math.min(
-                                  (subscription.submissionsThisPeriod / limit) * 100,
-                                  100
-                                )}%`,
-                              }}
-                              className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
-                            ></div>
-                          </div>
+
+                    <div className="mt-4">
+                      <div className="mt-1 text-sm text-gray-600 sm:flex sm:items-center">
+                        <div>
+                          <span className="font-medium">Plan: </span>
+                          <span className="text-gray-900">
+                            {plan.name}
+                          </span>
                         </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
-              </div>
-            </div>
+                        <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <div className="flex items-center">
+                          Status:
+                          <span className={`ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            subscription.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : subscription.status === 'past_due'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800'
+                          }`}>
+                            <span className={`mr-1.5 h-2 w-2 rounded-full ${
+                              subscription.status === 'active'
+                                ? 'bg-green-500'
+                                : subscription.status === 'past_due'
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
+                            }`}></span>
+                            {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                          </span>
+                        </div>
+                        <svg className="hidden sm:block mx-2 h-1 w-1 text-gray-500" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <div>
+                          Renews: <span className="font-medium">{formatDate(subscription.currentPeriodEnd)}</span>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex">
+                        {hasStripeCustomerId && (
+                          <div className="mt-4 sm:mt-0 sm:flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={handleManageSubscription}
+                              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            >
+                              Manage subscription
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-5">
+                      <h4 className="text-sm font-medium text-gray-500">USAGE</h4>
+                      <div className="mt-2">
+                        <div className="bg-gray-50 rounded-md p-4">
+                          <div className="sm:flex sm:items-center sm:justify-between">
+                            <div className="text-sm text-gray-900">
+                              Submissions this period: <span className="font-medium">{subscription.submissionsThisPeriod}</span>
+                            </div>
+                            {plan.features?.submissionsPerMonth && (
+                              <div className="mt-2 sm:mt-0 text-sm text-gray-900">
+                                Limit: <span className="font-medium">{plan.features?.submissionsPerMonth}</span>
+                              </div>
+                            )}
+                          </div>
+                          {/* Progress bar for submissions */}
+                          {plan.features?.submissionsPerMonth && (
+                            <div className="mt-3">
+                              <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
+                                <div
+                                  style={{
+                                    width: `${plan.features?.submissionsPerMonth ? Math.min(
+                                      (subscription.submissionsThisPeriod / (plan.features?.submissionsPerMonth || 1)) * 100,
+                                      100
+                                    ) : 0}%`,
+                                  }}
+                                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              } else {
+                return (
+                  <div className="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>No Plan Selected</p>
+                  </div>
+                );
+              }
+            })()}
           </div>
         </div>
       ) : (
@@ -235,14 +201,12 @@ export function SubscriptionUI({
                         <span className="ml-1 text-sm text-gray-500">/month</span>
                       </p>
                       <ul className="mt-4 space-y-2 flex-grow">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-start">
+                          <li className="flex items-start">
                             <svg className="h-5 w-5 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            <span className="ml-2 text-sm text-gray-500">{feature}</span>
+                            <span className="ml-2 text-sm text-gray-500">{plan.features?.submissionsPerMonth} Submissions per month</span>
                           </li>
-                        ))}
                       </ul>
                       <SubscriptionButton
                         planId={plan.id as PlanId}
@@ -272,14 +236,12 @@ export function SubscriptionUI({
                         <span className="ml-1 text-sm text-gray-500">/year</span>
                       </p>
                       <ul className="mt-4 space-y-2 flex-grow">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-start">
+                          <li className="flex items-start">
                             <svg className="h-5 w-5 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            <span className="ml-2 text-sm text-gray-500">{feature}</span>
+                            <span className="ml-2 text-sm text-gray-500">{plan.features?.submissionsPerMonth} Submissions per month</span>
                           </li>
-                        ))}
                       </ul>
                       <SubscriptionButton
                         planId={plan.id as PlanId}

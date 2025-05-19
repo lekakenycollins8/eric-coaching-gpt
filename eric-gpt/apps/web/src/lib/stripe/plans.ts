@@ -16,7 +16,9 @@ export interface Plan {
   name: string;
   description: string;
   price: number;
-  features: string[];
+  features?: {
+   submissionsPerMonth?: number;
+  };
   submissionLimit: number | null;
   teamSize?: number;
   priceId: string;
@@ -31,12 +33,9 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Solo Leader',
     description: 'Perfect for individual leaders looking to improve their skills',
     price: 29.99,
-    features: [
-      'Access to 5 core worksheets',
-      'Basic AI coaching feedback',
-      'Email support',
-      'Monthly billing'
-    ],
+    features: {
+     submissionsPerMonth: 10
+    },
     submissionLimit: 10,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_SOLO_MONTHLY || '',
     billingCycle: 'monthly'
@@ -46,12 +45,9 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Solo Leader (Annual)',
     description: 'Perfect for individual leaders looking to improve their skills',
     price: 299.99, // Save ~$60 compared to monthly
-    features: [
-      'Access to 5 core worksheets',
-      'Basic AI coaching feedback',
-      'Email support',
-      'Annual billing (save 15%)'
-    ],
+    features: {
+     submissionsPerMonth: 10
+    },
     submissionLimit: 10,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_SOLO_YEARLY || '',
     billingCycle: 'yearly'
@@ -63,14 +59,9 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Pro Builder',
     description: 'Ideal for team leaders and growing organizations',
     price: 99.99,
-    features: [
-      'Access to all 12 worksheets',
-      'Advanced AI coaching feedback',
-      'Priority email support',
-      'Monthly progress reports',
-      'Team access for up to 5 members',
-      'Monthly billing'
-    ],
+    features: {
+     submissionsPerMonth: 40
+    },
     submissionLimit: 40,
     teamSize: 5,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || '',
@@ -81,14 +72,9 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Pro Builder (Annual)',
     description: 'Ideal for team leaders and growing organizations',
     price: 999.99, // Save ~$200 compared to monthly
-    features: [
-      'Access to all 12 worksheets',
-      'Advanced AI coaching feedback',
-      'Priority email support',
-      'Monthly progress reports',
-      'Team access for up to 5 members',
-      'Annual billing (save 15%)'
-    ],
+    features: {
+     submissionsPerMonth: 40
+    },
     submissionLimit: 40,
     teamSize: 5,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || '',
@@ -101,14 +87,7 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Executive VIP',
     description: 'Complete solution for executive leadership development',
     price: 199.99,
-    features: [
-      'Unlimited access to all content',
-      'Premium AI coaching with personalized insights',
-      'Priority support with 24-hour response time',
-      'Executive analytics and reporting',
-      'Custom organization dashboard',
-      'Monthly billing'
-    ],
+    features: {},
     submissionLimit: null, // Unlimited
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_VIP_MONTHLY || '',
     billingCycle: 'monthly'
@@ -118,14 +97,7 @@ export const STRIPE_PLANS: Record<PlanId, Plan> = {
     name: 'Executive VIP (Annual)',
     description: 'Complete solution for executive leadership development',
     price: 1999.99, // Save ~$400 compared to monthly
-    features: [
-      'Unlimited access to all content',
-      'Premium AI coaching with personalized insights',
-      'Priority support with 24-hour response time',
-      'Executive analytics and reporting',
-      'Custom organization dashboard',
-      'Annual billing (save 15%)'
-    ],
+    features: {},
     submissionLimit: null, // Unlimited
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_VIP_YEARLY || '',
     billingCycle: 'yearly'

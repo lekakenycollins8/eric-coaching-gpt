@@ -226,6 +226,8 @@ export async function POST(request: Request) {
             }
           }
           
+          console.log('Plan ID after extraction:', planId);
+
           // Set up the subscription with available information
           if (!user.subscription) {
             user.subscription = {

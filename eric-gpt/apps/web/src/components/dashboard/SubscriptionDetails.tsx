@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { STRIPE_PLANS, getPlanById } from '../../../lib/stripe/plans';
+import { STRIPE_PLANS, getPlanById } from '../../../../web/src/lib/stripe/plans';
 
 interface SubscriptionDetailsProps {
   subscription?: {
@@ -76,15 +76,18 @@ export default function SubscriptionDetails({ subscription, userId }: Subscripti
   };
 
   // Get plan details if subscription exists
-  const currentPlan = subscription?.planId 
-    ? STRIPE_PLANS.find(plan => plan.id === subscription.planId) 
+  const currentPlan = subscription?.planId
+    ? Object.values(STRIPE_PLANS).find(plan => plan.id === subscription.planId)
     : null;
+
+  console.log('Subscription:', subscription);
+  console.log('Current Plan:', currentPlan);
 
   return (
     <div className="bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">
         <h3 className="text-lg font-medium leading-6 text-gray-900">Subscription</h3>
-        
+
         {subscription ? (
           <div className="mt-5">
             <div className="rounded-md bg-gray-50 px-6 py-5 sm:flex sm:items-start sm:justify-between">
@@ -162,7 +165,7 @@ export default function SubscriptionDetails({ subscription, userId }: Subscripti
               <h4 className="text-sm font-medium text-gray-900">Available Plans</h4>
               
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {STRIPE_PLANS.filter(plan => !plan.id.includes('yearly')).map((plan) => (
+                {Object.values(STRIPE_PLANS).filter(plan => !plan.id.includes('yearly')).map((plan) => (
                   <div key={plan.id} className="relative rounded-lg border border-gray-300 bg-white px-5 py-4 shadow-sm hover:border-gray-400">
                     <div className="flex flex-col h-full">
                       <h3 className="text-base font-semibold text-gray-900">{plan.name}</h3>
@@ -177,8 +180,8 @@ export default function SubscriptionDetails({ subscription, userId }: Subscripti
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                             <span className="ml-2 text-sm text-gray-500">
-                              {key === 'submissionsPerMonth' 
-                                ? `${value} submissions/month` 
+                              {key === 'submissionsPerMonth'
+                                ? `${plan.features?.submissionsPerMonth} submissions/month`
                                 : value.toString()}
                             </span>
                           </li>

@@ -151,12 +151,14 @@ export async function POST(request: Request) {
       subscription_data: {
         metadata: {
           userId: userId,
-          planId: plan.id,
+          planId: planId,
         },
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
     });
+
+    console.log('Checkout session created with metadata:', JSON.stringify(checkoutSession.metadata, null, 2));
 
     console.log('Checkout session created successfully:');
     console.log('Checkout session object:', JSON.stringify(checkoutSession, null, 2));
