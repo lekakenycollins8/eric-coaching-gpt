@@ -376,13 +376,24 @@ export async function POST(request: Request) {
         
         console.log(`Payment succeeded for subscription: ${subscriptionId}`);
         
-        if (!customerId || !subscriptionId) {
-          console.error('Missing customer ID or subscription ID in invoice');
+        if (!customerId) {
+          console.error('Missing customer ID in invoice');
+          break;
+        }
+
+        if (!subscriptionId) {
+          console.error('Missing subscription ID in invoice');
           break;
         }
         
-        // Get subscription details to update period dates
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        let subscription;
+        try {
+          // Get subscription details to update period dates
+          subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        } catch (error) {
+          console.error('Error retrieving subscription details:', error);
+          break;
+        }
         
         // Update the user's subscription in the database
         await connectToDatabase();

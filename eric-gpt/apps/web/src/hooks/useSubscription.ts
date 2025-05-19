@@ -44,7 +44,7 @@ export function useSubscription() {
       setErrorMessage('Subscription update was canceled.');
       setTimeout(() => setErrorMessage(''), 5000);
     }
-  }, [authStatus, session, searchParams]);
+  }, [authStatus, session?.user?.id, searchParams]);
 
   const fetchSubscription = async () => {
     try {
