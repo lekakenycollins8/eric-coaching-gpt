@@ -114,7 +114,8 @@ export async function POST(request: Request) {
 
     // Initialize Stripe
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    console.log('Stripe secret key exists:', !!stripeSecretKey);
+    console.log('Stripe secret key:', stripeSecretKey ? 'exists' : 'missing');
+    console.log('Stripe secret key value:', stripeSecretKey);
     
     if (!stripeSecretKey) {
       console.error('Missing Stripe secret key');
@@ -130,8 +131,10 @@ export async function POST(request: Request) {
 
     // Create a checkout session
     console.log('Creating checkout session with price ID:', plan.priceId);
+    console.log('Plan details:', JSON.stringify(plan, null, 2));
     
     try {
+      console.log('Creating checkout session...');
       const checkoutSession = await stripe.checkout.sessions.create({
       customer_email: email,
       client_reference_id: userId,
@@ -155,10 +158,10 @@ export async function POST(request: Request) {
       cancel_url: cancelUrl,
     });
 
-      console.log('Checkout session created successfully:', {
-        id: checkoutSession.id,
-        url: checkoutSession.url
-      });
+    console.log('Checkout session created successfully:');
+    console.log('Checkout session object:', JSON.stringify(checkoutSession, null, 2));
+    console.log('Checkout session ID:', checkoutSession.id);
+    console.log('Checkout session URL:', checkoutSession.url);
       
       return NextResponse.json({ sessionId: checkoutSession.id, url: checkoutSession.url });
     } catch (stripeError) {

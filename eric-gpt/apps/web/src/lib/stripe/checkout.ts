@@ -22,7 +22,7 @@ export async function redirectToCheckout({
 
   try {
     // Create a checkout session via the server-side API
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/checkout`, {
+    const response = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export async function redirectToCheckout({
  */
 export async function redirectToCustomerPortal() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stripe/customer-portal`, {
+    const response = await fetch('/api/stripe/customer-portal', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

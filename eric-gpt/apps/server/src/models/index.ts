@@ -1,4 +1,4 @@
-import { Collections } from '../db/config.js';
+import { Collections } from '@/db/config';
 
 // Import models
 import User from './User.js';

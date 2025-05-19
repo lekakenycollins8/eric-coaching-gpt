@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { config } from 'dotenv';
-import { dbOptions, DATABASE_NAME } from './config.js';
+import { dbOptions, DATABASE_NAME } from './config';
 
 // Load environment variables
 config();

@@ -49,7 +49,7 @@ UserSchema.index({ stripeCustomerId: 1 });
 UserSchema.index({ isActive: 1 });
 
 // Check if the model already exists to prevent overwriting during hot reloads
-import { Collections } from '../db/config.js';
+import { Collections } from '@/db/config';
 
 // Use the configured collection name
 export default mongoose.models.User || mongoose.model<IUser>(Collections.USERS, UserSchema);
