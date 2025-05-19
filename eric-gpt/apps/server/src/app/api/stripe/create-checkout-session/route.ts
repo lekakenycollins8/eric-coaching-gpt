@@ -148,6 +148,10 @@ export async function POST(request: Request) {
       mode: 'subscription',
       allow_promotion_codes: true,
       discounts: couponId ? [{ coupon: couponId }] : undefined,
+      metadata: {
+        userId: userId,
+        planId: planId,
+      },
       subscription_data: {
         metadata: {
           userId: userId,

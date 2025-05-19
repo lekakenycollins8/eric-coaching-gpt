@@ -58,6 +58,26 @@ export function getPlanById(planId: string) {
   return plans.find(plan => plan.id === planId);
 }
 
+// Helper function to get plan details by Stripe price ID
+export function getPlanByPriceId(priceId: string) {
+  console.log('Looking for plan with priceId:', priceId);
+  console.log('Available price IDs:', Object.values(STRIPE_PLANS).map(p => p.priceId));
+  
+  // Convert plans object to array and find the matching plan
+  for (const key in STRIPE_PLANS) {
+    // Use type assertion to fix TypeScript error
+    const plan = STRIPE_PLANS[key as keyof typeof STRIPE_PLANS];
+    if (plan.priceId === priceId) {
+      console.log('Found matching plan:', plan);
+      return plan;
+    }
+  }
+  
+  // If no match is found, try to determine the plan by price amount
+  console.log('No direct match found for price ID:', priceId);
+  return null;
+}
+
 // Helper function to check if a plan is a team plan
 export function isTeamPlan(planId: string) {
   return planId.startsWith('pro_');

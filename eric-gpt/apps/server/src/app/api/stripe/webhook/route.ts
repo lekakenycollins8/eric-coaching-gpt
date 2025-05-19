@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
-import { getPlanById } from '../../../../config/stripe';
+import { getPlanById, getPlanByPriceId } from '../../../../config/stripe';
 import { connectToDatabase } from '../../../../db/connection';
 import User from '../../../../models/User';
 
@@ -189,6 +189,7 @@ export async function POST(request: Request) {
           let priceId = '';
           
           console.log('Attempting to extract plan ID from session:', session.id);
+          console.log('Session metadata:', session.metadata);
           
           // First check metadata (this is the most reliable source)
           if (session.metadata && session.metadata.planId) {
@@ -211,12 +212,15 @@ export async function POST(request: Request) {
                 if (lineItem.price && lineItem.price.id) {
                   priceId = lineItem.price.id;
                   console.log('Found price ID in line items:', priceId);
-                  
-                  // Look up the plan by price ID
-                  const plan = getPlanById(priceId);
-                  if (plan) {
-                    planId = plan.id;
-                    console.log('Mapped price ID to plan ID:', planId);
+                  if (priceId) {
+                    // Look up the plan by price ID using the dedicated function
+                    const plan = getPlanByPriceId(priceId);
+                    if (plan) {
+                      planId = plan.id;
+                      console.log('Mapped price ID to plan ID:', planId);
+                    } else {
+                      console.log('Could not map price ID to plan using getPlanByPriceId, will try other methods');
+                    }
                   }
                 }
               }
@@ -242,26 +246,62 @@ export async function POST(request: Request) {
                   priceId = subscription.items.data[0].price.id;
                   console.log('Found price ID in subscription:', priceId);
                   
-                  // Look up the plan by price ID
-                  const plan = getPlanById(priceId);
+                  // Look up the plan by price ID using the dedicated function
+                  const plan = getPlanByPriceId(priceId);
+                  console.log('Plan found by price ID:', plan);
                   if (plan) {
                     planId = plan.id;
                     console.log('Mapped price ID to plan ID:', planId);
                   } else {
-                    // If we couldn't map the price ID to a plan, use a default naming convention
-                    // Extract the plan name from the price ID (e.g., price_1NxYZ -> plan_name)
-                    const priceParts = priceId.split('_');
-                    if (priceParts.length > 1) {
-                      // Use the last part of the price ID as a fallback plan identifier
-                      const priceSuffix = priceParts[priceParts.length - 1].toLowerCase();
-                      if (priceSuffix.includes('monthly')) {
-                        planId = 'pro_monthly';
-                      } else if (priceSuffix.includes('yearly')) {
-                        planId = 'pro_yearly';
-                      } else {
-                        planId = 'pro_monthly'; // Default fallback
+                    // If we still couldn't map the price ID to a plan, use a direct mapping approach
+                    console.log('Could not map price ID to plan using getPlanByPriceId');
+                    
+                    // Direct mapping of known price IDs to plan IDs
+                    const priceToPlanMapping: Record<string, string> = {
+                      'price_1RMCyVP1DJ8H8ccarTX30pgj': 'solo_monthly',
+                      'price_1RMCyVP1DJ8H8ccaFG3rYjz9': 'solo_yearly',
+                      'price_1RMD3MP1DJ8H8ccaRa5Mc4TR': 'pro_monthly',
+                      'price_1RMD4AP1DJ8H8ccaKSuVZrNR': 'pro_yearly',
+                      'price_1RMD4jP1DJ8H8ccaYCqHj8t4': 'vip_monthly',
+                      'price_1RMD5AP1DJ8H8ccaJ5QrFOzq': 'vip_yearly'
+                    };
+                    
+                    if (priceToPlanMapping[priceId]) {
+                      planId = priceToPlanMapping[priceId];
+                      console.log('Mapped price ID to plan ID using direct mapping:', planId);
+                    } else {
+                      // If direct mapping fails, try to determine the plan tier and billing cycle from the price amount
+                      try {
+                        // Get the price details
+                        const priceDetails = await stripe.prices.retrieve(priceId);
+                        const amount = priceDetails.unit_amount ? priceDetails.unit_amount / 100 : 0;
+                        console.log(`Price amount: $${amount}`);
+                        
+                        // Determine plan based on price amount
+                        if (amount >= 1900) {
+                          planId = 'vip_yearly';
+                          console.log('Identified as vip_yearly based on price amount');
+                        } else if (amount >= 190) {
+                          planId = 'vip_monthly';
+                          console.log('Identified as vip_monthly based on price amount');
+                        } else if (amount >= 900) {
+                          planId = 'pro_yearly';
+                          console.log('Identified as pro_yearly based on price amount');
+                        } else if (amount >= 90) {
+                          planId = 'pro_monthly';
+                          console.log('Identified as pro_monthly based on price amount');
+                        } else if (amount >= 290) {
+                          planId = 'solo_yearly';
+                          console.log('Identified as solo_yearly based on price amount');
+                        } else {
+                          planId = 'solo_monthly';
+                          console.log('Identified as solo_monthly based on price amount');
+                        }
+                      } catch (error) {
+                        console.error('Error getting price details:', error);
+                        planId = 'pro_monthly'; // Default fallback only if everything else fails
+                        console.log('Using default fallback plan ID:', planId);
                       }
-                      console.log('Created fallback plan ID from price:', planId);
                     }
                   }
                 }

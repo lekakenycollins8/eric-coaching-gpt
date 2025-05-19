@@ -51,4 +51,6 @@ UserSchema.index({ isActive: 1 });
 import { Collections } from '@/db/config';
 
 // Use the configured collection name
-export default mongoose.models.User || mongoose.model<IUser>(Collections.USERS, UserSchema);
+// Make sure we don't try to recompile the model if it already exists
+const User = mongoose.models.User || mongoose.model<IUser>(Collections.USERS, UserSchema);
+export default User;
