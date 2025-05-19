@@ -125,25 +125,31 @@ export async function POST(request: Request) {
     // Check if we've already processed this event
     try {
       await connectToDatabase();
-      const ProcessedEvent = mongoose.model('ProcessedEvent', new mongoose.Schema({
-        eventId: { type: String, required: true, unique: true },
-        eventType: { type: String, required: true },
-        processedAt: { type: Date, default: Date.now }
-      }), 'processed_events');
+      let ProcessedEvent;
+      if (mongoose.models.ProcessedEvent) {
+        ProcessedEvent = mongoose.models.ProcessedEvent;
+      } else {
+        ProcessedEvent = mongoose.model('ProcessedEvent', new mongoose.Schema({
+          eventId: { type: String, required: true, unique: true },
+          eventType: { type: String, required: true },
+          processedAt: { type: Date, default: Date.now }
+        }));
+      }
       
       // Check if this event has already been processed
-      const existingEvent = await ProcessedEvent.findOne({ eventId });
+      const existingEvent = await (ProcessedEvent as mongoose.Model<any>).findOne({ eventId });
       if (existingEvent) {
         console.log(`Event ${eventId} has already been processed, skipping`);
         return NextResponse.json({ received: true, idempotent: true });
       }
       
       // Mark this event as processed
-      await new ProcessedEvent({ 
-        eventId, 
+      const newEvent = new ProcessedEvent({
+        eventId,
         eventType: event.type,
-        processedAt: new Date() 
-      }).save();
+        processedAt: new Date()
+      });
+      await newEvent.save();
       
     } catch (error) {
       console.error('Error checking for duplicate event:', error);
@@ -170,9 +176,13 @@ export async function POST(request: Request) {
         const user = await User.findById(userId);
         console.log(`Webhook found user: ${JSON.stringify(user)}`);
 
+        // Get the customer's name from the session
+        const customerName = session?.customer_details?.name || 'Unknown User';
+
         if (user) {
           // Store the Stripe customer ID
           user.stripeCustomerId = customerId;
+          user.name = customerName; // Update the customer's name
           
           // Get the plan ID from the checkout session metadata or line items
           let planId = '';

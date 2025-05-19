@@ -7,6 +7,7 @@ import Worksheet from './Worksheet.js';
 import Submission from './Submission.js';
 import Subscription from './Subscription.js';
 import WebhookEvent from './WebhookEvent.js';
+import ProcessedEvent from './ProcessedEvent.js';
 
 // Export collection names for reference
 export const ModelCollections = {
@@ -26,4 +27,5 @@ export {
   Submission,
   Subscription,
   WebhookEvent,
+  ProcessedEvent,
 };

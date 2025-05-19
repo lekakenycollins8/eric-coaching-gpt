@@ -44,7 +44,6 @@ const UserSchema: Schema = new Schema(
 );
 
 // Add indexes for frequent queries
-UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ stripeCustomerId: 1 });
 UserSchema.index({ isActive: 1 });
 
