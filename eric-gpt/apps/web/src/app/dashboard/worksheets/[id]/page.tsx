@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useWorksheet } from '@/hooks/useWorksheets';
 import { useWorksheetSubmission } from '@/hooks/useWorksheetSubmission';
 import WorksheetForm from '@/components/worksheets/WorksheetForm';
+import FeedbackPanel from '@/components/worksheets/FeedbackPanel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -153,25 +154,12 @@ export default function WorksheetPage() {
         isSubmitting={isSubmitting} 
       />
 
-      {feedback && (
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Eric's Coaching Feedback</CardTitle>
-              <CardDescription>
-                Based on your responses, here's your personalized coaching feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-slate max-w-none">
-                {feedback.split('\n').map((paragraph: string, idx: number) => (
-                  <p key={idx}>{paragraph}</p>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <FeedbackPanel 
+        feedback={feedback}
+        isLoading={isSubmitting}
+        error={submissionError}
+        remainingQuota={worksheetSubmission.remainingQuota}
+      />
     </div>
   );
 }

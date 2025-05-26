@@ -4,39 +4,72 @@ import { useState, useCallback } from 'react';
 import type { WorksheetSubmission } from '@/types/worksheet';
 
 /**
- * Hook for worksheet form state management and draft saving
- * Note: Actual API submission will be implemented in Sprint 3
+ * Hook for worksheet submission, AI feedback, and draft saving
  */
 export function useWorksheetSubmission() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
-  // Placeholder for submission functionality (to be implemented in Sprint 3)
+  /**
+   * Submit a worksheet to the API and get AI coaching feedback
+   */
   const submitWorksheet = useCallback(async (submission: WorksheetSubmission) => {
     try {
       setIsSubmitting(true);
       setError(null);
+      setFeedback(null);
       setIsSuccess(false);
+      setSubmissionId(null);
       
-      // In Sprint 2, we'll just simulate a submission
-      console.log('Worksheet submission (placeholder):', submission);
+      console.log('Submitting worksheet for AI feedback:', submission.worksheetId);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the submissions API
+      const response = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worksheetId: submission.worksheetId,
+          answers: submission.answers,
+        }),
+      });
       
-      // Save as a completed submission in localStorage for now
-      const key = `worksheet_completed_${submission.worksheetId}`;
-      localStorage.setItem(key, JSON.stringify({
-        ...submission,
-        completedAt: new Date().toISOString()
-      }));
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 403) {
+          throw new Error('You have reached your monthly submission limit. Please upgrade your plan for more submissions.');
+        }
+        
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit worksheet');
+      }
+      
+      const data = await response.json();
+      
+      // Store the AI feedback and submission ID
+      setFeedback(data.aiFeedback);
+      setSubmissionId(data.id);
+      setRemainingQuota(data.remainingQuota);
       
       // Remove the draft after successful submission
       localStorage.removeItem(`worksheet_draft_${submission.worksheetId}`);
       
+      // Save the completed submission with feedback in localStorage for offline access
+      const key = `worksheet_completed_${submission.worksheetId}`;
+      localStorage.setItem(key, JSON.stringify({
+        ...submission,
+        id: data.id,
+        aiFeedback: data.aiFeedback,
+        completedAt: new Date().toISOString()
+      }));
+      
       setIsSuccess(true);
-      return { success: true };
+      return { success: true, id: data.id, feedback: data.aiFeedback };
     } catch (err) {
       console.error('Error submitting worksheet:', err);
       setError(err instanceof Error ? err.message : 'Failed to submit worksheet');
@@ -46,6 +79,9 @@ export function useWorksheetSubmission() {
     }
   }, []);
 
+  /**
+   * Save a draft of the worksheet to localStorage
+   */
   const saveDraft = useCallback(async (worksheetId: string, answers: Record<string, any>) => {
     try {
       const draft = { worksheetId, answers };
@@ -57,6 +93,9 @@ export function useWorksheetSubmission() {
     }
   }, []);
 
+  /**
+   * Load a draft of the worksheet from localStorage
+   */
   const loadDraft = useCallback((worksheetId: string) => {
     try {
       const draftJson = localStorage.getItem(`worksheet_draft_${worksheetId}`);
@@ -69,19 +108,36 @@ export function useWorksheetSubmission() {
     }
   }, []);
 
-  // For Sprint 2, we'll return a placeholder feedback value
-  // In Sprint 3, this will be replaced with actual AI feedback
-  const placeholderFeedback = isSuccess ? "Thank you for submitting your worksheet! In Sprint 3, you'll receive AI-powered coaching feedback here." : null;
-  const placeholderSubmissionId = isSuccess ? `temp-${Date.now()}` : null;
+  /**
+   * Get the user's remaining submission quota
+   */
+  const fetchRemainingQuota = useCallback(async () => {
+    try {
+      const response = await fetch('/api/submissions?limit=1');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch quota information');
+      }
+      
+      const data = await response.json();
+      setRemainingQuota(data.remainingQuota);
+      return data.remainingQuota;
+    } catch (err) {
+      console.error('Error fetching quota:', err);
+      return null;
+    }
+  }, []);
   
   return {
     submitWorksheet,
     saveDraft,
     loadDraft,
+    fetchRemainingQuota,
     isSubmitting,
     isSuccess,
-    feedback: placeholderFeedback,
-    submissionId: placeholderSubmissionId,
+    feedback,
+    submissionId,
+    remainingQuota,
     error,
   };
 }
