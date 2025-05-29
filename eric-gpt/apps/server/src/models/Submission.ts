@@ -37,7 +37,7 @@ SubmissionSchema.index({ userId: 1, createdAt: -1 });
 SubmissionSchema.index({ orgId: 1, createdAt: -1 });
 
 // Check if the model already exists to prevent overwriting during hot reloads
-import { Collections } from '../db/config.js';
+import { Collections } from '@/db/config';
 
 // Use the configured collection name
 export default mongoose.models.Submission || 

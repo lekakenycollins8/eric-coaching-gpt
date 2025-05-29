@@ -6,34 +6,34 @@
 import { BASE_SYSTEM_PROMPT } from './base';
 
 // Import all prompts from their respective files
-import { LEADERSHIP_MINDSET, PILLAR1_PROMPT } from './leadership-mindset';
-import { GOAL_SETTING, PILLAR2_PROMPT } from './goal-setting';
-import { COMMUNICATION_MASTERY, PILLAR3_PROMPT } from './communication-mastery';
-import { TIME_MASTERY, PILLAR4_PROMPT } from './time-mastery';
-import { STRATEGIC_THINKING, PILLAR5_PROMPT } from './strategic-thinking';
-import { EMOTIONAL_INTELLIGENCE, PILLAR6_PROMPT } from './emotional-intelligence';
-import { DELEGATION_EMPOWERMENT, PILLAR7_PROMPT } from './delegation-empowerment';
-import { CHANGE_UNCERTAINTY, PILLAR8_PROMPT } from './change-uncertainty';
-import { CONFLICT_RESOLUTION, PILLAR9_PROMPT } from './conflict-resolution';
-import { HIGH_PERFORMANCE, PILLAR10_PROMPT } from './high-performance';
-import { DECISION_MAKING, PILLAR11_PROMPT } from './decision-making';
-import { EXECUTION_RESULTS, PILLAR12_PROMPT } from './execution-results';
+import { PILLAR1_PROMPT } from './leadership-mindset';
+import { PILLAR2_PROMPT } from './goal-setting';
+import { PILLAR3_PROMPT } from './communication-mastery';
+import { PILLAR4_PROMPT } from './time-mastery';
+import { PILLAR5_PROMPT } from './strategic-thinking';
+import { PILLAR6_PROMPT } from './emotional-intelligence';
+import { PILLAR7_PROMPT } from './delegation-empowerment';
+import { PILLAR8_PROMPT } from './change-uncertainty';
+import { PILLAR9_PROMPT } from './conflict-resolution';
+import { PILLAR10_PROMPT } from './high-performance';
+import { PILLAR11_PROMPT } from './decision-making';
+import { PILLAR12_PROMPT } from './execution-results';
 
 // Re-export all prompts for external use
 export {
   BASE_SYSTEM_PROMPT,
-  LEADERSHIP_MINDSET, PILLAR1_PROMPT,
-  GOAL_SETTING, PILLAR2_PROMPT,
-  COMMUNICATION_MASTERY, PILLAR3_PROMPT,
-  TIME_MASTERY, PILLAR4_PROMPT,
-  STRATEGIC_THINKING, PILLAR5_PROMPT,
-  EMOTIONAL_INTELLIGENCE, PILLAR6_PROMPT,
-  DELEGATION_EMPOWERMENT, PILLAR7_PROMPT,
-  CHANGE_UNCERTAINTY, PILLAR8_PROMPT,
-  CONFLICT_RESOLUTION, PILLAR9_PROMPT,
-  HIGH_PERFORMANCE, PILLAR10_PROMPT,
-  DECISION_MAKING, PILLAR11_PROMPT,
-  EXECUTION_RESULTS, PILLAR12_PROMPT
+  PILLAR1_PROMPT,
+  PILLAR2_PROMPT,
+  PILLAR3_PROMPT,
+  PILLAR4_PROMPT,
+  PILLAR5_PROMPT,
+  PILLAR6_PROMPT,
+  PILLAR7_PROMPT,
+  PILLAR8_PROMPT,
+  PILLAR9_PROMPT,
+  PILLAR10_PROMPT,
+  PILLAR11_PROMPT,
+  PILLAR12_PROMPT
 };
 
 /**
@@ -41,18 +41,6 @@ export {
  */
 export const SYSTEM_PROMPTS = {
   // General worksheet categories
-  LEADERSHIP_MINDSET,
-  GOAL_SETTING,
-  COMMUNICATION_MASTERY,
-  TIME_MASTERY,
-  STRATEGIC_THINKING,
-  EMOTIONAL_INTELLIGENCE,
-  DELEGATION_EMPOWERMENT,
-  CHANGE_UNCERTAINTY,
-  CONFLICT_RESOLUTION,
-  HIGH_PERFORMANCE,
-  DECISION_MAKING,
-  EXECUTION_RESULTS,
   
   // Specific pillar prompts
   pillar1_prompt: PILLAR1_PROMPT,
@@ -98,30 +86,30 @@ export function getSystemPromptForWorksheet(worksheetId: string, systemPromptKey
   }
   
   // Otherwise, try to infer from the worksheet ID
-  if (worksheetId.includes('leadership_mindset')) {
-    return SYSTEM_PROMPTS.LEADERSHIP_MINDSET;
-  } else if (worksheetId.includes('goal_setting')) {
-    return SYSTEM_PROMPTS.GOAL_SETTING;
-  } else if (worksheetId.includes('communication')) {
-    return SYSTEM_PROMPTS.COMMUNICATION_MASTERY;
-  } else if (worksheetId.includes('time_mastery')) {
-    return SYSTEM_PROMPTS.TIME_MASTERY;
-  } else if (worksheetId.includes('strategic_thinking')) {
-    return SYSTEM_PROMPTS.STRATEGIC_THINKING;
-  } else if (worksheetId.includes('emotional_intelligence')) {
-    return SYSTEM_PROMPTS.EMOTIONAL_INTELLIGENCE;
-  } else if (worksheetId.includes('delegation')) {
-    return SYSTEM_PROMPTS.DELEGATION_EMPOWERMENT;
-  } else if (worksheetId.includes('change')) {
-    return SYSTEM_PROMPTS.CHANGE_UNCERTAINTY;
-  } else if (worksheetId.includes('conflict')) {
-    return SYSTEM_PROMPTS.CONFLICT_RESOLUTION;
-  } else if (worksheetId.includes('performance')) {
-    return SYSTEM_PROMPTS.HIGH_PERFORMANCE;
-  } else if (worksheetId.includes('decision')) {
-    return SYSTEM_PROMPTS.DECISION_MAKING;
-  } else if (worksheetId.includes('execution')) {
-    return SYSTEM_PROMPTS.EXECUTION_RESULTS;
+  if (worksheetId.includes('pillar1_leadership_mindset')) {
+    return SYSTEM_PROMPTS.pillar1_prompt;
+  } else if (worksheetId.includes('pillar2_goal_setting')) {
+    return SYSTEM_PROMPTS.pillar2_prompt;
+  } else if (worksheetId.includes('pillar3_communication_mastery')) {
+    return SYSTEM_PROMPTS.pillar3_prompt;
+  } else if (worksheetId.includes('pillar4_time_mastery')) {
+    return SYSTEM_PROMPTS.pillar4_prompt;
+  } else if (worksheetId.includes('pillar5_strategic_thinking')) {
+    return SYSTEM_PROMPTS.pillar5_prompt;
+  } else if (worksheetId.includes('pillar6_emotional_intelligence')) {
+    return SYSTEM_PROMPTS.pillar6_prompt;
+  } else if (worksheetId.includes('pillar7_delegation_empowerment')) {
+    return SYSTEM_PROMPTS.pillar7_prompt;
+  } else if (worksheetId.includes('pillar8_change_uncertainty')) {
+    return SYSTEM_PROMPTS.pillar8_prompt;
+  } else if (worksheetId.includes('pillar9_conflict_resolution')) {
+    return SYSTEM_PROMPTS.pillar9_prompt;
+  } else if (worksheetId.includes('pillar10_high_performance')) {
+    return SYSTEM_PROMPTS.pillar10_prompt;
+  } else if (worksheetId.includes('pillar11_decision_making')) {
+    return SYSTEM_PROMPTS.pillar11_prompt;
+  } else if (worksheetId.includes('pillar12_execution_results')) {
+    return SYSTEM_PROMPTS.pillar12_prompt;
   }
   
   // Default to the base prompt if no match is found

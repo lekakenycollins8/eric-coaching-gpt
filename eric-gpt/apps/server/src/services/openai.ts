@@ -54,6 +54,9 @@ export async function generateCoachingFeedback(
   try {
     console.log(`Generating coaching feedback using model: ${mergedOptions.model}`);
     
+    // Log what we're sending to OpenAI
+    console.log(`Sending request to OpenAI with model: ${mergedOptions.model}, temperature: ${mergedOptions.temperature}, max_tokens: ${mergedOptions.maxTokens}`);
+    
     // Make the API call to OpenAI
     const response = await openai.chat.completions.create({
       model: mergedOptions.model!,
@@ -62,11 +65,30 @@ export async function generateCoachingFeedback(
         { role: 'user', content: userPrompt }
       ],
       temperature: mergedOptions.temperature,
-      max_tokens: mergedOptions.maxTokens,
+      max_tokens: mergedOptions.maxTokens, // OpenAI API expects snake_case parameter names
     });
     
+    // Log a condensed version of the response to avoid cluttering logs
+    console.log(`OpenAI response received - ID: ${response.id}, Model: ${response.model}, Finish reason: ${response.choices[0]?.finish_reason}`);
+    console.log(`Token usage - Prompt: ${response.usage?.prompt_tokens}, Completion: ${response.usage?.completion_tokens}, Total: ${response.usage?.total_tokens}`);
+    
+    // In development, log the full response for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Full OpenAI response:', JSON.stringify(response, null, 2));
+    }
+    
     // Extract the feedback from the response
-    const feedback = response.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
+    let feedback: string;
+    const firstChoice = response.choices[0];
+    
+    if (firstChoice?.message?.tool_calls && firstChoice.message.tool_calls.length > 0) {
+      // Handle tool calls if present (for future compatibility)
+      console.log('Tool calls detected in response:', firstChoice.message.tool_calls);
+      feedback = 'The AI suggested using tools to provide better feedback. This feature is not yet implemented.';
+    } else {
+      // Extract regular text content
+      feedback = firstChoice?.message?.content || 'Unable to generate feedback at this time.';  
+    }
     
     // Track token usage
     const tokenUsage: TokenUsage = {

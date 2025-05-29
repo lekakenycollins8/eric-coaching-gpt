@@ -8,7 +8,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = params.id;
+    // Access params.id safely to avoid Next.js warnings about synchronously accessing params
+    const id = params?.id;
     
     if (!id) {
       return NextResponse.json(

@@ -4,7 +4,9 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import Submission from '@/models/Submission';
-import Worksheet from '@/models/Worksheet';
+// Import fs and path for reading the JSON file directly
+import fs from 'fs';
+import path from 'path';
 import { generateCoachingFeedback } from '@/services/openai';
 import { formatUserPrompt, getSystemPromptForWorksheet } from '@/config/prompts';
 import { hasUserExceededQuota, recordSubmissionUsage, getUserRemainingQuota } from '@/services/quotaManager';
@@ -13,6 +15,7 @@ import { hasUserExceededQuota, recordSubmissionUsage, getUserRemainingQuota } fr
 const submissionSchema = z.object({
   worksheetId: z.string(),
   answers: z.record(z.any()),
+  userId: z.string().optional(), // Allow userId to be passed from web app
 });
 
 export const dynamic = 'force-dynamic';
@@ -71,17 +74,28 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Get the authenticated user
-    const session = await getServerSession(authOptions);
+    // Parse the request body first
+    const body = await request.json();
     
-    if (!session || !session.user) {
+    // Get the user ID - either from session or from request body
+    let userId: string;
+    
+    // Try to get from session first (direct API calls)
+    const session = await getServerSession(authOptions);
+    if (session && session.user && session.user.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise use the userId from the request body (web app proxy)
+    else if (body.userId) {
+      userId = body.userId;
+    } 
+    // No authentication found
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
-    
-    const userId = session.user.id;
     
     // Check if the user has exceeded their quota
     const hasExceededQuota = await hasUserExceededQuota(userId);
@@ -95,9 +109,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Parse and validate the request body
-    const body = await request.json();
-    
     try {
       submissionSchema.parse(body);
     } catch (error) {
@@ -109,18 +120,27 @@ export async function POST(request: NextRequest) {
     
     const { worksheetId, answers } = body;
     
-    // Connect to the database
+    // Connect to the database (still needed for submissions)
     await connectToDatabase();
     
-    // Get the worksheet to verify it exists and get its title
-    const worksheet = await Worksheet.findOne({ id: worksheetId });
+    // Get the worksheet from the JSON file instead of the database
+    const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
+    const worksheetsData = fs.readFileSync(worksheetsPath, 'utf8');
+    const worksheets = JSON.parse(worksheetsData);
+    
+    // Find the worksheet with the matching ID
+    const worksheet = worksheets.find((w: any) => w.id === worksheetId);
     
     if (!worksheet) {
+      console.error(`Worksheet not found: ${worksheetId}`);
       return NextResponse.json(
         { error: 'Worksheet not found' },
         { status: 404 }
       );
     }
+    
+    console.log(`Found worksheet: ${worksheet.title} (${worksheetId})`);
+
     
     // Get the system prompt for this worksheet type using the systemPromptKey
     const systemPrompt = getSystemPromptForWorksheet(worksheetId, worksheet.systemPromptKey);
@@ -153,7 +173,7 @@ export async function POST(request: NextRequest) {
     // Return the feedback and submission ID
     return NextResponse.json(
       {
-        id: submission._id,
+        id: submission._id.toString(), // Convert MongoDB ObjectId to string
         aiFeedback: feedback,
         remainingQuota,
       },
@@ -229,20 +249,31 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get the authenticated user
-    const session = await getServerSession(authOptions);
+    // Get the user ID - either from session or from query parameters
+    let userId: string;
     
-    if (!session || !session.user) {
+    // Get query parameters
+    const searchParams = request.nextUrl.searchParams;
+    const userIdParam = searchParams.get('userId');
+    
+    // Try to get from session first (direct API calls)
+    const session = await getServerSession(authOptions);
+    if (session && session.user && session.user.id) {
+      userId = session.user.id;
+    }
+    // Otherwise use the userId from query parameters (web app proxy)
+    else if (userIdParam) {
+      userId = userIdParam;
+    }
+    // No authentication found
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
     
-    const userId = session.user.id;
-    
-    // Parse query parameters
-    const searchParams = request.nextUrl.searchParams;
+    // Parse pagination parameters from the same searchParams
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const skip = (page - 1) * limit;

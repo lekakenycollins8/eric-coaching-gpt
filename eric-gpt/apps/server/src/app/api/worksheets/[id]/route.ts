@@ -88,7 +88,15 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    // Ensure params is properly awaited before accessing properties
+    const id = params?.id;
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Missing worksheet ID' },
+        { status: 400 }
+      );
+    }
 
     // Read the worksheets.json file
     const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');

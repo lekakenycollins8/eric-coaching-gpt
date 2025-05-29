@@ -39,17 +39,77 @@ export function useWorksheetSubmission() {
         }),
       });
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', [...response.headers.entries()].map(([k, v]) => `${k}: ${v}`).join(', '));
+      
+      // Clone the response so we can try multiple ways to read it if needed
+      const responseClone = response.clone();
+      
       if (!response.ok) {
         // Handle specific error cases
         if (response.status === 403) {
           throw new Error('You have reached your monthly submission limit. Please upgrade your plan for more submissions.');
         }
         
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit worksheet');
+        if (response.status === 503) {
+          throw new Error('Unable to connect to the server. Please try again later.');
+        }
+        
+        // Try to get a useful error message from the response
+        let errorMessage = 'Failed to submit worksheet';
+        
+        try {
+          const errorText = await responseClone.text();
+          console.log('Error response text:', errorText);
+          
+          try {
+            // Try to parse as JSON
+            if (errorText && errorText.trim()) {
+              const errorData = JSON.parse(errorText);
+              if (errorData.message) {
+                errorMessage = errorData.message;
+              } else if (errorData.error) {
+                errorMessage = errorData.error;
+              }
+            }
+          } catch (jsonError) {
+            console.error('Error response is not valid JSON:', jsonError);
+            // Use the raw text if it's not empty
+            if (errorText && errorText.trim()) {
+              errorMessage = 'Server error: ' + errorText.substring(0, 100); // Limit length
+            }
+          }
+        } catch (textError) {
+          console.error('Could not read error response text:', textError);
+        }
+        
+        throw new Error(errorMessage);
       }
       
-      const data = await response.json();
+      // Try to parse the success response
+      let data;
+      try {
+        // Use the cloned response we created earlier
+        const responseText = await response.text();
+        console.log('Success response text:', responseText);
+        
+        try {
+          // Ensure we have a valid JSON response
+          if (responseText && responseText.trim()) {
+            data = JSON.parse(responseText);
+            console.log('Parsed success data:', data);
+          } else {
+            console.error('Empty success response received');
+            throw new Error('The server returned an empty response');
+          }
+        } catch (jsonError) {
+          console.error('Error parsing JSON success response:', jsonError);
+          throw new Error('Failed to parse server response');
+        }
+      } catch (textError) {
+        console.error('Error reading success response:', textError);
+        throw new Error('Failed to read server response');
+      }
       
       // Store the AI feedback and submission ID
       setFeedback(data.aiFeedback);

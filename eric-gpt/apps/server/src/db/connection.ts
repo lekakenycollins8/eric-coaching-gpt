@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { config } from 'dotenv';
 import { dbOptions, DATABASE_NAME } from './config';
+import path from 'path';
+import fs from 'fs';
 
 // Load environment variables
 config();
@@ -63,6 +65,39 @@ export async function connectToDatabase() {
   }
 
   return cached.conn;
+}
+
+/**
+ * Initialize worksheets in the database from the JSON file
+ * This ensures the worksheets are available for the application
+ */
+async function initializeWorksheets() {
+  try {
+    // Wait for import to avoid circular dependencies
+    const Worksheet = (await import('../models/Worksheet')).default;
+    
+    // Check if worksheets already exist
+    const worksheetCount = await Worksheet.countDocuments();
+    
+    if (worksheetCount === 0) {
+      console.log('No worksheets found in database. Seeding from JSON file...');
+      
+      // Read the worksheets JSON file
+      const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
+      const worksheetsData = JSON.parse(fs.readFileSync(worksheetsPath, 'utf8'));
+      
+      console.log(`Loaded ${worksheetsData.length} worksheets from JSON file`);
+      
+      // Insert the worksheets into the database
+      await Worksheet.insertMany(worksheetsData);
+      
+      console.log(`Successfully seeded ${worksheetsData.length} worksheets into database`);
+    } else {
+      console.log(`Found ${worksheetCount} worksheets already in database`);
+    }
+  } catch (error) {
+    console.error('Error initializing worksheets:', error);
+  }
 }
 
 export default connectToDatabase;
