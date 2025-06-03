@@ -151,15 +151,26 @@ export function SubscriptionUI({
                           {plan.features?.submissionsPerMonth && (
                             <div className="mt-3">
                               <div className="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
-                                <div
-                                  style={{
-                                    width: `${plan.features?.submissionsPerMonth ? Math.min(
-                                      (subscription.submissionsThisPeriod / (plan.features?.submissionsPerMonth || 1)) * 100,
-                                      100
-                                    ) : 0}%`,
-                                  }}
-                                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"
-                                ></div>
+                                {(() => {
+                                  const percentage = plan.features?.submissionsPerMonth ? 
+                                    Math.min((subscription.submissionsThisPeriod / (plan.features?.submissionsPerMonth || 1)) * 100, 100) : 0;
+                                  
+                                  // Determine color based on usage percentage
+                                  let colorClass = "bg-green-500";
+                                  if (percentage >= 90) colorClass = "bg-red-500";
+                                  else if (percentage >= 75) colorClass = "bg-yellow-500";
+                                  
+                                  return (
+                                    <div
+                                      style={{ width: `${percentage}%` }}
+                                      className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center ${colorClass}`}
+                                    ></div>
+                                  );
+                                })()}
+                              </div>
+                              <div className="mt-1 text-xs text-gray-500 flex justify-between">
+                                <span>{subscription.submissionsThisPeriod} used</span>
+                                <span>{plan.features?.submissionsPerMonth} total</span>
                               </div>
                             </div>
                           )}

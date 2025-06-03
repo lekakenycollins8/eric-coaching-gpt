@@ -41,9 +41,11 @@ export function useQuota() {
       
       // Calculate quota values
       const used = data.total || 0;
-      const limit = data.quotaLimit || 0;
-      const remaining = Math.max(0, limit - used);
-      const isOverQuota = used >= limit;
+      // If remainingQuota is provided directly by the API, use it
+      const remaining = data.remainingQuota !== undefined ? data.remainingQuota : 0;
+      // Calculate limit based on used + remaining
+      const limit = used + remaining;
+      const isOverQuota = remaining <= 0;
       const percentage = limit > 0 ? Math.min(Math.round((used / limit) * 100), 100) : 0;
       
       setState({
