@@ -6,7 +6,7 @@ After each sprint, update the Status column to ✅ Done or 🟢 In Review.
 | 0      | Apr 30 - May 6    | Core infra in place                | ✅ Done      |
 | 1      | May 7 - May 13    | Secure login and subscription system | ✅ Done      |
 | 2      | May 14 - May 20   | Dashboard UI and worksheet system  | ✅ Done      |
-| 3      | May 21 - May 27   | Custom GPT integration for coaching feedback | 🟢 In Progress |
+| 3      | May 21 - May 27   | Custom GPT integration for coaching feedback | ✅ Done      |
 
 ## Sprint 1 Completed Work
 
@@ -57,52 +57,72 @@ After each sprint, update the Status column to ✅ Done or 🟢 In Review.
 - Implemented toast notifications for user feedback
 - Created responsive layouts for all pages
 
-## Sprint 3 Plan: Custom GPT Integration
+## Sprint 3 Completed Work: Custom GPT Integration
+
+### OpenAI API Integration
+- Set up OpenAI API client with proper authentication in `openai.ts`
+- Implemented environment configuration for API keys and model settings
+- Created a service layer for making API calls with error handling and retries
+- Added comprehensive logging for API calls to track usage and diagnose issues
+
+### Custom GPT Configuration
+- Defined the custom GPT model parameters and configuration
+- Created a modular prompt system with separate files for each leadership pillar
+- Implemented prompt templates that incorporate user worksheet responses
+- Set up a configuration system to manage and version prompt templates
+
+### Submission API Development
+- Created `/api/submissions` endpoint with quota middleware
+- Implemented submission storage in MongoDB with proper schema
+- Added tracking for token usage and quota consumption per user
+- Implemented authentication and authorization checks for submissions
+
+### Quota Management
+- Implemented quota limits based on subscription tiers (Solo, Pro, VIP)
+- Created middleware to check and enforce quota limits
+- Added quota reset functionality based on billing cycles
+- Implemented quota usage tracking and reporting
+
+### Feedback Display
+- Enhanced the worksheet submission UI to display AI feedback
+- Added loading states during API calls
+- Implemented error handling for failed API calls
+- Created a FeedbackPanel component to display formatted coaching advice
+
+### Bug Fixes and Improvements
+- Fixed critical issue with worksheet submissions by aligning data sources
+- Ensured worksheets are read from JSON file consistently across the application
+- Added better error logging to help diagnose similar issues
+- Updated worksheet ID patterns in the prompt selection logic
+- Fixed OpenAI parameter naming from camelCase to snake_case
+
+## Sprint 4 Plan: PDF Export & Quota Enforcement UI
 
 ### Objective
-Integrate a custom GPT from OpenAI to provide personalized coaching feedback on worksheet submissions, enforcing quota limits based on subscription tiers.
+Implement downloadable PDF exports of worksheet submissions with feedback and enhance the quota enforcement UI to provide clear visual indicators of usage limits.
 
 ### Key Tasks
 
-#### 1. OpenAI API Integration
-- Set up OpenAI API client with proper authentication
-- Implement environment configuration for API keys and model settings
-- Create a service layer for making API calls with error handling and retries
-- Implement logging for API calls to track usage and diagnose issues
+#### 1. PDF Export Implementation
+- Create a PDF template page at `/pdf-template/[submissionId]` with branded styling
+- Implement `/api/submissions/:id/pdf` endpoint using Puppeteer for PDF generation
+- Add download functionality to the worksheet submission page
+- Ensure PDF includes both user responses and AI feedback in a well-formatted layout
 
-#### 2. Custom GPT Configuration
-- Define the custom GPT model parameters and configuration
-- Create system prompts for each worksheet type that embody Eric's coaching style
-- Implement prompt templates that incorporate user worksheet responses
-- Set up a configuration system to manage and version prompt templates
+#### 2. Quota Enforcement UI
+- Add usage meter showing current usage vs. limit ("X of Y used") to dashboard
+- Implement visual indicators on the worksheet form for remaining submissions
+- Create blocking UI for over-quota submissions with upgrade call-to-action
+- Add quota information to the user profile page
 
-#### 3. Submission API Development
-- Create `/api/submissions` endpoint with quota middleware
-- Implement submission storage in MongoDB with proper schema
-- Track token usage and quota consumption per user
-- Add authentication and authorization checks for submissions
-
-#### 4. Quota Management
-- Implement quota limits based on subscription tiers (Solo, Pro, VIP)
-- Create middleware to check and enforce quota limits
-- Add quota reset functionality based on billing cycles
-- Implement quota usage tracking and reporting
-
-#### 5. Feedback Display
-- Enhance the worksheet submission UI to display AI feedback
-- Add loading states during API calls
-- Implement error handling for failed API calls
-- Create a FeedbackPanel component to display formatted coaching advice
-
-#### 6. Testing & Quality Assurance
-- Create sample answer sets for each worksheet type
-- Implement unit tests for the submission logic with mocked OpenAI responses
-- Test error handling and edge cases
-- Perform prompt QA to ensure feedback tone and quality consistency
+#### 3. Testing & Quality Assurance
+- Write integration tests for the PDF generation endpoint
+- Test quota enforcement UI across different subscription tiers
+- Verify PDF formatting across different worksheet types
+- Test edge cases like very long responses and special characters
 
 ### Deliverables
-- Fully functional custom GPT integration providing personalized coaching feedback
-- Quota management system tied to subscription tiers
-- Comprehensive test suite for the AI integration
-- Documentation of the prompt system and configuration
-- QA report on prompt effectiveness and feedback quality
+- Fully functional "Download PDF" feature for worksheet submissions
+- Clear quota visualization and enforcement UI
+- Passing tests for PDF generation and quota enforcement
+- Documentation for the PDF generation system

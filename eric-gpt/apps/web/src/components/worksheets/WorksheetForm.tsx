@@ -23,6 +23,7 @@ interface WorksheetFormProps {
   isSubmitting?: boolean;
   initialData?: Record<string, any>;
   onSaveDraft?: (data: Record<string, any>) => void;
+  disabled?: boolean;
 }
 
 const WorksheetForm: React.FC<WorksheetFormProps> = ({
@@ -31,6 +32,7 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
   isSubmitting = false,
   initialData = {},
   onSaveDraft,
+  disabled = false,
 }) => {
   const { toast } = useToast();
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -178,7 +180,7 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
           variant="outline" 
           type="button" 
           onClick={handleSaveDraft} 
-          disabled={isSavingDraft || !isDirty}
+          disabled={isSavingDraft || !isDirty || disabled}
         >
           {isSavingDraft ? (
             <>
@@ -192,13 +194,15 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
         <Button 
           type="submit" 
           form="worksheet-form" 
-          disabled={isSubmitting}
+          disabled={isSubmitting || disabled}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Submitting...
             </>
+          ) : disabled ? (
+            'Quota Exceeded'
           ) : (
             'Submit for Feedback'
           )}

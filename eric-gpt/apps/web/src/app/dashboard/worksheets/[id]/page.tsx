@@ -7,11 +7,11 @@ import { useWorksheetSubmission } from '@/hooks/useWorksheetSubmission';
 import WorksheetForm from '@/components/worksheets/WorksheetForm';
 import FeedbackPanel from '@/components/worksheets/FeedbackPanel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { QuotaExceededAlert } from '@/components/usage/QuotaExceededAlert';
 import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-// Import toast utilities
 import { useToast } from '@/components/ui/use-toast';
 
 export default function WorksheetPage() {
@@ -27,7 +27,12 @@ export default function WorksheetPage() {
     loadDraft,
     isSubmitting, 
     feedback, 
-    error: submissionError
+    error: submissionError,
+    remainingQuota,
+    isOverQuota,
+    quotaLimit,
+    quotaUsed,
+    submissionId
   } = worksheetSubmission;
 
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -146,19 +151,29 @@ export default function WorksheetPage() {
         </Alert>
       )}
 
+      {isOverQuota && quotaUsed !== null && quotaLimit !== null && (
+        <QuotaExceededAlert
+          used={quotaUsed}
+          limit={quotaLimit}
+          className="mb-6"
+        />
+      )}
+
       <WorksheetForm 
         worksheet={worksheet} 
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
         initialData={formData}
-        isSubmitting={isSubmitting} 
+        isSubmitting={isSubmitting}
+        disabled={isOverQuota} 
       />
 
       <FeedbackPanel 
         feedback={feedback}
         isLoading={isSubmitting}
         error={submissionError}
-        remainingQuota={worksheetSubmission.remainingQuota}
+        remainingQuota={remainingQuota}
+        submissionId={submissionId}
       />
     </div>
   );

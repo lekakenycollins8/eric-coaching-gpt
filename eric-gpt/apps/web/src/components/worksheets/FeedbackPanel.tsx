@@ -1,16 +1,19 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface FeedbackPanelProps {
   feedback: string | null;
   isLoading: boolean;
   error: string | null;
   remainingQuota: number | null;
+  submissionId?: string | null;
 }
 
 /**
@@ -20,8 +23,53 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
   feedback,
   isLoading,
   error,
-  remainingQuota
+  remainingQuota,
+  submissionId
 }) => {
+  const { toast } = useToast();
+  const [isPdfLoading, setIsPdfLoading] = React.useState(false);
+
+  const handleDownloadPdf = async () => {
+    if (!submissionId) {
+      toast({
+        title: "Error",
+        description: "Cannot download PDF: submission ID is missing",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsPdfLoading(true);
+      
+      // Create a URL to the PDF endpoint
+      const pdfUrl = `/api/submissions/${submissionId}/pdf`;
+      
+      // Create a link element and trigger a download
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.setAttribute('download', `worksheet-feedback-${submissionId}.pdf`);
+      link.setAttribute('target', '_blank');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "PDF Generated",
+        description: "Your worksheet feedback PDF is downloading",
+      });
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast({
+        title: "Download Error",
+        description: "Failed to generate PDF. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPdfLoading(false);
+    }
+  };
+
   if (error) {
     return (
       <Alert variant="destructive" className="mt-8">
@@ -79,6 +127,20 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
             ))}
           </div>
         </CardContent>
+        {submissionId && (
+          <CardFooter className="flex justify-end pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadPdf}
+              disabled={isPdfLoading}
+              className="flex items-center gap-1"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              {isPdfLoading ? 'Generating PDF...' : 'Download PDF'}
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );

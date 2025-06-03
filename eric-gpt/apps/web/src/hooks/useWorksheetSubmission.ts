@@ -12,6 +12,7 @@ export function useWorksheetSubmission() {
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
+  const [quotaLimit, setQuotaLimit] = useState<number | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   /**
@@ -181,13 +182,14 @@ export function useWorksheetSubmission() {
       
       const data = await response.json();
       setRemainingQuota(data.remainingQuota);
+      setQuotaLimit(data.quotaLimit);
       return data.remainingQuota;
     } catch (err) {
       console.error('Error fetching quota:', err);
       return null;
     }
   }, []);
-  
+
   return {
     submitWorksheet,
     saveDraft,
@@ -199,5 +201,8 @@ export function useWorksheetSubmission() {
     submissionId,
     remainingQuota,
     error,
+    isOverQuota: remainingQuota !== null && remainingQuota <= 0,
+    quotaLimit,
+    quotaUsed: quotaLimit !== null && remainingQuota !== null ? quotaLimit - remainingQuota : null,
   };
 }

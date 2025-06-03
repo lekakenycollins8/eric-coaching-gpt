@@ -1,0 +1,67 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * Proxy endpoint to forward PDF generation requests to the server
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = params;
+    
+    // Get the authenticated user
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+    
+    const userId = session.user.id;
+    
+    // Get the server URL from environment variables
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const apiUrl = `${serverUrl}/api/submissions/${id}/pdf?userId=${userId}`;
+    
+    // Forward the request to the server
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    // If the response is not OK, return the error
+    if (!response.ok) {
+      const errorData = await response.json();
+      return NextResponse.json(
+        { error: errorData.error || 'Failed to generate PDF' },
+        { status: response.status }
+      );
+    }
+    
+    // Get the PDF buffer
+    const pdfBuffer = await response.arrayBuffer();
+    
+    // Return the PDF as a response
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': response.headers.get('Content-Disposition') || 'attachment; filename="worksheet.pdf"',
+      },
+    });
+  } catch (error: any) {
+    console.error('Error generating PDF:', error);
+    
+    return NextResponse.json(
+      { error: 'Failed to generate PDF', message: error.message },
+      { status: 500 }
+    );
+  }
+}
