@@ -9,9 +9,10 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id?: string } }
 ) {
   try {
+    // Access params using proper pattern for Next.js 14+
     const { id } = params;
     
     // Get the authenticated user
@@ -56,11 +57,13 @@ export async function GET(
         'Content-Disposition': response.headers.get('Content-Disposition') || 'attachment; filename="worksheet.pdf"',
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error generating PDF:', error);
     
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return NextResponse.json(
-      { error: 'Failed to generate PDF', message: error.message },
+      { error: 'Failed to generate PDF', message: errorMessage },
       { status: 500 }
     );
   }

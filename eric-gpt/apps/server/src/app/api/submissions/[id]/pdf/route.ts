@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
-import Submission from '@/models/Submission';
+import Submission, { ISubmission } from '@/models/Submission';
 import mongoose from 'mongoose';
 import puppeteer from 'puppeteer';
 
@@ -44,9 +44,10 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id?: string } }
 ) {
   try {
+    // Access id from params using proper pattern for Next.js 14+
     const { id } = params;
     
     // Validate submission ID format
@@ -85,7 +86,7 @@ export async function GET(
     await connectToDatabase();
     
     // Find the submission by ID
-    const submission = await Submission.findById(id);
+    const submission: ISubmission | null = await Submission.findById(id);
     
     // Check if the submission exists
     if (!submission) {
@@ -113,11 +114,13 @@ export async function GET(
         'Content-Disposition': `attachment; filename="worksheet-${submission.worksheetId}-${id}.pdf"`,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error generating PDF:', error);
     
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return NextResponse.json(
-      { error: 'Failed to generate PDF', message: error.message },
+      { error: 'Failed to generate PDF', message: errorMessage },
       { status: 500 }
     );
   }
@@ -133,10 +136,19 @@ async function generatePDF(submissionId: string): Promise<Buffer> {
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
   
-  // Launch a headless browser
+  // Launch a headless browser with additional arguments to improve compatibility
   const browser = await puppeteer.launch({
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu'
+    ],
+    ignoreHTTPSErrors: true
   });
   
   try {

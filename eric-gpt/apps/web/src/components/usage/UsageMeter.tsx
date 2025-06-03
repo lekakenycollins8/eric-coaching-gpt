@@ -55,11 +55,12 @@ const UsageMeter: React.FC<UsageMeterProps> = ({
           )}
         </div>
       )}
-      <Progress 
-        value={percentage} 
-        className={cn(getSizeClass(), 'w-full')}
-        indicatorClassName={getColorClass()}
-      />
+      <div className={cn('relative w-full overflow-hidden rounded-full bg-secondary', getSizeClass())}>  
+        <div 
+          className={cn('h-full transition-all', getColorClass())} 
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
     </div>
   );
 };

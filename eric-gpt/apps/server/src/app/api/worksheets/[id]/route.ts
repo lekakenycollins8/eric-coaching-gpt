@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+// Define interfaces for worksheet data
+interface WorksheetField {
+  name: string;
+  label: string;
+  type: 'text' | 'textarea' | 'rating' | 'checkbox' | 'multiselect' | 'info';
+  required?: boolean;
+  options?: string[];
+  placeholder?: string;
+  description?: string;
+}
+
+interface Worksheet {
+  id: string;
+  title: string;
+  description: string;
+  systemPromptKey: string;
+  fields: WorksheetField[];
+}
+
 /**
  * @swagger
  * /api/worksheets/{id}:
@@ -88,8 +107,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Ensure params is properly awaited before accessing properties
-    const id = params?.id;
+    // Destructure id from params to comply with Next.js 14+ requirements
+    const { id } = params;
     
     if (!id) {
       return NextResponse.json(
@@ -101,10 +120,10 @@ export async function GET(
     // Read the worksheets.json file
     const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
     const worksheetsData = fs.readFileSync(worksheetsPath, 'utf8');
-    const worksheets = JSON.parse(worksheetsData);
+    const worksheets: Worksheet[] = JSON.parse(worksheetsData);
 
     // Find the worksheet with the matching ID
-    const worksheet = worksheets.find((w: any) => w.id === id);
+    const worksheet = worksheets.find((w: Worksheet) => w.id === id);
 
     if (!worksheet) {
       return NextResponse.json(

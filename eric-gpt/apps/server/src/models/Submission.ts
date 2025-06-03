@@ -39,6 +39,14 @@ SubmissionSchema.index({ orgId: 1, createdAt: -1 });
 // Check if the model already exists to prevent overwriting during hot reloads
 import { Collections } from '@/db/config';
 
-// Use the configured collection name
-export default mongoose.models.Submission || 
-  mongoose.model<ISubmission>(Collections.WORKSHEET_SUBMISSIONS, SubmissionSchema);
+// Use the configured collection name and prevent model overwrites
+let SubmissionModel: mongoose.Model<ISubmission>;
+try {
+  // Try to get existing model first
+  SubmissionModel = mongoose.model<ISubmission>('Submission');
+} catch (error) {
+  // Model doesn't exist yet, create it
+  SubmissionModel = mongoose.model<ISubmission>(Collections.WORKSHEET_SUBMISSIONS, SubmissionSchema);
+}
+
+export default SubmissionModel;

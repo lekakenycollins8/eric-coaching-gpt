@@ -89,9 +89,13 @@ export async function countUserSubmissionsInCurrentPeriod(userId: string): Promi
     }
     
     // Calculate the start of the current billing period
-    // This assumes subscription.currentPeriodStart is stored as a timestamp
+    // Handle both Date objects and timestamps for backward compatibility
     const currentPeriodStart = user.subscription.currentPeriodStart 
-      ? new Date(user.subscription.currentPeriodStart * 1000) 
+      ? (user.subscription.currentPeriodStart instanceof Date 
+          ? user.subscription.currentPeriodStart 
+          : new Date(typeof user.subscription.currentPeriodStart === 'number' 
+              ? user.subscription.currentPeriodStart * 1000 
+              : user.subscription.currentPeriodStart)) 
       : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default to 30 days ago
     
     // Count submissions since the start of the current period
@@ -167,6 +171,12 @@ export async function recordSubmissionUsage(userId: string, tokensUsed: number):
     } else {
       user.usage.totalSubmissions = (user.usage.totalSubmissions || 0) + 1;
       user.usage.totalTokensUsed = (user.usage.totalTokensUsed || 0) + tokensUsed;
+    }
+    
+    // Also update the submissionsThisPeriod counter in the subscription object
+    // This ensures the counter is in sync with the actual submissions count
+    if (user.subscription) {
+      user.subscription.submissionsThisPeriod = (user.subscription.submissionsThisPeriod || 0) + 1;
     }
     
     await user.save();

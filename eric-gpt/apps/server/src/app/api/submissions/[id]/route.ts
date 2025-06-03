@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
-import Submission from '@/models/Submission';
+import Submission, { ISubmission } from '@/models/Submission';
 import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
@@ -59,9 +59,10 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id?: string } }
 ) {
   try {
+    // Access params using proper pattern for Next.js 14+
     const { id } = params;
     
     // Validate submission ID format
@@ -100,7 +101,7 @@ export async function GET(
     await connectToDatabase();
     
     // Find the submission by ID
-    const submission = await Submission.findById(id);
+    const submission: ISubmission | null = await Submission.findById(id);
     
     // Check if the submission exists
     if (!submission) {
@@ -131,11 +132,13 @@ export async function GET(
         createdAt: submission.createdAt,
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching submission:', error);
     
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
     return NextResponse.json(
-      { error: 'Failed to fetch submission', message: error.message },
+      { error: 'Failed to fetch submission', message: errorMessage },
       { status: 500 }
     );
   }

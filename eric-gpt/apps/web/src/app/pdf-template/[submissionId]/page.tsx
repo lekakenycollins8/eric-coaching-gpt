@@ -17,8 +17,9 @@ interface Submission {
 export default async function PdfTemplatePage({
   params,
 }: {
-  params: { submissionId: string };
+  params: { submissionId?: string };
 }) {
+  // Access params using proper pattern for Next.js 14+
   const { submissionId } = params;
   
   // Fetch the submission data from the API
