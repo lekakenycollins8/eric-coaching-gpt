@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     // Access params.id asynchronously to comply with Next.js 14+ requirements
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(

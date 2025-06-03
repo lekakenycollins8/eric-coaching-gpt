@@ -63,7 +63,7 @@ export async function GET(
 ) {
   try {
     // Access params using proper pattern for Next.js 14+
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
     
     // Validate submission ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {

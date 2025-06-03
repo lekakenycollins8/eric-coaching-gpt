@@ -16,14 +16,24 @@ interface Submission {
 // This page is a server component that will be used to generate PDFs
 export default async function PdfTemplatePage({
   params,
+  searchParams,
 }: {
   params: { submissionId?: string };
+  searchParams: { userId?: string };
 }) {
   // Access params using proper pattern for Next.js 14+
-  const { submissionId } = params;
+  const { submissionId } = await Promise.resolve(params);
+  
+  // Check if submissionId exists before proceeding
+  if (!submissionId) {
+    notFound();
+  }
+  
+  // Get the userId from searchParams - must await in Next.js 14+
+  const { userId } = await Promise.resolve(searchParams);
   
   // Fetch the submission data from the API
-  const submission = await getSubmission(submissionId);
+  const submission = await getSubmission(submissionId, userId);
   
   if (!submission) {
     notFound();
@@ -104,11 +114,17 @@ function formatAnswerValue(value: any): string {
 }
 
 // Function to fetch submission data from the API
-async function getSubmission(submissionId: string): Promise<Submission | null> {
+async function getSubmission(submissionId: string, userId?: string): Promise<Submission | null> {
   try {
     // Using server-side fetch with absolute URL
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/submissions/${submissionId}`, {
+    // Ensure we're using the correct parameter name (submissionId) that matches the server endpoint
+    // Include userId as a query parameter if provided
+    const url = userId 
+      ? `${baseUrl}/api/submissions/${submissionId}?userId=${userId}` 
+      : `${baseUrl}/api/submissions/${submissionId}`;
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

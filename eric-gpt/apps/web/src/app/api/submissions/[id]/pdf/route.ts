@@ -13,7 +13,7 @@ export async function GET(
 ) {
   try {
     // Access params using proper pattern for Next.js 14+
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
     
     // Get the authenticated user
     const session = await getServerSession(authOptions);
@@ -28,6 +28,7 @@ export async function GET(
     
     // Get the server URL from environment variables
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    // Ensure this matches the actual server endpoint structure
     const apiUrl = `${serverUrl}/api/submissions/${id}/pdf?userId=${userId}`;
     
     // Forward the request to the server

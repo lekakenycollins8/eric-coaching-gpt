@@ -48,7 +48,7 @@ export async function GET(
 ) {
   try {
     // Access id from params using proper pattern for Next.js 14+
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
     
     // Validate submission ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -105,7 +105,7 @@ export async function GET(
     }
     
     // Generate the PDF using Puppeteer
-    const pdf = await generatePDF(id);
+    const pdf = await generatePDF(id, userId);
     
     // Return the PDF as a response
     return new NextResponse(pdf, {
@@ -129,10 +129,13 @@ export async function GET(
 /**
  * Generate a PDF from the submission template page
  */
-async function generatePDF(submissionId: string): Promise<Buffer> {
+async function generatePDF(submissionId: string, userId?: string): Promise<Buffer> {
   // Get the base URL from environment variables or use a default
   const webAppUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-  const templateUrl = `${webAppUrl}/pdf-template/${submissionId}`;
+  // Include userId as a query parameter if provided
+  const templateUrl = userId
+    ? `${webAppUrl}/pdf-template/${submissionId}?userId=${userId}`
+    : `${webAppUrl}/pdf-template/${submissionId}`;  // Using submissionId to match the PDF template page's route parameter
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
   
