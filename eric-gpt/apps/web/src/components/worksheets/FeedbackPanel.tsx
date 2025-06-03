@@ -122,9 +122,7 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
         </CardHeader>
         <CardContent>
           <div className="prose prose-slate max-w-none">
-            {feedback.split('\n').map((paragraph: string, idx: number) => (
-              <p key={idx}>{paragraph}</p>
-            ))}
+            {formatAIFeedback(feedback)}
           </div>
         </CardContent>
         {submissionId && (
@@ -145,5 +143,49 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({
     </div>
   );
 };
+
+// Helper function to format AI feedback with proper structure
+function formatAIFeedback(feedback: string): React.ReactNode {
+  if (!feedback) return <p>No feedback provided.</p>;
+  
+  // Split by double newlines to identify paragraphs
+  const paragraphs = feedback.split(/\n\n+/);
+  
+  return (
+    <>
+      {paragraphs.map((paragraph, idx) => {
+        // Check if paragraph starts with a bullet point or number
+        const isList = /^\s*[•\-*]|^\s*\d+\./.test(paragraph);
+        
+        if (isList) {
+          // Handle bullet points by splitting into lines
+          const listItems = paragraph.split(/\n/);
+          return (
+            <ul key={idx} className="list-disc pl-5 mb-4">
+              {listItems.map((item, itemIdx) => {
+                // Clean up bullet points or numbers
+                const cleanItem = item.replace(/^\s*[•\-*]\s*|^\s*\d+\.\s*/, '');
+                return cleanItem.trim() ? <li key={itemIdx} className="mb-1">{cleanItem}</li> : null;
+              })}
+            </ul>
+          );
+        } else {
+          // Handle regular paragraphs, preserving internal line breaks
+          const lines = paragraph.split(/\n/);
+          return (
+            <div key={idx} className="mb-4">
+              {lines.map((line, lineIdx) => (
+                <React.Fragment key={lineIdx}>
+                  {line}
+                  {lineIdx < lines.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </div>
+          );
+        }
+      })}
+    </>
+  );
+}
 
 export default FeedbackPanel;
