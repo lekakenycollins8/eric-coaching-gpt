@@ -9,13 +9,16 @@ import {
   ArrowTrendingUpIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import { STRIPE_PLANS, getPlanById, type PlanId } from '../../lib/stripe/plans';
 
 interface UserStatsState {
   worksheetsCompleted: number;
   activeTrackers: number;
   subscriptionPlan: string;
+  planId: string;
   isSubscribed: boolean;
   daysRemaining: number;
+  status: string;
 }
 
 // Component to display user statistics and subscription status
@@ -25,8 +28,10 @@ export default function UserStats() {
     worksheetsCompleted: 0,
     activeTrackers: 0,
     subscriptionPlan: 'Loading...',
+    planId: '',
     isSubscribed: false,
     daysRemaining: 0,
+    status: '',
   });
   const [loading, setLoading] = React.useState(true);
 
@@ -45,16 +50,47 @@ export default function UserStats() {
           const submissionsData = await submissionsResponse.json();
           const worksheetsCompleted = submissionsData.total || 0;
           
-          // Fetch subscription data
-          // In a real implementation, we would have a dedicated endpoint for this
-          // For now, we'll extract what we can from the quota endpoint
-          const subscriptionData = submissionsData.subscription || {};
-          const subscriptionPlan = subscriptionData.plan || 'Free Trial';
-          const isSubscribed = subscriptionPlan !== 'Free Trial';
+          // Fetch subscription data from the user subscription endpoint
+          // This is the same endpoint used by the subscription page
+          const subscriptionResponse = await fetch('/api/user/subscription', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
           
-          // Calculate days remaining in subscription
-          // This would be more accurate in a real implementation
-          const daysRemaining = subscriptionData.daysRemaining || 0;
+          let subscriptionPlan = 'Free Trial';
+          let planId = '';
+          let isSubscribed = false;
+          let daysRemaining = 0;
+          let status = '';
+          
+          if (subscriptionResponse.ok) {
+            const subscriptionData = await subscriptionResponse.json();
+            console.log('Subscription data in UserStats:', subscriptionData);
+            
+            if (subscriptionData.subscription && subscriptionData.subscription.status) {
+              // Get subscription details
+              status = subscriptionData.subscription.status;
+              isSubscribed = status === 'active' || status === 'trialing';
+              planId = subscriptionData.subscription.planId || '';
+              
+              // Get plan details from the plan ID
+              if (planId) {
+                const plan = getPlanById(planId as PlanId);
+                if (plan) {
+                  subscriptionPlan = plan.name;
+                }
+              }
+              
+              // Calculate days remaining if we have the end date
+              if (subscriptionData.subscription.currentPeriodEnd) {
+                const endDate = new Date(subscriptionData.subscription.currentPeriodEnd);
+                const now = new Date();
+                daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+              }
+            }
+          }
           
           // For now, active trackers is always 0 since we haven't implemented that feature yet
           const activeTrackers = 0;
@@ -63,8 +99,10 @@ export default function UserStats() {
             worksheetsCompleted,
             activeTrackers,
             subscriptionPlan,
+            planId,
             isSubscribed,
             daysRemaining,
+            status,
           });
         } catch (error) {
           console.error('Error fetching user stats:', error);
@@ -73,8 +111,10 @@ export default function UserStats() {
             worksheetsCompleted: 0,
             activeTrackers: 0,
             subscriptionPlan: 'Free Trial',
+            planId: '',
             isSubscribed: false,
             daysRemaining: 0,
+            status: '',
           });
         } finally {
           setLoading(false);
@@ -109,7 +149,7 @@ export default function UserStats() {
       </div>
       
       <div className="px-4 py-5 sm:p-6 border-t border-gray-200">
-        {/* Subscription Status Alert */}
+        {/* Subscription Status Alert - Only show for users without an active subscription */}
         {!stats.isSubscribed && (
           <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
             <div className="flex">
@@ -124,9 +164,9 @@ export default function UserStats() {
                 <div className="mt-2">
                   <Link
                     href="/dashboard/subscription"
-                    className="text-sm font-medium text-amber-800 hover:text-amber-700"
+                    className="inline-flex items-center px-3 py-1.5 border border-amber-700 text-sm font-medium rounded-md text-amber-800 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
                   >
-                    Upgrade now &rarr;
+                    Subscribe Now &rarr;
                   </Link>
                 </div>
               </div>
@@ -157,21 +197,32 @@ export default function UserStats() {
               <dt className="text-sm font-medium text-gray-500">Subscription Plan</dt>
             </div>
             <dd className="mt-1 text-lg font-medium text-gray-900">
-              <span className={stats.isSubscribed ? 'text-green-600' : 'text-gray-600'}>
-                {stats.subscriptionPlan}
-              </span>
-              {stats.daysRemaining > 0 && (
-                <span className="ml-2 text-sm text-gray-500">
-                  ({stats.daysRemaining} days remaining)
+              {stats.isSubscribed ? (
+                <>
+                  <span className="text-green-600">
+                    {stats.subscriptionPlan}
+                  </span>
+                  <span className="ml-2 text-sm text-gray-500">
+                    ({stats.status === 'active' ? 'Active' : stats.status})
+                  </span>
+                  {stats.daysRemaining > 0 && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({stats.daysRemaining} days remaining)
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-600">
+                  {stats.subscriptionPlan}
                 </span>
               )}
             </dd>
             <div className="mt-3">
               <Link 
                 href="/dashboard/subscription" 
-                className="text-sm font-medium text-green-600 hover:text-green-500"
+                className={`inline-flex items-center px-3 py-1.5 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${stats.isSubscribed ? 'border-green-600 text-green-700 bg-green-50 hover:bg-green-100' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
               >
-                {stats.isSubscribed ? 'Manage subscription →' : 'Upgrade now →'}
+                {stats.isSubscribed ? 'Manage subscription' : 'Subscribe now'} &rarr;
               </Link>
             </div>
           </div>
