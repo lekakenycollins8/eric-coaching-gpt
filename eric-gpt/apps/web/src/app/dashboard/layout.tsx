@@ -9,6 +9,7 @@ import {
   UserIcon, 
   CreditCardIcon, 
   DocumentTextIcon, 
+  ClipboardDocumentListIcon,
   Cog6ToothIcon,
   Bars3Icon,
   XMarkIcon
@@ -28,6 +29,7 @@ export default function DashboardLayout({
     { name: 'Profile', href: '/dashboard/profile', icon: UserIcon },
     { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
+    { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
     { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
   ];
 

@@ -123,16 +123,51 @@
 *   Quota meter visible; submissions blocked when limit reached
 *   Passing PDF & quota enforcement tests
 
-## Sprint 5: Pro Team Collaboration
+## Sprint 5: My Submissions Page & Trackers/Reflection Tools
 
-### Dates: June 4 – June 10
+### Dates: June 4 – June 17 (Extended Sprint to accommodate new scope)
+
+### Goals: 
+1. Enable users to view their past worksheet submissions.
+2. Implement 5-day trackers with autosave + manual save, linkable to worksheet commitments.
+
+### Tasks
+
+**Part 1: 'My Submissions' Page**
+*   Backend: API endpoint to fetch all of a user's worksheet submissions (ID, title, date).
+*   Backend: Ensure existing endpoint to fetch full submission details is robust.
+*   Frontend: Add 'My Submissions' navigation link.
+*   Frontend: Create page to list all user submissions.
+*   Frontend: Create page to display full details of a selected submission (read-only view of questions and answers).
+
+**Part 2: Trackers & Reflection Tools**
+*   Backend: Define Mongoose models for `TrackerPeriod`, `TrackerEntry`, `TrackerReflection`.
+*   Backend: API endpoints to create/manage tracker periods, log daily entries, and submit final reflections.
+*   Backend: API endpoint to generate a PDF export of a tracker summary.
+*   Frontend: UI to start a new tracker (ideally from a worksheet commitment).
+*   Frontend: UI for daily tracker entries (5-day view) with autosave.
+*   Frontend: UI for submitting the final tracker reflection.
+*   Frontend: UI to list and view active/completed trackers.
+*   Frontend: 'Download PDF' for tracker summary.
+*   End-to-end test: start tracker → log entries → submit reflection → export PDF.
+
+### Deliverables
+
+*   Users can view and revisit their past worksheet submissions.
+*   Fully functional 5-day tracker flow, linkable to worksheet commitments.
+*   Consolidated tracker PDF export.
+*   Passing E2E tests for submissions viewing and tracker functionality.
+
+## Sprint 6: Pro Team Collaboration
+
+### Dates: June 18 – June 24
 
 ### Goals: Org invites, shared usage
 
 ### Tasks
 
 *   Org model & schema in DB
-*   /api/org/invite endpoint → send email via Mailgun
+*   /api/org/invite endpoint → send email (Nodemailer preferred)
 *   Join flow: invite token → new/existing user added to Org
 *   Team Settings UI: list members, remove member
 *   Tests for invite flow, join logic, shared quota increments
@@ -143,29 +178,9 @@
 *   Usage pool shared across Org members
 *   Invite workflow tests passing
 
-## Sprint 6: Trackers & Reflection Tools
-
-### Dates: June 11 – June 17
-
-### Goals: 5-day trackers with autosave + manual save
-
-### Tasks
-
-*   /api/trackers and /api/trackers/:id/start → create TrackerPeriod
-*   Render 5 date rows with promptFields; implement autosave on blur + “Save” button
-*   /entries and /reflection endpoints, plus /export PDF of tracker summary
-*   UI reveal logic for reflectionFields after 5 entries
-*   End-to-end test: start tracker → log entries → submit reflection → export PDF
-
-### Deliverables
-
-*   Fully functional 5-day tracker flow
-*   Consolidated tracker PDF export
-*   Passing tracker E2E test
-
 ## Sprint 7: VIP Dashboard & UI/UX Polish
 
-### Dates: June 18 – June 24
+### Dates: June 25 – July 1
 
 ### Goals: VIP history view, responsive polish, accessibility
 
