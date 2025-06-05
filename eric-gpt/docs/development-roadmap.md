@@ -133,12 +133,12 @@
 
 ### Tasks
 
-**Part 1: 'My Submissions' Page**
-*   Backend: API endpoint to fetch all of a user's worksheet submissions (ID, title, date).
-*   Backend: Ensure existing endpoint to fetch full submission details is robust.
-*   Frontend: Add 'My Submissions' navigation link.
-*   Frontend: Create page to list all user submissions.
-*   Frontend: Create page to display full details of a selected submission (read-only view of questions and answers).
+**Part 1: 'My Submissions' Page** ✅
+*   ✅ Backend: Leveraged existing API endpoint to fetch all of a user's worksheet submissions (ID, title, date).
+*   ✅ Backend: Confirmed existing endpoint to fetch full submission details is robust.
+*   ✅ Frontend: Added 'My Submissions' navigation link to dashboard sidebar.
+*   ✅ Frontend: Created page to list all user submissions with pagination.
+*   ✅ Frontend: Implemented direct PDF viewing and downloading for submissions.
 
 **Part 2: Trackers & Reflection Tools**
 *   Backend: Define Mongoose models for `TrackerPeriod`, `TrackerEntry`, `TrackerReflection`.
@@ -153,10 +153,11 @@
 
 ### Deliverables
 
-*   Users can view and revisit their past worksheet submissions.
-*   Fully functional 5-day tracker flow, linkable to worksheet commitments.
-*   Consolidated tracker PDF export.
-*   Passing E2E tests for submissions viewing and tracker functionality.
+*   ✅ Users can view and revisit their past worksheet submissions via the "My Submissions" page.
+*   ✅ Users can directly view and download PDFs of their past submissions.
+*   🔄 Fully functional 5-day tracker flow, linkable to worksheet commitments (in progress).
+*   🔄 Consolidated tracker PDF export (in progress).
+*   🔄 Passing E2E tests for submissions viewing and tracker functionality (in progress).
 
 ## Sprint 6: Pro Team Collaboration
 

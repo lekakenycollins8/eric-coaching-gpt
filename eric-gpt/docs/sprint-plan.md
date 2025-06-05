@@ -7,6 +7,8 @@ After each sprint, update the Status column to ✅ Done or 🟢 In Review.
 | 1      | May 7 - May 13    | Secure login and subscription system | ✅ Done      |
 | 2      | May 14 - May 20   | Dashboard UI and worksheet system  | ✅ Done      |
 | 3      | May 21 - May 27   | Custom GPT integration for coaching feedback | ✅ Done      |
+| 4      | May 28 - June 3   | PDF Export & Quota Enforcement UI  | ✅ Done      |
+| 5      | June 4 - June 17  | My Submissions & Trackers/Reflection Tools | 🟢 In Progress |
 
 ## Sprint 1 Completed Work
 
@@ -96,33 +98,64 @@ After each sprint, update the Status column to ✅ Done or 🟢 In Review.
 - Updated worksheet ID patterns in the prompt selection logic
 - Fixed OpenAI parameter naming from camelCase to snake_case
 
-## Sprint 4 Plan: PDF Export & Quota Enforcement UI
+## Sprint 4 Completed Work: PDF Export & Quota Enforcement UI
+
+### PDF Export Implementation
+- Created a PDF template page at `/pdf-template/[submissionId]` with branded styling
+- Implemented `/api/submissions/:id/pdf` endpoint using Puppeteer for PDF generation
+- Added download functionality to the worksheet submission page
+- Ensured PDF includes both user responses and AI feedback in a well-formatted layout
+
+### Quota Enforcement UI
+- Added usage meter showing current usage vs. limit ("X of Y used") to dashboard
+- Implemented visual indicators on the worksheet form for remaining submissions
+- Created blocking UI for over-quota submissions with upgrade call-to-action
+- Added quota information to the user profile page
+
+### Testing & Quality Assurance
+- Wrote integration tests for the PDF generation endpoint
+- Tested quota enforcement UI across different subscription tiers
+- Verified PDF formatting across different worksheet types
+- Tested edge cases like very long responses and special characters
+
+## Sprint 5 Progress: My Submissions & Trackers/Reflection Tools
 
 ### Objective
-Implement downloadable PDF exports of worksheet submissions with feedback and enhance the quota enforcement UI to provide clear visual indicators of usage limits.
+Enable users to view their past worksheet submissions and implement 5-day trackers with autosave + manual save, linkable to worksheet commitments.
 
-### Key Tasks
+### Completed Work: My Submissions Page
+- Added "My Submissions" navigation link to the dashboard sidebar
+- Created a paginated submissions list page that displays all user submissions
+- Implemented direct PDF viewing and downloading for submissions
+- Leveraged existing backend API endpoints for fetching submission data
+- Removed the detailed submission view page in favor of direct PDF access
 
-#### 1. PDF Export Implementation
-- Create a PDF template page at `/pdf-template/[submissionId]` with branded styling
-- Implement `/api/submissions/:id/pdf` endpoint using Puppeteer for PDF generation
-- Add download functionality to the worksheet submission page
-- Ensure PDF includes both user responses and AI feedback in a well-formatted layout
+### In Progress: Trackers & Reflection Tools
 
-#### 2. Quota Enforcement UI
-- Add usage meter showing current usage vs. limit ("X of Y used") to dashboard
-- Implement visual indicators on the worksheet form for remaining submissions
-- Create blocking UI for over-quota submissions with upgrade call-to-action
-- Add quota information to the user profile page
+#### 1. Database Models (Planned)
+- TrackerPeriod: Overall 5-day tracking period linked to worksheet commitments
+- TrackerEntry: Daily tracking entries with progress data and notes
+- TrackerReflection: Final reflection after the 5-day period
 
-#### 3. Testing & Quality Assurance
-- Write integration tests for the PDF generation endpoint
-- Test quota enforcement UI across different subscription tiers
-- Verify PDF formatting across different worksheet types
-- Test edge cases like very long responses and special characters
+#### 2. API Endpoints (Planned)
+- Create Tracker: Start a new 5-day tracker linked to a worksheet submission
+- Get User Trackers: List all trackers for the current user
+- Get Tracker Details: Get a specific tracker with its entries and reflection
+- Add/Update Entry: Add or update a daily tracker entry
+- Add/Update Reflection: Add or update the final reflection
+- Generate PDF: Create a PDF summary of the tracker
+
+#### 3. Frontend Components (Planned)
+- Tracker List: View all active and completed trackers
+- Tracker Creation: Start a new tracker from a worksheet commitment
+- Daily Entry Form: Log progress for each day
+- Final Reflection Form: Submit overall reflection
+- Tracker Detail View: See all entries and reflection for a tracker
+- PDF Export: Generate and download a PDF summary
 
 ### Deliverables
-- Fully functional "Download PDF" feature for worksheet submissions
-- Clear quota visualization and enforcement UI
-- Passing tests for PDF generation and quota enforcement
-- Documentation for the PDF generation system
+- ✅ Users can view and revisit their past worksheet submissions via the "My Submissions" page
+- ✅ Users can directly view and download PDFs of their past submissions
+- 🔄 Fully functional 5-day tracker flow, linkable to worksheet commitments (in progress)
+- 🔄 Consolidated tracker PDF export (in progress)
+- 🔄 Passing E2E tests for submissions viewing and tracker functionality (in progress)
