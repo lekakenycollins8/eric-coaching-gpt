@@ -37,9 +37,9 @@ TrackerSchema.index({ submissionId: 1 });
 // Use the configured collection name and prevent model overwrites
 let TrackerModel: mongoose.Model<ITracker>;
 try {
-  TrackerModel = mongoose.model<ITracker>('Tracker');
+  TrackerModel = mongoose.model<ITracker>(Collections.TRACKERS);
 } catch (error) {
-  TrackerModel = mongoose.model<ITracker>('trackers', TrackerSchema);
+  TrackerModel = mongoose.model<ITracker>(Collections.TRACKERS, TrackerSchema);
 }
 
 export default TrackerModel;

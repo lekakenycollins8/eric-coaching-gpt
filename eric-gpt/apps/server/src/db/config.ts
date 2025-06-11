@@ -13,6 +13,11 @@ export const Collections = {
   WORKSHEETS: 'worksheets',
   WORKSHEET_SUBMISSIONS: 'worksheet_submissions',
   FEEDBACK: 'feedback',
+  
+  // Tracker Collections
+  TRACKERS: 'trackers',
+  TRACKER_ENTRIES: 'tracker_entries',
+  TRACKER_REFLECTIONS: 'tracker_reflections',
 
   // Subscription & Webhook Collections
   SUBSCRIPTIONS: 'subscriptions',

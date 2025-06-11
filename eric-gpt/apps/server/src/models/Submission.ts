@@ -43,7 +43,7 @@ import { Collections } from '@/db/config';
 let SubmissionModel: mongoose.Model<ISubmission>;
 try {
   // Try to get existing model first
-  SubmissionModel = mongoose.model<ISubmission>('Submission');
+  SubmissionModel = mongoose.model<ISubmission>(Collections.WORKSHEET_SUBMISSIONS);
 } catch (error) {
   // Model doesn't exist yet, create it
   SubmissionModel = mongoose.model<ISubmission>(Collections.WORKSHEET_SUBMISSIONS, SubmissionSchema);

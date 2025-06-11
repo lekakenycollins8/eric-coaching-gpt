@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Collections } from '@/db/config';
 
 export interface ITrackerReflection extends Document {
   trackerId: Schema.Types.ObjectId;
@@ -24,9 +25,9 @@ TrackerReflectionSchema.index({ userId: 1 });
 // Use the configured collection name and prevent model overwrites
 let TrackerReflectionModel: mongoose.Model<ITrackerReflection>;
 try {
-  TrackerReflectionModel = mongoose.model<ITrackerReflection>('TrackerReflection');
+  TrackerReflectionModel = mongoose.model<ITrackerReflection>(Collections.TRACKER_REFLECTIONS);
 } catch (error) {
-  TrackerReflectionModel = mongoose.model<ITrackerReflection>('tracker_reflections', TrackerReflectionSchema);
+  TrackerReflectionModel = mongoose.model<ITrackerReflection>(Collections.TRACKER_REFLECTIONS, TrackerReflectionSchema);
 }
 
 export default TrackerReflectionModel;

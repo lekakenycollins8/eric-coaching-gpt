@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Collections } from '@/db/config';
 
 export interface ITrackerEntry extends Document {
   trackerId: Schema.Types.ObjectId;
@@ -28,9 +29,9 @@ TrackerEntrySchema.index({ userId: 1 });
 // Use the configured collection name and prevent model overwrites
 let TrackerEntryModel: mongoose.Model<ITrackerEntry>;
 try {
-  TrackerEntryModel = mongoose.model<ITrackerEntry>('TrackerEntry');
+  TrackerEntryModel = mongoose.model<ITrackerEntry>(Collections.TRACKER_ENTRIES);
 } catch (error) {
-  TrackerEntryModel = mongoose.model<ITrackerEntry>('tracker_entries', TrackerEntrySchema);
+  TrackerEntryModel = mongoose.model<ITrackerEntry>(Collections.TRACKER_ENTRIES, TrackerEntrySchema);
 }
 
 export default TrackerEntryModel;
