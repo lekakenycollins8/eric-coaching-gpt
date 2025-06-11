@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { Collections } from '../db/config.js';
+import { Collections } from '../db/config';
 
 export interface IWebhookEvent extends Document {
   type: string;
@@ -37,5 +37,12 @@ WebhookEventSchema.index({ eventId: 1 }, { unique: true });
 WebhookEventSchema.index({ createdAt: 1 });
 WebhookEventSchema.index({ status: 1, processedAt: 1 });
 
-export default mongoose.models.WebhookEvent ||
-  mongoose.model<IWebhookEvent>(Collections.WEBHOOK_EVENTS, WebhookEventSchema);
+// Prevent model overwrites using try-catch pattern
+let WebhookEventModel: mongoose.Model<IWebhookEvent>;
+try {
+  WebhookEventModel = mongoose.model<IWebhookEvent>(Collections.WEBHOOK_EVENTS);
+} catch (error) {
+  WebhookEventModel = mongoose.model<IWebhookEvent>(Collections.WEBHOOK_EVENTS, WebhookEventSchema);
+}
+
+export default WebhookEventModel;

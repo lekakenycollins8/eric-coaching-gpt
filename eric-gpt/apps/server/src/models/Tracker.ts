@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { Collections } from '@/db/config';
+import { Collections } from '../db/config';
 
 export interface ITracker extends Document {
   userId: Schema.Types.ObjectId;

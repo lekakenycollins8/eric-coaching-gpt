@@ -41,16 +41,25 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get the authenticated user
+    // Get the authenticated user from session or query parameter
+    let userId;
+    
+    // First try to get userId from the session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else {
+      // If no session, try to get userId from query parameters (for web app proxy requests)
+      const searchParams = request.nextUrl.searchParams;
+      userId = searchParams.get('userId');
+      
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
     }
-
-    const userId = session.user.id;
 
     // Check if user has an active subscription
     await connectToDatabase();
@@ -148,16 +157,30 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Get the authenticated user
+    // Get the authenticated user from session or request body
+    let userId;
+    let body;
+    
+    // First try to get userId from the session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    if (session?.user?.id) {
+      userId = session.user.id;
+      body = await request.json();
+    } else {
+      // If no session, try to get userId from request body (for web app proxy requests)
+      body = await request.json();
+      userId = body.userId;
+      
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+      
+      // Remove userId from body to avoid duplicate
+      delete body.userId;
     }
-
-    const userId = session.user.id;
 
     // Check if user has an active subscription
     await connectToDatabase();
@@ -177,8 +200,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get request body
-    const body = await request.json();
+    // Body has already been parsed earlier
     const { title, description, startDate, endDate, submissionId } = body;
 
     // Validate required fields

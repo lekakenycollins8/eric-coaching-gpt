@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { Collections } from '@/db/config';
 
 export interface IProcessedEvent extends Document {
   eventId: string;
@@ -12,7 +13,12 @@ const ProcessedEventSchema: Schema = new Schema({
   processedAt: { type: Date, default: Date.now },
 });
 
-// Use the configured collection name
-import { Collections } from '@/db/config';
+// Prevent model overwrites using try-catch pattern
+let ProcessedEventModel: mongoose.Model<IProcessedEvent>;
+try {
+  ProcessedEventModel = mongoose.model<IProcessedEvent>(Collections.WEBHOOK_EVENTS);
+} catch (error) {
+  ProcessedEventModel = mongoose.model<IProcessedEvent>(Collections.WEBHOOK_EVENTS, ProcessedEventSchema, 'processed_events');
+}
 
-export default mongoose.models.ProcessedEvent || mongoose.model<IProcessedEvent>(Collections.WEBHOOK_EVENTS, ProcessedEventSchema, 'processed_events');
+export default ProcessedEventModel;

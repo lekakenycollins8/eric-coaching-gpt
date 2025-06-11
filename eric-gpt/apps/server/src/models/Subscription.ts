@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { Collections } from '../db/config.js';
+import { Collections } from '../db/config';
 
 export interface ISubscription extends Document {
   userId: Schema.Types.ObjectId;

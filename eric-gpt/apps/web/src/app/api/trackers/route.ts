@@ -25,15 +25,34 @@ export async function GET(request: NextRequest) {
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${serverUrl}/api/trackers${queryPart}`, {
+    console.log('Web app: Forwarding to server URL:', serverUrl);
+    
+    // Add the user ID to the query parameters
+    const userId = session.user.id;
+    const userQueryParam = queryString ? `&userId=${userId}` : `?userId=${userId}`;
+    
+    const response = await fetch(`${serverUrl}/api/trackers${queryPart}${userQueryParam}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    // Check if response is OK before trying to parse JSON
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Could not read error response');
+      console.error('Server returned an error:', response.status, errorText);
+      return NextResponse.json(
+        { error: `Server error: ${response.status}`, message: 'The server API returned an error' },
+        { status: response.status }
+      );
+    }
+
     // Get the response data
-    const data = await response.json();
+    const data = await response.json().catch(error => {
+      console.error('Failed to parse JSON response:', error);
+      throw new Error('Invalid JSON response from server');
+    });
 
     // Return the response from the server
     return NextResponse.json(data, { status: response.status });
@@ -66,16 +85,35 @@ export async function POST(request: NextRequest) {
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    console.log('Web app: Forwarding to server URL:', serverUrl);
+    
+    // Add the user ID to the body
+    const userId = session.user.id;
+    const bodyWithUserId = { ...body, userId };
+    
     const response = await fetch(`${serverUrl}/api/trackers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(bodyWithUserId),
     });
 
+    // Check if response is OK before trying to parse JSON
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Could not read error response');
+      console.error('Server returned an error:', response.status, errorText);
+      return NextResponse.json(
+        { error: `Server error: ${response.status}`, message: 'The server API returned an error' },
+        { status: response.status }
+      );
+    }
+
     // Get the response data
-    const data = await response.json();
+    const data = await response.json().catch(error => {
+      console.error('Failed to parse JSON response:', error);
+      throw new Error('Invalid JSON response from server');
+    });
 
     // Return the response from the server
     return NextResponse.json(data, { status: response.status });
