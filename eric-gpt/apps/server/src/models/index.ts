@@ -1,13 +1,16 @@
 import { Collections } from '@/db/config';
 
 // Import models
-import User from './User.js';
-import Organization from './Organization.js';
-import Worksheet from './Worksheet.js';
-import Submission from './Submission.js';
-import Subscription from './Subscription.js';
-import WebhookEvent from './WebhookEvent.js';
-import ProcessedEvent from './ProcessedEvent.js';
+import User from './User';
+import Organization from './Organization';
+import Worksheet from './Worksheet';
+import Submission from './Submission';
+import Subscription from './Subscription';
+import WebhookEvent from './WebhookEvent';
+import ProcessedEvent from './ProcessedEvent';
+import Tracker from './Tracker';
+import TrackerEntry from './TrackerEntry';
+import TrackerReflection from './TrackerReflection';
 
 // Export collection names for reference
 export const ModelCollections = {
@@ -17,6 +20,9 @@ export const ModelCollections = {
   Submission: Collections.WORKSHEET_SUBMISSIONS,
   Subscription: Collections.SUBSCRIPTIONS,
   WebhookEvent: Collections.WEBHOOK_EVENTS,
+  Tracker: 'trackers',
+  TrackerEntry: 'tracker_entries',
+  TrackerReflection: 'tracker_reflections',
 } as const;
 
 // Export models
@@ -28,4 +34,7 @@ export {
   Subscription,
   WebhookEvent,
   ProcessedEvent,
+  Tracker,
+  TrackerEntry,
+  TrackerReflection,
 };
