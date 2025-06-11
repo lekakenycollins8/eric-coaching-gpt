@@ -12,6 +12,7 @@ import {
 import { STRIPE_PLANS, getPlanById, type PlanId } from '../../lib/stripe/plans';
 import useQuota from '../../hooks/useQuota';
 import { useSubscription } from '../../hooks/useSubscription';
+import { useActiveTrackersCount } from '../../hooks/useTrackers';
 
 interface UserStatsState {
   worksheetsCompleted: number;
@@ -28,6 +29,7 @@ export default function UserStats() {
   const { data: session } = useSession();
   const { used: worksheetsCompleted, isLoading: quotaLoading } = useQuota();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { count: activeTrackers, isLoading: isLoadingTrackers } = useActiveTrackersCount();
   
   // Derive stats from hooks
   const stats = React.useMemo(() => {
@@ -56,9 +58,6 @@ export default function UserStats() {
       daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     }
     
-    // For now, active trackers is always 0 since we haven't implemented that feature yet
-    const activeTrackers = 0;
-    
     return {
       worksheetsCompleted,
       activeTrackers,
@@ -68,10 +67,10 @@ export default function UserStats() {
       daysRemaining,
       status,
     };
-  }, [worksheetsCompleted, subscription]);
+  }, [worksheetsCompleted, subscription, activeTrackers]);
   
   // Combined loading state
-  const loading = quotaLoading || subscriptionLoading;
+  const loading = quotaLoading || subscriptionLoading || isLoadingTrackers;
 
   if (loading) {
     return (
@@ -132,11 +131,21 @@ export default function UserStats() {
           </div>
           
           <div className="sm:col-span-1">
-            <div className="flex items-center">
-              <ClipboardDocumentListIcon className="h-5 w-5 text-green-500 mr-2" />
-              <dt className="text-sm font-medium text-gray-500">Active Trackers</dt>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">Active Trackers</p>
+                <p className="text-sm text-muted-foreground">
+                  Track your progress
+                </p>
+              </div>
+              <div className="text-2xl font-bold">
+                {isLoadingTrackers ? (
+                  <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+                ) : (
+                  stats.activeTrackers
+                )}
+              </div>
             </div>
-            <dd className="mt-1 text-2xl font-semibold text-gray-900">{stats.activeTrackers}</dd>
           </div>
           
           <div className="sm:col-span-2 pt-4 border-t border-gray-200">

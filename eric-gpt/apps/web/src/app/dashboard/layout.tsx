@@ -12,7 +12,8 @@ import {
   ClipboardDocumentListIcon,
   Cog6ToothIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 export default function DashboardLayout({
@@ -30,6 +31,7 @@ export default function DashboardLayout({
     { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
+    { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
     { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
   ];
 
