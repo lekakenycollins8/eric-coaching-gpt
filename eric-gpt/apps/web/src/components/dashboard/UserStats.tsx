@@ -10,6 +10,8 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { STRIPE_PLANS, getPlanById, type PlanId } from '../../lib/stripe/plans';
+import useQuota from '../../hooks/useQuota';
+import { useSubscription } from '../../hooks/useSubscription';
 
 interface UserStatsState {
   worksheetsCompleted: number;
@@ -24,106 +26,52 @@ interface UserStatsState {
 // Component to display user statistics and subscription status
 export default function UserStats() {
   const { data: session } = useSession();
-  const [stats, setStats] = React.useState<UserStatsState>({
-    worksheetsCompleted: 0,
-    activeTrackers: 0,
-    subscriptionPlan: 'Loading...',
-    planId: '',
-    isSubscribed: false,
-    daysRemaining: 0,
-    status: '',
-  });
-  const [loading, setLoading] = React.useState(true);
-
-  // Fetch user statistics from API
-  React.useEffect(() => {
-    if (session?.user?.id) {
-      const fetchUserStats = async () => {
-        try {
-          // Fetch submissions count
-          const submissionsResponse = await fetch('/api/submissions?limit=1');
-          
-          if (!submissionsResponse.ok) {
-            throw new Error('Failed to fetch submissions data');
-          }
-          
-          const submissionsData = await submissionsResponse.json();
-          const worksheetsCompleted = submissionsData.total || 0;
-          
-          // Fetch subscription data from the user subscription endpoint
-          // This is the same endpoint used by the subscription page
-          const subscriptionResponse = await fetch('/api/user/subscription', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          let subscriptionPlan = 'Free Trial';
-          let planId = '';
-          let isSubscribed = false;
-          let daysRemaining = 0;
-          let status = '';
-          
-          if (subscriptionResponse.ok) {
-            const subscriptionData = await subscriptionResponse.json();
-            console.log('Subscription data in UserStats:', subscriptionData);
-            
-            if (subscriptionData.subscription && subscriptionData.subscription.status) {
-              // Get subscription details
-              status = subscriptionData.subscription.status;
-              isSubscribed = status === 'active' || status === 'trialing';
-              planId = subscriptionData.subscription.planId || '';
-              
-              // Get plan details from the plan ID
-              if (planId) {
-                const plan = getPlanById(planId as PlanId);
-                if (plan) {
-                  subscriptionPlan = plan.name;
-                }
-              }
-              
-              // Calculate days remaining if we have the end date
-              if (subscriptionData.subscription.currentPeriodEnd) {
-                const endDate = new Date(subscriptionData.subscription.currentPeriodEnd);
-                const now = new Date();
-                daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-              }
-            }
-          }
-          
-          // For now, active trackers is always 0 since we haven't implemented that feature yet
-          const activeTrackers = 0;
-          
-          setStats({
-            worksheetsCompleted,
-            activeTrackers,
-            subscriptionPlan,
-            planId,
-            isSubscribed,
-            daysRemaining,
-            status,
-          });
-        } catch (error) {
-          console.error('Error fetching user stats:', error);
-          // Set default values on error
-          setStats({
-            worksheetsCompleted: 0,
-            activeTrackers: 0,
-            subscriptionPlan: 'Free Trial',
-            planId: '',
-            isSubscribed: false,
-            daysRemaining: 0,
-            status: '',
-          });
-        } finally {
-          setLoading(false);
-        }
-      };
+  const { used: worksheetsCompleted, isLoading: quotaLoading } = useQuota();
+  const { subscription, loading: subscriptionLoading } = useSubscription();
+  
+  // Derive stats from hooks
+  const stats = React.useMemo(() => {
+    let subscriptionPlan = 'Free Trial';
+    let planId = '';
+    let isSubscribed = false;
+    let daysRemaining = 0;
+    let status = '';
+    
+    if (subscription) {
+      status = subscription.status;
+      isSubscribed = status === 'active' || status === 'trialing';
+      planId = subscription.planId || '';
       
-      fetchUserStats();
+      // Get plan details from the plan ID
+      if (planId) {
+        const plan = getPlanById(planId as PlanId);
+        if (plan) {
+          subscriptionPlan = plan.name;
+        }
+      }
+      
+      // Calculate days remaining
+      const endDate = subscription.currentPeriodEnd;
+      const now = new Date();
+      daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
     }
-  }, [session]);
+    
+    // For now, active trackers is always 0 since we haven't implemented that feature yet
+    const activeTrackers = 0;
+    
+    return {
+      worksheetsCompleted,
+      activeTrackers,
+      subscriptionPlan,
+      planId,
+      isSubscribed,
+      daysRemaining,
+      status,
+    };
+  }, [worksheetsCompleted, subscription]);
+  
+  // Combined loading state
+  const loading = quotaLoading || subscriptionLoading;
 
   if (loading) {
     return (
