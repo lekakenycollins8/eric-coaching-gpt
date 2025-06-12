@@ -108,7 +108,7 @@ export async function GET(
 ) {
   try {
     // Destructure id from params to comply with Next.js 14+ requirements
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
