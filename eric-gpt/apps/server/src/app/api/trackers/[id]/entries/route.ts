@@ -1,59 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
-import { Tracker, TrackerEntry } from '@/models';
+import { Tracker } from '@/models';
+import { TrackerEntry } from '@/models';
 import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * @swagger
- * /api/trackers/{id}/entries:
- *   get:
- *     summary: Get all entries for a tracker
- *     description: Returns all entries for a specific tracker
- *     tags:
- *       - Trackers
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The tracker ID
- *     responses:
- *       200:
- *         description: List of tracker entries
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: Forbidden - user doesn't have access to this tracker
- *       404:
- *         description: Tracker not found
- *       500:
- *         description: Server error
+ * GET endpoint to retrieve all entries for a specific tracker
  */
 export async function GET(
   request: NextRequest,
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    await connectToDatabase();
+
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -69,9 +58,6 @@ export async function GET(
         { status: 400 }
       );
     }
-
-    // Connect to the database
-    await connectToDatabase();
 
     // Find the tracker by ID
     const tracker = await Tracker.findById(id);
@@ -109,71 +95,40 @@ export async function GET(
 }
 
 /**
- * @swagger
- * /api/trackers/{id}/entries:
- *   post:
- *     summary: Create or update a tracker entry
- *     description: Creates or updates an entry for a specific day of a tracker
- *     tags:
- *       - Trackers
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The tracker ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - day
- *             properties:
- *               day:
- *                 type: number
- *                 minimum: 1
- *                 maximum: 5
- *               completed:
- *                 type: boolean
- *               notes:
- *                 type: string
- *     responses:
- *       200:
- *         description: Entry created or updated successfully
- *       400:
- *         description: Bad request - invalid day
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: Forbidden - user doesn't have access to this tracker
- *       404:
- *         description: Tracker not found
- *       500:
- *         description: Server error
+ * POST endpoint to create or update a tracker entry
  */
 export async function POST(
   request: NextRequest,
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    await connectToDatabase();
+
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -189,9 +144,6 @@ export async function POST(
         { status: 400 }
       );
     }
-
-    // Connect to the database
-    await connectToDatabase();
 
     // Find the tracker by ID
     const tracker = await Tracker.findById(id);

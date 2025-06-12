@@ -1,59 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { connectToDatabase } from '@/db/connection';
-import { Tracker, TrackerEntry, TrackerReflection, User } from '@/models';
+import { getServerSession } from 'next-auth';
 import mongoose from 'mongoose';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { Tracker } from '@/models/Tracker';
+import { TrackerEntry } from '@/models/TrackerEntry';
+import { connectToDatabase } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * @swagger
- * /api/trackers/{id}:
- *   get:
- *     summary: Get a specific tracker
- *     description: Returns a specific tracker with its entries and reflection
- *     tags:
- *       - Trackers
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The tracker ID
- *     responses:
- *       200:
- *         description: Tracker details with entries and reflection
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: Forbidden - user doesn't have access to this tracker
- *       404:
- *         description: Tracker not found
- *       500:
- *         description: Server error
+ * GET endpoint to retrieve a specific tracker by ID
  */
 export async function GET(
   request: NextRequest,
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    await connectToDatabase();
+
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params using proper pattern for Next.js
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -70,13 +59,10 @@ export async function GET(
       );
     }
 
-    // Connect to the database
-    await connectToDatabase();
-
     // Find the tracker by ID
     const tracker = await Tracker.findById(id);
 
-    // Check if the tracker exists
+    // Check if tracker exists
     if (!tracker) {
       return NextResponse.json(
         { error: 'Tracker not found' },
@@ -84,7 +70,7 @@ export async function GET(
       );
     }
 
-    // Check if the user has access to this tracker
+    // Check if the tracker belongs to the authenticated user
     if (tracker.userId.toString() !== userId) {
       return NextResponse.json(
         { error: 'You do not have permission to access this tracker' },
@@ -92,93 +78,53 @@ export async function GET(
       );
     }
 
-    // Get tracker entries
-    const entries = await TrackerEntry.find({ trackerId: id })
-      .sort({ day: 1 })
-      .lean();
-
-    // Get tracker reflection
-    const reflection = await TrackerReflection.findOne({ trackerId: id }).lean();
-
-    // Return tracker with entries and reflection
-    return NextResponse.json({
-      tracker,
-      entries,
-      reflection,
-    });
+    // Return the tracker data
+    return NextResponse.json(tracker);
   } catch (error) {
-    console.error('Error getting tracker:', error);
+    console.error('Error retrieving tracker:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to get tracker', message: errorMessage },
+      { error: 'Failed to retrieve tracker', message: errorMessage },
       { status: 500 }
     );
   }
 }
 
 /**
- * @swagger
- * /api/trackers/{id}:
- *   put:
- *     summary: Update a tracker
- *     description: Updates a specific tracker
- *     tags:
- *       - Trackers
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The tracker ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *               description:
- *                 type: string
- *               status:
- *                 type: string
- *                 enum: [active, completed, abandoned]
- *     responses:
- *       200:
- *         description: Tracker updated successfully
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: Forbidden - user doesn't have access to this tracker
- *       404:
- *         description: Tracker not found
- *       500:
- *         description: Server error
+ * PUT endpoint to update a specific tracker by ID
  */
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    await connectToDatabase();
+
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params using proper pattern for Next.js
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -195,13 +141,10 @@ export async function PUT(
       );
     }
 
-    // Connect to the database
-    await connectToDatabase();
-
     // Find the tracker by ID
     const tracker = await Tracker.findById(id);
 
-    // Check if the tracker exists
+    // Check if tracker exists
     if (!tracker) {
       return NextResponse.json(
         { error: 'Tracker not found' },
@@ -209,7 +152,7 @@ export async function PUT(
       );
     }
 
-    // Check if the user has access to this tracker
+    // Check if the tracker belongs to the authenticated user
     if (tracker.userId.toString() !== userId) {
       return NextResponse.json(
         { error: 'You do not have permission to update this tracker' },
@@ -217,21 +160,18 @@ export async function PUT(
       );
     }
 
-    // Get request body
+    // Get the request body
     const body = await request.json();
-    const { title, description, status } = body;
 
-    // Update tracker fields if provided
-    if (title !== undefined) tracker.title = title;
-    if (description !== undefined) tracker.description = description;
-    if (status !== undefined && ['active', 'completed', 'abandoned'].includes(status)) {
-      tracker.status = status;
-    }
+    // Update the tracker
+    const updatedTracker = await Tracker.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true, runValidators: true }
+    );
 
-    // Save the updated tracker
-    await tracker.save();
-
-    return NextResponse.json(tracker);
+    // Return the updated tracker
+    return NextResponse.json(updatedTracker);
   } catch (error) {
     console.error('Error updating tracker:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -243,52 +183,40 @@ export async function PUT(
 }
 
 /**
- * @swagger
- * /api/trackers/{id}:
- *   delete:
- *     summary: Delete a tracker
- *     description: Deletes a specific tracker and all its entries and reflection
- *     tags:
- *       - Trackers
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: The tracker ID
- *     responses:
- *       200:
- *         description: Tracker deleted successfully
- *       401:
- *         description: Unauthorized - user not authenticated
- *       403:
- *         description: Forbidden - user doesn't have access to this tracker
- *       404:
- *         description: Tracker not found
- *       500:
- *         description: Server error
+ * DELETE endpoint to delete a specific tracker by ID
  */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    await connectToDatabase();
+
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params using proper pattern for Next.js
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -305,13 +233,10 @@ export async function DELETE(
       );
     }
 
-    // Connect to the database
-    await connectToDatabase();
-
     // Find the tracker by ID
     const tracker = await Tracker.findById(id);
 
-    // Check if the tracker exists
+    // Check if tracker exists
     if (!tracker) {
       return NextResponse.json(
         { error: 'Tracker not found' },
@@ -319,7 +244,7 @@ export async function DELETE(
       );
     }
 
-    // Check if the user has access to this tracker
+    // Check if the tracker belongs to the authenticated user
     if (tracker.userId.toString() !== userId) {
       return NextResponse.json(
         { error: 'You do not have permission to delete this tracker' },
@@ -327,16 +252,14 @@ export async function DELETE(
       );
     }
 
-    // Delete all related entries
+    // Delete the tracker
+    await Tracker.findByIdAndDelete(id);
+    
+    // Delete all associated tracker entries
     await TrackerEntry.deleteMany({ trackerId: id });
 
-    // Delete reflection if exists
-    await TrackerReflection.deleteOne({ trackerId: id });
-
-    // Delete the tracker
-    await Tracker.deleteOne({ _id: id });
-
-    return NextResponse.json({ success: true });
+    // Return success message
+    return NextResponse.json({ message: 'Tracker deleted successfully' });
   } catch (error) {
     console.error('Error deleting tracker:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

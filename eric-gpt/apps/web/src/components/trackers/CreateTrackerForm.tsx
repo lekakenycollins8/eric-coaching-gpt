@@ -98,7 +98,7 @@ export default function CreateTrackerForm({
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push('/trackers');
+        router.push('/dashboard/trackers');
       }
     } catch (error) {
       console.error('Error creating tracker:', error);

@@ -33,7 +33,7 @@ const WebhookEventSchema: Schema = new Schema(
 
 // Add indexes for frequent queries
 WebhookEventSchema.index({ type: 1, status: 1 });
-WebhookEventSchema.index({ eventId: 1 }, { unique: true });
+// eventId index is already created by the unique: true in the schema definition
 WebhookEventSchema.index({ createdAt: 1 });
 WebhookEventSchema.index({ status: 1, processedAt: 1 });
 

@@ -13,7 +13,7 @@ export interface ITrackerEntry extends Document {
 
 const TrackerEntrySchema: Schema = new Schema(
   {
-    trackerId: { type: Schema.Types.ObjectId, ref: "Tracker", required: true },
+    trackerId: { type: Schema.Types.ObjectId, ref: "Tracker", required: true, index: false }, // Disable automatic index creation
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     day: { type: Number, required: true, min: 1, max: 5 },
     completed: { type: Boolean, default: false },

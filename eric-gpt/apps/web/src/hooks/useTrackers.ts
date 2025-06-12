@@ -44,6 +44,7 @@ interface CreateTrackerData {
   title: string;
   description: string;
   startDate: string;
+  endDate?: string;
   submissionId?: string;
 }
 
@@ -90,12 +91,21 @@ export function useTrackers(status?: string) {
   const createTracker = useCallback(
     async (trackerData: CreateTrackerData) => {
       try {
+        // Calculate endDate as 5 days after startDate if not provided
+        const dataToSend = { ...trackerData };
+        if (!dataToSend.endDate) {
+          const startDate = new Date(dataToSend.startDate);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 5);
+          dataToSend.endDate = endDate.toISOString();
+        }
+
         const response = await fetch('/api/trackers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(trackerData),
+          body: JSON.stringify(dataToSend),
         });
 
         if (!response.ok) {
