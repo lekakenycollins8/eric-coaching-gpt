@@ -33,8 +33,19 @@ export default function TrackerEntryForm({
   // Debounce notes changes to reduce API calls
   const debouncedNotes = useDebounce(notes, 1000);
   
-  // Save entry when completed status changes
+  // Track if this is the initial render
+  const [isInitialRender, setIsInitialRender] = useState(true);
+  
+  // Set isInitialRender to false after component mounts
   useEffect(() => {
+    setIsInitialRender(false);
+  }, []);
+  
+  // Save entry when completed status changes (but not on initial render)
+  useEffect(() => {
+    // Skip saving on initial render
+    if (isInitialRender) return;
+    
     const saveEntry = async () => {
       try {
         setIsSaving(true);
@@ -57,16 +68,19 @@ export default function TrackerEntryForm({
     };
     
     saveEntry();
-  }, [completed]);
+  }, [completed, isInitialRender]);
   
   // Save entry when debounced notes change
   useEffect(() => {
+    // Skip saving on initial render
+    if (isInitialRender) return;
+    
+    // Skip if notes haven't actually changed from initial state
+    if (debouncedNotes === initialNotes) {
+      return;
+    }
+    
     const saveEntry = async () => {
-      // Don't save if notes are empty and haven't changed from initial state
-      if (debouncedNotes === initialNotes && debouncedNotes === '') {
-        return;
-      }
-      
       try {
         setIsSaving(true);
         await updateEntry({
@@ -88,7 +102,7 @@ export default function TrackerEntryForm({
     };
     
     saveEntry();
-  }, [debouncedNotes]);
+  }, [debouncedNotes, isInitialRender]);
   
   return (
     <Card className="w-full">

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import mongoose from 'mongoose';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Tracker } from '@/models/Tracker';
-import { TrackerEntry } from '@/models/TrackerEntry';
-import { connectToDatabase } from '@/lib/db';
+import { authOptions } from '@/lib/auth';
+import { Tracker, TrackerEntry, TrackerReflection } from '@/models';
+import { connectToDatabase } from '@/db/connection';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,8 +77,18 @@ export async function GET(
       );
     }
 
-    // Return the tracker data
-    return NextResponse.json(tracker);
+    // Fetch tracker entries
+    const entries = await TrackerEntry.find({ trackerId: id }).sort({ day: 1 });
+    
+    // Fetch tracker reflection if it exists
+    const reflection = await TrackerReflection.findOne({ trackerId: id });
+    
+    // Return the tracker with entries and reflection
+    return NextResponse.json({
+      tracker,
+      entries,
+      reflection
+    });
   } catch (error) {
     console.error('Error retrieving tracker:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
