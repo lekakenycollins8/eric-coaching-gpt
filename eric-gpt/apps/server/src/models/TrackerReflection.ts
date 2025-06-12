@@ -11,7 +11,7 @@ export interface ITrackerReflection extends Document {
 
 const TrackerReflectionSchema: Schema = new Schema(
   {
-    trackerId: { type: Schema.Types.ObjectId, ref: "Tracker", required: true, unique: true },
+    trackerId: { type: Schema.Types.ObjectId, ref: "Tracker", required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, required: true },
   },
