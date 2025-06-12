@@ -195,6 +195,24 @@ export async function POST(
       });
       await entry.save();
     }
+    
+    // Check if all entries are completed to update tracker status
+    if (completed === true) { // Explicitly check for true to avoid issues with undefined
+      try {
+        const allEntries = await TrackerEntry.find({ trackerId: id });
+        const totalEntries = allEntries.length;
+        const completedEntries = allEntries.filter(e => e.completed).length;
+        
+        // If we have all 5 days and all are completed, mark the tracker as completed
+        if (totalEntries === 5 && completedEntries === 5 && tracker.status === 'active') {
+          tracker.status = 'completed';
+          await tracker.save();
+        }
+      } catch (error) {
+        console.error('Error checking tracker completion status:', error);
+        // Don't throw here - we still want to return the entry even if status update fails
+      }
+    }
 
     return NextResponse.json(entry);
   } catch (error) {

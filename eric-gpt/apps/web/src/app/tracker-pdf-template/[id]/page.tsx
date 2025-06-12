@@ -43,8 +43,9 @@ interface TrackerData {
 }
 
 export default async function TrackerPDFTemplate({ params, searchParams }: TrackerPDFTemplateProps) {
-  const { id } = params;
-  const { userId } = searchParams;
+  // In Next.js 15, params and searchParams must be awaited
+  const { id } = await Promise.resolve(params);
+  const { userId } = await Promise.resolve(searchParams);
 
   if (!id) {
     return notFound();
