@@ -41,19 +41,31 @@ export async function GET(
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(
@@ -157,19 +169,31 @@ export async function POST(
   { params }: { params: { id?: string } }
 ) {
   try {
-    // Get the authenticated user
+    // Get the authenticated user session or check for userId in query params
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.id) {
+    const searchParams = request.nextUrl.searchParams;
+    const queryUserId = searchParams.get('userId');
+    
+    let userId;
+    
+    // Check if we have a valid session with user ID
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query params (for proxy requests)
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no user ID is available, return authentication error
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    const userId = session.user.id;
-
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
     
     if (!id) {
       return NextResponse.json(

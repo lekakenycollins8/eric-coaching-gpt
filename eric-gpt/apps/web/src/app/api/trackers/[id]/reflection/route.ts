@@ -21,12 +21,22 @@ export async function GET(
       );
     }
 
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Tracker ID is required' },
+        { status: 400 }
+      );
+    }
+    
+    // Get user ID from session
+    const userId = session.user.id;
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${serverUrl}/api/trackers/${id}/reflection`, {
+    const response = await fetch(`${serverUrl}/api/trackers/${id}/reflection?userId=${userId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -65,15 +75,25 @@ export async function POST(
       );
     }
 
-    // Access id from params
-    const { id } = params;
+    // Access id from params - in Next.js 15, params must be awaited
+    const { id } = await Promise.resolve(params);
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Tracker ID is required' },
+        { status: 400 }
+      );
+    }
+    
+    // Get user ID from session
+    const userId = session.user.id;
 
     // Get the request body
     const body = await request.json();
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const response = await fetch(`${serverUrl}/api/trackers/${id}/reflection`, {
+    const response = await fetch(`${serverUrl}/api/trackers/${id}/reflection?userId=${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
