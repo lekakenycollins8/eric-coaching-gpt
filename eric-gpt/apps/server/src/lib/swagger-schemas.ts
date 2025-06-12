@@ -165,5 +165,156 @@ export const swaggerSchemas = {
         description: 'Options for select/multiselect fields'
       }
     }
+  },
+  Submission: {
+    type: 'object',
+    properties: {
+      _id: {
+        type: 'string',
+        description: 'Unique identifier for the submission'
+      },
+      userId: {
+        type: 'string',
+        description: 'ID of the user who created the submission'
+      },
+      worksheetId: {
+        type: 'string',
+        description: 'ID of the worksheet that was submitted'
+      },
+      worksheetTitle: {
+        type: 'string',
+        description: 'Title of the worksheet that was submitted'
+      },
+      answers: {
+        type: 'object',
+        description: 'User answers to worksheet questions'
+      },
+      aiFeedback: {
+        type: 'string',
+        description: 'AI-generated coaching feedback'
+      },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the submission was created'
+      }
+    }
+  },
+  Tracker: {
+    type: 'object',
+    properties: {
+      _id: {
+        type: 'string',
+        description: 'Unique identifier for the tracker'
+      },
+      userId: {
+        type: 'string',
+        description: 'ID of the user who created the tracker'
+      },
+      title: {
+        type: 'string',
+        description: 'Title of the tracker'
+      },
+      description: {
+        type: 'string',
+        description: 'Description of what is being tracked'
+      },
+      startDate: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Start date of the tracker'
+      },
+      endDate: {
+        type: 'string',
+        format: 'date-time',
+        description: 'End date of the tracker (5 days after start date)'
+      },
+      status: {
+        type: 'string',
+        enum: ['active', 'completed', 'abandoned'],
+        description: 'Current status of the tracker'
+      },
+      submissionId: {
+        type: 'string',
+        description: 'Optional ID of a worksheet submission this tracker is linked to'
+      },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the tracker was created'
+      }
+    }
+  },
+  TrackerEntry: {
+    type: 'object',
+    properties: {
+      _id: {
+        type: 'string',
+        description: 'Unique identifier for the tracker entry'
+      },
+      trackerId: {
+        type: 'string',
+        description: 'ID of the tracker this entry belongs to'
+      },
+      userId: {
+        type: 'string',
+        description: 'ID of the user who created the entry'
+      },
+      day: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 5,
+        description: 'Day number (1-5) for this entry'
+      },
+      completed: {
+        type: 'boolean',
+        description: 'Whether the tracked activity was completed on this day'
+      },
+      notes: {
+        type: 'string',
+        description: 'Optional notes for this day\'s entry'
+      },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the entry was created'
+      },
+      updatedAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the entry was last updated'
+      }
+    }
+  },
+  TrackerReflection: {
+    type: 'object',
+    properties: {
+      _id: {
+        type: 'string',
+        description: 'Unique identifier for the reflection'
+      },
+      trackerId: {
+        type: 'string',
+        description: 'ID of the tracker this reflection belongs to'
+      },
+      userId: {
+        type: 'string',
+        description: 'ID of the user who created the reflection'
+      },
+      content: {
+        type: 'string',
+        description: 'Reflection content written by the user'
+      },
+      createdAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the reflection was created'
+      },
+      updatedAt: {
+        type: 'string',
+        format: 'date-time',
+        description: 'Date when the reflection was last updated'
+      }
+    }
   }
 };

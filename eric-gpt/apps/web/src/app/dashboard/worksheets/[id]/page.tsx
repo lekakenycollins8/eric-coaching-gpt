@@ -174,6 +174,7 @@ export default function WorksheetPage() {
         error={submissionError}
         remainingQuota={remainingQuota}
         submissionId={submissionId}
+        worksheetTitle={worksheet.title}
       />
     </div>
   );

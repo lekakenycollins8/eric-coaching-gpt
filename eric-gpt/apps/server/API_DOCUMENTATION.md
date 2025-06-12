@@ -27,6 +27,27 @@ The API is organized into the following categories:
 ### Worksheets
 
 - `GET /api/worksheets` - Get a list of available worksheets with their metadata and form fields
+- `GET /api/worksheets/{id}` - Get a specific worksheet by ID
+
+### Submissions
+
+- `POST /api/submissions` - Submit a worksheet for AI coaching feedback
+- `GET /api/submissions` - Get a list of the user's worksheet submissions
+- `GET /api/submissions/{id}` - Get a specific submission by ID
+- `GET /api/submissions/{id}/pdf` - Generate a PDF of a submission
+
+### Trackers
+
+- `GET /api/trackers` - Get all trackers for the current user
+- `POST /api/trackers` - Create a new tracker
+- `GET /api/trackers/{id}` - Get a specific tracker by ID
+- `PUT /api/trackers/{id}` - Update a tracker
+- `DELETE /api/trackers/{id}` - Delete a tracker
+- `GET /api/trackers/{id}/entries` - Get all entries for a specific tracker
+- `POST /api/trackers/{id}/entries` - Create or update a tracker entry
+- `GET /api/trackers/{id}/reflection` - Get reflection for a tracker
+- `POST /api/trackers/{id}/reflection` - Create or update a tracker reflection
+- `GET /api/trackers/{id}/pdf` - Generate a PDF of a tracker
 
 ## Authentication
 
@@ -45,6 +66,10 @@ The API uses the following data models:
 - **SubscriptionPlan** - Information about available subscription plans
 - **Worksheet** - Metadata about a coaching worksheet
 - **WorksheetField** - Form field definition for worksheets
+- **Submission** - User submission of a worksheet with answers and AI feedback
+- **Tracker** - Commitment tracker for 5-day accountability
+- **TrackerEntry** - Daily entry for a tracker (days 1-5)
+- **TrackerReflection** - User reflection on a completed tracker
 
 ## Development
 

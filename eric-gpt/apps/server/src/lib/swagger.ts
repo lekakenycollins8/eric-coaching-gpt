@@ -49,6 +49,14 @@ export const getApiDocs = () => {
           name: 'Worksheets',
           description: 'Worksheet management and submission endpoints',
         },
+        {
+          name: 'Submissions',
+          description: 'Worksheet submission and AI feedback endpoints',
+        },
+        {
+          name: 'Trackers',
+          description: 'Commitment tracking and reflection endpoints',
+        },
       ],
     },
   });
