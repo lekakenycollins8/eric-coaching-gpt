@@ -43,8 +43,34 @@ export async function GET(
       },
     });
 
+    // Check if response is ok before trying to parse JSON
+    if (!response.ok) {
+      // Try to get error details if possible
+      let errorDetails = '';
+      try {
+        const errorData = await response.text();
+        errorDetails = errorData;
+      } catch (e) {
+        // Ignore error in getting error details
+      }
+      
+      return NextResponse.json(
+        { error: `Server returned error: ${response.status}`, details: errorDetails },
+        { status: response.status }
+      );
+    }
+
     // Get the response data
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (error) {
+      console.error('Error parsing response:', error);
+      return NextResponse.json(
+        { error: 'Failed to parse server response' },
+        { status: 500 }
+      );
+    }
 
     // Return the response from the server
     return NextResponse.json(data, { status: response.status });
@@ -101,8 +127,34 @@ export async function POST(
       body: JSON.stringify(body),
     });
 
+    // Check if response is ok before trying to parse JSON
+    if (!response.ok) {
+      // Try to get error details if possible
+      let errorDetails = '';
+      try {
+        const errorData = await response.text();
+        errorDetails = errorData;
+      } catch (e) {
+        // Ignore error in getting error details
+      }
+      
+      return NextResponse.json(
+        { error: `Server returned error: ${response.status}`, details: errorDetails },
+        { status: response.status }
+      );
+    }
+
     // Get the response data
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (error) {
+      console.error('Error parsing response:', error);
+      return NextResponse.json(
+        { error: 'Failed to parse server response' },
+        { status: 500 }
+      );
+    }
 
     // Return the response from the server
     return NextResponse.json(data, { status: response.status });

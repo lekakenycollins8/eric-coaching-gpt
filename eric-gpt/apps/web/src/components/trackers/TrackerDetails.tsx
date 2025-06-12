@@ -199,9 +199,9 @@ export default function TrackerDetails({ trackerId }: TrackerDetailsProps) {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 px-3">
                 <MoreVertical className="h-4 w-4" />
-                <span className="sr-only">More options</span>
+                <span>Actions</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
