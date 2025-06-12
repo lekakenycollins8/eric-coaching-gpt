@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import SwaggerUI from 'swagger-ui-react';
+import dynamic from 'next/dynamic';
 import 'swagger-ui-react/swagger-ui.css';
+
+// Dynamically import SwaggerUI to prevent SSR issues
+// This also helps with the React Strict Mode warnings
+const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
 
 export default function ApiDocs() {
   const [spec, setSpec] = useState(null);
@@ -20,7 +24,10 @@ export default function ApiDocs() {
         <h1>Eric GPT Coaching Platform API Documentation</h1>
       </div>
       {spec ? (
-        <SwaggerUI spec={spec} />
+        // SwaggerUI is rendered client-side only
+        <div className="swagger-ui-wrapper">
+          <SwaggerUI spec={spec} />
+        </div>
       ) : (
         <div className="loading">Loading API documentation...</div>
       )}
@@ -46,6 +53,9 @@ export default function ApiDocs() {
         }
         .swagger-ui .opblock .opblock-summary-method {
           background-color: #0070f3;
+        }
+        .swagger-ui-wrapper {
+          margin-top: 20px;
         }
       `}</style>
     </div>
