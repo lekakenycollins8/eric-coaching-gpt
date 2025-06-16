@@ -53,10 +53,18 @@ export default function UserStats() {
       }
       
       // Calculate days remaining only for active subscriptions
-      if (isSubscribed) {
-        const endDate = subscription.currentPeriodEnd;
+      if (isSubscribed && subscription.currentPeriodEnd) {
+        // Ensure endDate is a proper Date object
+        const endDate = subscription.currentPeriodEnd instanceof Date 
+          ? subscription.currentPeriodEnd 
+          : new Date(subscription.currentPeriodEnd);
+        
         const now = new Date();
-        daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+        
+        // Only calculate if endDate is valid
+        if (endDate instanceof Date && !isNaN(endDate.getTime())) {
+          daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+        }
       }
     }
     
