@@ -11,6 +11,7 @@ import QuotaDisplayClient from '@/components/dashboard/QuotaDisplayClient';
 import { Loader2, ExternalLink } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { STRIPE_PLANS } from '@/lib/stripe/plans';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function ProfilePage() {
   const { data: session, status } = useSession({
@@ -100,52 +101,49 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Current Plan:</span>
-                    <span className="text-sm font-semibold">
-                      {subscription?.planId ? 
-                        (() => {
-                          const plan = STRIPE_PLANS[subscription.planId];
-                          return plan ? 
-                            <>
-                              {plan.name}
-                              <span className="ml-1 text-xs text-gray-500">
-                                ({plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'})
-                              </span>
-                            </> : 'Unknown Plan';
-                        })() : 'Free Tier'}
-                    </span>
-                  </div>
-                  
-                  {subscription?.status && (
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">Status:</span>
-                      <span className={`text-xs inline-flex items-center px-2 py-0.5 rounded-full font-medium ${
-                        subscription.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : subscription.status === 'past_due'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                      }`}>
-                        <span className={`mr-1 h-2 w-2 rounded-full ${
-                          subscription.status === 'active'
-                            ? 'bg-green-500'
-                            : subscription.status === 'past_due'
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                        }`}></span>
-                        {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                      </span>
-                    </div>
-                  )}
-                  
-                  {subscription?.currentPeriodEnd && (
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">Renews:</span>
-                      <span className="text-sm">
-                        {formatDate(subscription.currentPeriodEnd)}
-                      </span>
-                    </div>
+                  {subscription?.status === 'active' ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium">Current Plan:</span>
+                        <span className="text-sm font-semibold">
+                          {subscription?.planId ? 
+                            (() => {
+                              const plan = STRIPE_PLANS[subscription.planId];
+                              return plan ? 
+                                <>
+                                  {plan.name}
+                                  <span className="ml-1 text-xs text-gray-500">
+                                    ({plan.billingCycle === 'yearly' ? 'Annual' : 'Monthly'})
+                                  </span>
+                                </> : 'Unknown Plan';
+                            })() : 'Unknown Plan'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium">Status:</span>
+                        <span className="text-xs inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-800">
+                          <span className="mr-1 h-2 w-2 rounded-full bg-green-500"></span>
+                          Active
+                        </span>
+                      </div>
+                      
+                      {subscription?.currentPeriodEnd && (
+                        <div className="flex justify-between">
+                          <span className="text-sm font-medium">Renews:</span>
+                          <span className="text-sm">
+                            {formatDate(subscription.currentPeriodEnd)}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Alert variant="destructive" className="bg-red-50 border-red-200">
+                      <AlertDescription>
+                        <div className="font-medium mb-1">No Active Subscription</div>
+                        <p className="text-sm">You currently don't have an active subscription. Subscribe to unlock premium features including worksheet submissions and trackers.</p>
+                      </AlertDescription>
+                    </Alert>
                   )}
                   
                   <Separator className="my-3" />
@@ -162,7 +160,7 @@ export default function ProfilePage() {
                   </div>
                   
                   <div className="pt-2 text-xs text-muted-foreground">
-                    {subscription ? (
+                    {subscription?.status === 'active' ? (
                       <p>You can manage your billing details, update payment methods, or cancel your subscription through the Stripe customer portal.</p>
                     ) : (
                       <p>Visit the <a href="/dashboard/subscription" className="text-primary hover:text-primary/80 font-medium">subscription page</a> to view available plans and upgrade your account.</p>

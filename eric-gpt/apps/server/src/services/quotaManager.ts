@@ -28,30 +28,39 @@ export async function getUserSubscriptionTier(userId: string): Promise<Subscript
     // This mapping should match the tiers defined in QUOTA_LIMITS and STRIPE_PLANS
     const planId = user.subscription.planId || '';
     
-    if (planId.startsWith('solo_')) {
-      return 'SOLO';
-    } else if (planId.startsWith('pro_')) {
-      return 'PRO';
-    } else if (planId.startsWith('vip_')) {
-      return 'VIP';
+    if (planId.startsWith('foundation_')) {
+      return 'FOUNDATION';
+    } else if (planId.startsWith('momentum_')) {
+      return 'MOMENTUM';
+    } else if (planId.startsWith('legacy_')) {
+      return 'LEGACY';
+    } else if (planId.startsWith('executive_')) {
+      return 'EXECUTIVE';
     }
     
     // If we can't determine from planId, try to use the price ID
     const priceId = user.subscription.priceId || '';
     if (priceId.includes('price_')) {
-      // These should match the price IDs in the Stripe config
-      if (priceId === 'price_1RMCyVP1DJ8H8ccarTX30pgj' || priceId === 'price_1RMCyVP1DJ8H8ccaFG3rYjz9') {
-        return 'SOLO';
-      } else if (priceId === 'price_1RMD3MP1DJ8H8ccaRa5Mc4TR' || priceId === 'price_1RMD4AP1DJ8H8ccaKSuVZrNR') {
-        return 'PRO';
-      } else if (priceId === 'price_1RMD4jP1DJ8H8ccaYCqHj8t4' || priceId === 'price_1RMD5AP1DJ8H8ccaJ5QrFOzq') {
-        return 'VIP';
+      // Get price IDs from environment variables
+      const foundationMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY || '';
+      const momentumMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY || '';
+      const legacyMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY || '';
+      const executiveMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY || '';
+      
+      if (priceId === foundationMonthlyPriceId) {
+        return 'FOUNDATION';
+      } else if (priceId === momentumMonthlyPriceId) {
+        return 'MOMENTUM';
+      } else if (priceId === legacyMonthlyPriceId) {
+        return 'LEGACY';
+      } else if (priceId === executiveMonthlyPriceId) {
+        return 'EXECUTIVE';
       }
     }
     
     // Default to the lowest tier if no match is found
-    console.warn(`Could not determine subscription tier for plan: ${planId}, price: ${priceId}. Defaulting to SOLO tier.`);
-    return 'SOLO';
+    console.warn(`Could not determine subscription tier for plan: ${planId}, price: ${priceId}. Defaulting to FOUNDATION tier.`);
+    return 'FOUNDATION';
   } catch (error) {
     console.error('Error getting user subscription tier:', error);
     throw new Error('Failed to determine user subscription tier');
@@ -132,17 +141,24 @@ export async function hasUserExceededQuota(userId: string): Promise<boolean> {
 /**
  * Gets the user's remaining quota
  * @param userId - The ID of the user
- * @returns The number of submissions remaining in the current period
+ * @returns The number of submissions remaining in the current period, or 0 if no active subscription
  */
 export async function getUserRemainingQuota(userId: string): Promise<number> {
   try {
+    // First check if user has an active subscription
+    const hasSubscription = await hasActiveSubscription(userId);
+    if (!hasSubscription) {
+      return 0; // Return 0 quota for users without an active subscription
+    }
+    
     const quotaLimits = await getUserQuotaLimits(userId);
     const submissionCount = await countUserSubmissionsInCurrentPeriod(userId);
     
     return Math.max(0, quotaLimits.monthlySubmissions - submissionCount);
   } catch (error) {
     console.error('Error getting user remaining quota:', error);
-    throw new Error('Failed to get user remaining quota');
+    // Return 0 instead of throwing an error to prevent client-side issues
+    return 0;
   }
 }
 

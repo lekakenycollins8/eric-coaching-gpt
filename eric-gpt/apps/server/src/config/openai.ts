@@ -40,17 +40,22 @@ export function validateOpenAIConfig() {
 // Define quota limits based on subscription tiers
 // These values should match the limits defined in the Stripe plans
 export const QUOTA_LIMITS = {
-  SOLO: {
-    monthlySubmissions: 10, // Matches the limit in STRIPE_PLANS.SOLO_MONTHLY/YEARLY
-    maxTokensPerRequest: 4000,
+  FOUNDATION: {
+    monthlySubmissions: parseInt(process.env.QUOTA_LIMIT_FOUNDATION_SUBMISSIONS || '10'),
+    maxTokensPerRequest: parseInt(process.env.QUOTA_LIMIT_FOUNDATION_TOKENS || '4000'),
   },
-  PRO: {
-    monthlySubmissions: 40, // Matches the limit in STRIPE_PLANS.PRO_MONTHLY/YEARLY
-    maxTokensPerRequest: 8000,
+  MOMENTUM: {
+    monthlySubmissions: parseInt(process.env.QUOTA_LIMIT_MOMENTUM_SUBMISSIONS || '25'),
+    maxTokensPerRequest: parseInt(process.env.QUOTA_LIMIT_MOMENTUM_TOKENS || '8000'),
   },
-  VIP: {
-    monthlySubmissions: 999999, // Effectively unlimited, as in STRIPE_PLANS.VIP_MONTHLY/YEARLY
-    maxTokensPerRequest: 16000,
+  LEGACY: {
+    monthlySubmissions: parseInt(process.env.QUOTA_LIMIT_LEGACY_SUBMISSIONS || '40'),
+    maxTokensPerRequest: parseInt(process.env.QUOTA_LIMIT_LEGACY_TOKENS || '12000'),
+  },
+  EXECUTIVE: {
+    // Default to a very high number if env var is not set
+    monthlySubmissions: parseInt(process.env.QUOTA_LIMIT_EXECUTIVE_SUBMISSIONS || '999999'),
+    maxTokensPerRequest: parseInt(process.env.QUOTA_LIMIT_EXECUTIVE_TOKENS || '16000'),
   },
 };
 

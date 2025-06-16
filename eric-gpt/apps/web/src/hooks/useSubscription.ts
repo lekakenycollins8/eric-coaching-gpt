@@ -70,8 +70,8 @@ export function useSubscription() {
       setHasStripeCustomerId(!!data.stripeCustomerId);
       
       // Only process subscription data if the user actually has a subscription
-      // with valid data (has a status field at minimum)
-      if (data.subscription && data.subscription.status) {
+      // with valid data (has a status field at minimum AND status is 'active')
+      if (data.subscription && data.subscription.status === 'active') {
         // Convert date strings to Date objects and handle potential invalid dates
         const subscription = {
           ...data.subscription,
@@ -83,7 +83,7 @@ export function useSubscription() {
             new Date(),
           currentPeriodEnd: data.subscription.currentPeriodEnd ? 
             new Date(data.subscription.currentPeriodEnd) : 
-            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Default to 30 days from now
+            new Date(),
           // Ensure submissions count exists
           submissionsThisPeriod: data.subscription.submissionsThisPeriod || 0
         };
@@ -93,7 +93,7 @@ export function useSubscription() {
         
         setSubscription(subscription);
       } else {
-        // User doesn't have a subscription yet
+        // User doesn't have an active subscription
         setSubscription(null);
       }
       

@@ -290,6 +290,9 @@ export async function GET(request: NextRequest) {
       );
     }
     
+    // Check if the user has an active subscription
+    const hasSubscription = await hasActiveSubscription(userId);
+    
     // Parse pagination parameters from the same searchParams
     const limit = parseInt(searchParams.get('limit') || '10', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -308,16 +311,17 @@ export async function GET(request: NextRequest) {
     // Count total submissions
     const total = await Submission.countDocuments({ userId });
     
-    // Get the user's remaining quota
+    // Get the user's remaining quota (will be 0 if no active subscription)
     const remainingQuota = await getUserRemainingQuota(userId);
     
-    // Return the submissions
+    // Return the submissions with subscription status
     return NextResponse.json({
       submissions,
       total,
       page,
       limit,
       remainingQuota,
+      hasActiveSubscription: hasSubscription,
     });
   } catch (error: any) {
     console.error('Error fetching submissions:', error);

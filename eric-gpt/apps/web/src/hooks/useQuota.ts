@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSubscription } from './useSubscription';
 
 interface QuotaState {
   used: number;
@@ -16,6 +17,9 @@ interface QuotaState {
  * Hook to fetch and manage user quota information
  */
 export function useQuota() {
+  const { subscription } = useSubscription();
+  const hasActiveSubscription = subscription?.status === 'active';
+  
   const [state, setState] = useState<QuotaState>({
     used: 0,
     limit: 0,
@@ -30,7 +34,21 @@ export function useQuota() {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      // Fetch quota information from the API
+      // If user doesn't have an active subscription, return zeros
+      if (!hasActiveSubscription) {
+        setState({
+          used: 0,
+          limit: 0,
+          remaining: 0,
+          isLoading: false,
+          error: null,
+          isOverQuota: false,
+          percentage: 0,
+        });
+        return { used: 0, limit: 0, remaining: 0, isOverQuota: false, percentage: 0 };
+      }
+      
+      // Fetch quota information from the API only for subscribed users
       const response = await fetch('/api/submissions?limit=1');
       
       if (!response.ok) {
@@ -68,7 +86,7 @@ export function useQuota() {
       }));
       return null;
     }
-  }, []);
+  }, [hasActiveSubscription]);
 
   // Fetch quota on initial mount
   useEffect(() => {
