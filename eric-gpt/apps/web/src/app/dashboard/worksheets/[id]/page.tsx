@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useWorksheet } from '@/hooks/useWorksheets';
 import { useWorksheetSubmission } from '@/hooks/useWorksheetSubmission';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
+import { hasFeatureAccess, debugSubscription } from '@/lib/subscription-utils';
 
 export default function WorksheetPage() {
   const params = useParams();
@@ -21,13 +22,36 @@ export default function WorksheetPage() {
   const worksheetId = params.id as string;
   
   const { worksheet, isLoading, error } = useWorksheet(worksheetId);
-  const { subscription } = useSubscription();
-  const worksheetSubmission = useWorksheetSubmission();
+  const { subscription, loading: subscriptionLoading, hasJustSubscribed } = useSubscription();
+  const { 
+    subscriptionLoading: hookSubscriptionLoading,
+    hasJustSubscribed: hookHasJustSubscribed,
+    ...worksheetSubmission 
+  } = useWorksheetSubmission();
   
-  // Check if user has an active subscription
-  // Consider subscription as not active if it's null (still loading) or not 'active'
-  const hasActiveSubscription = subscription?.status === 'active';
-  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
+  // Use URL parameters to check if user just completed a subscription
+  const searchParams = useSearchParams();
+  const urlHasSubscribedFlag = searchParams?.has('subscribed') || searchParams?.has('success') || false;
+  
+  // Check if user has access to worksheet submission feature
+  const canSubmitWorksheet = hasFeatureAccess(
+    subscription, 
+    'worksheetSubmit', 
+    { 
+      isLoading: subscriptionLoading, 
+      hasJustSubscribed: hasJustSubscribed || hookHasJustSubscribed || urlHasSubscribedFlag 
+    }
+  );
+  
+  // Debug subscription status using our debug utility
+  debugSubscription(subscription);
+  console.log('Worksheet page - Can submit worksheet:', canSubmitWorksheet);
+  console.log('Worksheet page - Subscription loading:', subscriptionLoading);
+  console.log('Worksheet page - Has just subscribed:', hasJustSubscribed || hookHasJustSubscribed || urlHasSubscribedFlag);
+  
+  // Show subscription alert if user doesn't have access to worksheet submission
+  // Only show the alert if we're sure the subscription data has loaded AND the user hasn't just subscribed
+  const showSubscriptionAlert = !subscriptionLoading && !canSubmitWorksheet && !urlHasSubscribedFlag;
   const { 
     submitWorksheet, 
     saveDraft,
@@ -118,7 +142,8 @@ export default function WorksheetPage() {
     );
   }
 
-  if (isLoading) {
+  // Show loading state if either worksheet or subscription data is loading
+  if (isLoading || subscriptionLoading) {
     return (
       <div className="container mx-auto py-8">
         <div className="mb-4">
@@ -131,7 +156,9 @@ export default function WorksheetPage() {
         </div>
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <Loader2 className="h-8 w-8 animate-spin mb-4" />
-          <p className="text-muted-foreground">Loading worksheet...</p>
+          <p className="text-muted-foreground">
+            {isLoading ? "Loading worksheet..." : "Checking subscription status..."}
+          </p>
         </div>
       </div>
     );

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import type { WorksheetSubmission } from '@/types/worksheet';
 import { useSubscription } from './useSubscription';
+import { hasFeatureAccess } from '@/lib/subscription-utils';
 
 /**
  * Hook for worksheet submission, AI feedback, and draft saving
@@ -15,7 +16,7 @@ export function useWorksheetSubmission() {
   const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
   const [quotaLimit, setQuotaLimit] = useState<number | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
-  const { subscription } = useSubscription();
+  const { subscription, loading: subscriptionLoading, hasJustSubscribed, fetchSubscription } = useSubscription();
 
   /**
    * Submit a worksheet to the API and get AI coaching feedback
@@ -28,8 +29,16 @@ export function useWorksheetSubmission() {
       setIsSuccess(false);
       setSubmissionId(null);
       
-      // Check if user has an active subscription
-      if (!subscription || subscription.status !== 'active') {
+      // If subscription data is still loading, wait for it
+      if (subscriptionLoading) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        // Try to refresh subscription data before proceeding
+        await fetchSubscription();
+      }
+      
+      // Check if user has access to the worksheet submission feature
+      // Pass loading and hasJustSubscribed flags to the access check
+      if (!hasFeatureAccess(subscription, 'worksheetSubmit', { isLoading: subscriptionLoading, hasJustSubscribed })) {
         setError('An active subscription is required to submit worksheets. Please subscribe to continue.');
         return { success: false, error: 'subscription_required' };
       }
@@ -125,6 +134,9 @@ export function useWorksheetSubmission() {
       setSubmissionId(data.id);
       setRemainingQuota(data.remainingQuota);
       
+      // Refresh subscription data after successful submission
+      fetchSubscription();
+      
       // Remove the draft after successful submission
       localStorage.removeItem(`worksheet_draft_${submission.worksheetId}`);
       
@@ -212,6 +224,8 @@ export function useWorksheetSubmission() {
     isOverQuota: remainingQuota !== null && remainingQuota <= 0,
     quotaLimit,
     quotaUsed: quotaLimit !== null && remainingQuota !== null ? quotaLimit - remainingQuota : null,
-    hasActiveSubscription: subscription?.status === 'active',
+    hasActiveSubscription: hasFeatureAccess(subscription, 'worksheetSubmit', { isLoading: subscriptionLoading, hasJustSubscribed }),
+    subscriptionLoading,
+    hasJustSubscribed,
   };
 }

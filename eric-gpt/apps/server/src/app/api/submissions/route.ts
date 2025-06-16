@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
     // Return the feedback and submission ID
     return NextResponse.json(
       {
-        id: submission._id.toString(), // Convert MongoDB ObjectId to string
+        id: submission._id?.toString() || submission.id || '', // Convert MongoDB ObjectId to string with fallback
         aiFeedback: feedback,
         remainingQuota,
       },

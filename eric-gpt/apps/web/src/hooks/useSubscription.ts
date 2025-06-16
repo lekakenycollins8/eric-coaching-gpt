@@ -30,6 +30,9 @@ export function useSubscription() {
   const [loading, setLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // Check if the URL indicates a successful subscription
+  const hasJustSubscribed = searchParams.get('success') === 'true' || searchParams.get('subscribed') === 'true';
 
   useEffect(() => {
     if (authStatus === 'authenticated' && session?.user?.id) {
@@ -46,6 +49,7 @@ export function useSubscription() {
     }
   }, [authStatus, session?.user?.id, searchParams]);
 
+  // Function to refresh subscription data
   const fetchSubscription = async () => {
     try {
       setLoading(true);
@@ -70,8 +74,11 @@ export function useSubscription() {
       setHasStripeCustomerId(!!data.stripeCustomerId);
       
       // Only process subscription data if the user actually has a subscription
-      // with valid data (has a status field at minimum AND status is 'active')
-      if (data.subscription && data.subscription.status === 'active') {
+      // with valid data (has a status field at minimum AND status is valid)
+      // Valid statuses include: active, past_due (still has access)
+      // Note: According to the User schema, only "active", "past_due", and "canceled" are valid statuses
+      const validStatuses = ['active', 'past_due'];
+      if (data.subscription && data.subscription.status && validStatuses.includes(data.subscription.status)) {
         // Convert date strings to Date objects and handle potential invalid dates
         const subscription = {
           ...data.subscription,
@@ -242,6 +249,8 @@ export function useSubscription() {
     handleManageSubscription,
     handleSubscribe,
     formatDate,
-    calculateProratedPrice
+    calculateProratedPrice,
+    fetchSubscription,
+    hasJustSubscribed
   };
 }

@@ -30,8 +30,7 @@ const UserSchema: Schema = new Schema(
       planId: { type: String },
       status: { 
         type: String, 
-        enum: ["active", "past_due", "canceled"],
-        default: "active" 
+        enum: ["active", "past_due", "canceled"], 
       },
       currentPeriodStart: { type: Date },
       currentPeriodEnd: { type: Date },

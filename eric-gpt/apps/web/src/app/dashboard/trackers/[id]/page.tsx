@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { hasFeatureAccess, debugSubscription } from '@/lib/subscription-utils';
 import { redirect, useParams } from 'next/navigation';
 import React from 'react';
 import Link from 'next/link';
@@ -14,12 +15,18 @@ export default function TrackerDetailsPage() {
   const { id } = useParams();
   const trackerId = Array.isArray(id) ? id[0] : (id || '');
   
-  const { subscription } = useSubscription();
+  const { subscription, loading: subscriptionLoading } = useSubscription();
   
-  // Check if user has an active subscription
-  // Consider subscription as not active if it's null (still loading) or not 'active'
-  const hasActiveSubscription = subscription?.status === 'active';
-  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
+  // Check if user has access to tracker entry update feature
+  const canUpdateTrackerEntry = hasFeatureAccess(subscription, 'trackerEntryUpdate');
+  
+  // Debug subscription status using our debug utility
+  debugSubscription(subscription);
+  console.log('Tracker page - Can update tracker entry:', canUpdateTrackerEntry);
+  
+  // Show subscription alert if user doesn't have access to tracker entry update
+  // Only show the alert if we're sure the subscription data has loaded
+  const showSubscriptionAlert = !subscriptionLoading && !canUpdateTrackerEntry;
   
   const { data: session, status } = useSession({
     required: true,
