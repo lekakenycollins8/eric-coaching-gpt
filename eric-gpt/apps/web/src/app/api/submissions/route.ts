@@ -21,10 +21,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Add the user ID to the request body instead of using Authorization header
+    const userId = session.user.id;
+    console.log(`[DEBUG] web/api/submissions/route.ts - User ID from session: ${userId}`);
+    
     const enrichedBody = {
       ...body,
-      userId: session.user.id // Include user ID in the request body
+      userId // Include user ID in the request body
     };
+    
+    console.log(`[DEBUG] web/api/submissions/route.ts - User object from session:`, JSON.stringify(session.user, null, 2));
     
     // Forward the request to the server application
     const SERVER_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';

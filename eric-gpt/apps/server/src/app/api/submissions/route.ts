@@ -103,8 +103,12 @@ export async function POST(request: NextRequest) {
     }
     
     // Check if the user has an active subscription
+    console.log(`[DEBUG] submissions/route.ts - Checking subscription for userId: ${userId}`);
     const hasSubscription = await hasActiveSubscription(userId);
+    console.log(`[DEBUG] submissions/route.ts - hasActiveSubscription result: ${hasSubscription}`);
+    
     if (!hasSubscription) {
+      console.log(`[DEBUG] submissions/route.ts - Subscription check failed for userId: ${userId}`);
       return NextResponse.json(
         { 
           error: 'Subscription required',
@@ -113,6 +117,8 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+    
+    console.log(`[DEBUG] submissions/route.ts - Subscription check passed for userId: ${userId}`);
     
     // Check if the user has exceeded their quota
     const hasExceededQuota = await hasUserExceededQuota(userId);

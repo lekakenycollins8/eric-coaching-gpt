@@ -72,7 +72,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user has an active subscription
-    if (!user.subscription || user.subscription.status !== 'active') {
+    const validStatuses = ['active', 'past_due'];
+    if (!user.subscription || !validStatuses.includes(user.subscription.status)) {
       return NextResponse.json(
         { error: 'Active subscription required' },
         { status: 403 }
@@ -193,7 +194,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has an active subscription
-    if (!user.subscription || user.subscription.status !== 'active') {
+    const validStatuses = ['active', 'past_due'];
+    if (!user.subscription || !validStatuses.includes(user.subscription.status)) {
       return NextResponse.json(
         { error: 'Active subscription required' },
         { status: 403 }

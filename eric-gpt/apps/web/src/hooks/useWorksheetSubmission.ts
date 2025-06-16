@@ -29,19 +29,53 @@ export function useWorksheetSubmission() {
       setIsSuccess(false);
       setSubmissionId(null);
       
-      // If subscription data is still loading, wait for it
-      if (subscriptionLoading) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      // If subscription data is still loading, wait for it with multiple retries
+      let retries = 0;
+      const maxRetries = 3;
+      
+      while (subscriptionLoading && retries < maxRetries) {
+        console.log(`[DEBUG] useWorksheetSubmission - Subscription data is loading, waiting... (retry ${retries + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Increased timeout to 1 second
         // Try to refresh subscription data before proceeding
         await fetchSubscription();
+        retries++;
       }
       
+      console.log('[DEBUG] useWorksheetSubmission - Subscription loading complete');
+      console.log('[DEBUG] useWorksheetSubmission - Final subscription data:', 
+        subscription ? {
+          planId: subscription.planId,
+          status: subscription.status,
+          currentPeriodEnd: subscription.currentPeriodEnd
+        } : 'null');
+      
+      // Special handling for subscription data
+      // If we have a valid subscription object with active status, override the loading state
+      const isActiveSubscription = subscription && 
+        (subscription.status === 'active' || subscription.status === 'past_due');
+      
+      console.log('[DEBUG] useWorksheetSubmission - isActiveSubscription:', isActiveSubscription);
+      console.log('[DEBUG] useWorksheetSubmission - subscriptionLoading after retries:', subscriptionLoading);
+      console.log('[DEBUG] useWorksheetSubmission - hasJustSubscribed:', hasJustSubscribed);
+      
       // Check if user has access to the worksheet submission feature
-      // Pass loading and hasJustSubscribed flags to the access check
-      if (!hasFeatureAccess(subscription, 'worksheetSubmit', { isLoading: subscriptionLoading, hasJustSubscribed })) {
+      // If we have confirmed active subscription, don't pass the loading flag
+      const hasAccess = isActiveSubscription ? 
+        true : // Skip hasFeatureAccess check if we already know subscription is active
+        hasFeatureAccess(subscription, 'worksheetSubmit', { 
+          isLoading: subscriptionLoading && !isActiveSubscription, 
+          hasJustSubscribed 
+        });
+      
+      console.log('[DEBUG] useWorksheetSubmission - hasFeatureAccess result:', hasAccess);
+      
+      if (!hasAccess) {
+        console.log('[DEBUG] useWorksheetSubmission - Feature access denied');
         setError('An active subscription is required to submit worksheets. Please subscribe to continue.');
         return { success: false, error: 'subscription_required' };
       }
+      
+      console.log('[DEBUG] useWorksheetSubmission - Feature access granted');
       
       console.log('Submitting worksheet for AI feedback:', submission.worksheetId);
       

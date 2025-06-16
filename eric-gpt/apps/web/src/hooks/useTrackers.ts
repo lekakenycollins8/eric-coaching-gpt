@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import useSWR, { mutate, type SWRResponse } from 'swr';
 import { useSubscription } from './useSubscription';
 import { toast } from '@/components/ui/use-toast';
+import { hasActiveSubscription } from '@/lib/subscription-utils';
 
 interface Tracker {
   _id: string;
@@ -97,7 +98,7 @@ export function useTrackers(status?: string) {
     async (trackerData: CreateTrackerData) => {
       try {
         // Check if user has an active subscription
-        if (!subscription || subscription.status !== 'active') {
+        if (!hasActiveSubscription(subscription)) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to create trackers. Please subscribe to continue.",
@@ -225,7 +226,7 @@ export function useTracker(trackerId: string) {
     async (entryData: TrackerEntryData) => {
       try {
         // Check if user has an active subscription
-        if (!subscription || subscription.status !== 'active') {
+        if (!hasActiveSubscription(subscription)) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to update tracker entries. Please subscribe to continue.",
@@ -271,7 +272,7 @@ export function useTracker(trackerId: string) {
     async (reflectionData: TrackerReflectionData) => {
       try {
         // Check if user has an active subscription
-        if (!subscription || subscription.status !== 'active') {
+        if (!hasActiveSubscription(subscription)) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to update tracker reflections. Please subscribe to continue.",

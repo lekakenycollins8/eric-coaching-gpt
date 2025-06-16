@@ -34,6 +34,23 @@ export function useSubscription() {
   // Check if the URL indicates a successful subscription
   const hasJustSubscribed = searchParams.get('success') === 'true' || searchParams.get('subscribed') === 'true';
 
+  // Try to load cached subscription data on initial mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cachedSubscription = localStorage.getItem('eric_subscription_cache');
+        if (cachedSubscription) {
+          const parsed = JSON.parse(cachedSubscription);
+          console.log('Loaded cached subscription data:', parsed);
+          setSubscription(parsed);
+          // Still mark as loading until we get fresh data
+        }
+      } catch (e) {
+        console.error('Error loading cached subscription:', e);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     if (authStatus === 'authenticated' && session?.user?.id) {
       fetchSubscription();
@@ -97,6 +114,16 @@ export function useSubscription() {
         
         // Log the processed subscription for debugging
         console.log('Processed subscription:', subscription);
+        
+        // Cache the subscription data in localStorage
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('eric_subscription_cache', JSON.stringify(subscription));
+            console.log('Cached subscription data in localStorage');
+          } catch (e) {
+            console.error('Error caching subscription data:', e);
+          }
+        }
         
         setSubscription(subscription);
       } else {

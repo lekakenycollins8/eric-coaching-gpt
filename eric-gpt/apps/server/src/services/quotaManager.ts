@@ -20,7 +20,10 @@ export async function getUserSubscriptionTier(userId: string): Promise<Subscript
     await connectToDatabase();
     const user = await User.findById(userId);
     
-    if (!user || !user.subscription || user.subscription.status !== 'active') {
+    // Check if subscription status is active or past_due
+    // This matches the client-side validation in hasFeatureAccess
+    const validStatuses = ['active', 'past_due'];
+    if (!user || !user.subscription || !validStatuses.includes(user.subscription.status)) {
       return null;
     }
     
@@ -169,24 +172,38 @@ export async function getUserRemainingQuota(userId: string): Promise<number> {
  */
 export async function hasActiveSubscription(userId: string): Promise<boolean> {
   try {
+    console.log(`[DEBUG] hasActiveSubscription - Checking subscription for userId: ${userId}`);
     await connectToDatabase();
     
     // Validate userId format to avoid MongoDB errors
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      console.error(`Invalid userId format: ${userId}`);
+      console.error(`[DEBUG] hasActiveSubscription - Invalid userId format: ${userId}`);
       return false;
     }
     
     const user = await User.findById(userId);
     
-    if (!user || !user.subscription) {
+    if (!user) {
+      console.error(`[DEBUG] hasActiveSubscription - User not found for userId: ${userId}`);
       return false;
     }
     
-    // Check if subscription status is active
-    return user.subscription.status === 'active';
+    if (!user.subscription) {
+      console.error(`[DEBUG] hasActiveSubscription - No subscription found for userId: ${userId}`);
+      return false;
+    }
+    
+    // Check if subscription status is active or past_due
+    // This matches the client-side validation in hasFeatureAccess
+    const validStatuses = ['active', 'past_due'];
+    const isValid = validStatuses.includes(user.subscription.status);
+    
+    console.log(`[DEBUG] hasActiveSubscription - User: ${userId}, Status: ${user.subscription.status}, Valid: ${isValid}`);
+    console.log(`[DEBUG] hasActiveSubscription - Plan ID: ${user.subscription.planId}, Price ID: ${user.subscription.priceId || 'N/A'}`);
+    
+    return isValid;
   } catch (error) {
-    console.error('Error checking user subscription status:', error);
+    console.error('[DEBUG] hasActiveSubscription - Error checking user subscription status:', error);
     return false;
   }
 }

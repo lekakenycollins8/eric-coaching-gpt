@@ -112,11 +112,49 @@ export function hasFeatureAccess(
     return true;
   }
 
-  // If subscription data is still loading, we should not make a final decision
-  // Return null to indicate indeterminate state
+  // If subscription data is still loading, we need to be careful about denying access
+  // For worksheet submission specifically, we'll check if there's a URL parameter indicating just subscribed
   if (options?.isLoading) {
     console.log('hasFeatureAccess - Subscription data is still loading for:', featureKey);
-    return false;
+    
+    // If we're on the client side and can access the URL
+    if (typeof window !== 'undefined') {
+      // Check URL parameters for subscription success indicators
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasSubscriptionSuccess = urlParams.has('subscription') && urlParams.get('subscription') === 'success';
+      
+      if (hasSubscriptionSuccess) {
+        console.log('hasFeatureAccess - Found subscription success parameter in URL, granting access to:', featureKey);
+        return true;
+      }
+      
+      // For worksheet submission, we'll be more lenient during loading
+      if (featureKey === 'worksheetSubmit') {
+        console.log('hasFeatureAccess - Special case for worksheetSubmit during loading, checking localStorage');
+        // Check localStorage for any cached subscription status
+        try {
+          const cachedSubscription = localStorage.getItem('eric_subscription_cache');
+          if (cachedSubscription) {
+            const parsed = JSON.parse(cachedSubscription);
+            if (parsed && (parsed.status === 'active' || parsed.status === 'past_due')) {
+              console.log('hasFeatureAccess - Found valid cached subscription, granting access to:', featureKey);
+              return true;
+            }
+          }
+        } catch (e) {
+          console.error('Error checking cached subscription:', e);
+        }
+      }
+    }
+    
+    // If we're in a worksheet or tracker context, be more permissive during loading
+    if (['worksheetSubmit', 'trackerCreate', 'trackerEntryUpdate', 'trackerReflectionUpdate'].includes(featureKey)) {
+      console.log('hasFeatureAccess - Critical feature access during loading, granting provisional access to:', featureKey);
+      return true; // Grant provisional access during loading for critical features
+    }
+    
+    // For other features, we'll still show them during loading
+    return true;
   }
   
   // If no subscription data is available (not loading), deny access
