@@ -51,16 +51,30 @@ export default function WorksheetPage() {
 
   const handleSubmit = async (data: Record<string, any>) => {
     try {
-      await submitWorksheet({
+      const result = await submitWorksheet({
         worksheetId,
         answers: data
       });
-      toast({
-        title: "Worksheet Submitted",
-        description: "Your worksheet has been submitted successfully.",
-      });
+      
+      // If the submission was successful
+      if (result?.success) {
+        toast({
+          title: "Worksheet Submitted",
+          description: "Your worksheet has been submitted successfully.",
+        });
+      } else if (result?.error === 'subscription_required') {
+        // Handle subscription error specifically
+        toast({
+          title: "Subscription Required",
+          description: "You need an active subscription to submit worksheets. Please subscribe to continue.",
+          variant: "destructive",
+        });
+        
+        // Could redirect to subscription page
+        // router.push('/dashboard/subscription');
+      }
     } catch (err) {
-      // Error is handled by the hook and displayed in the UI
+      // Handle other errors
       console.error('Submission error:', err);
       toast({
         title: "Submission Error",

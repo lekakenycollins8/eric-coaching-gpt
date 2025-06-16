@@ -30,7 +30,8 @@ export function useWorksheetSubmission() {
       
       // Check if user has an active subscription
       if (!subscription || subscription.status !== 'active') {
-        throw new Error('An active subscription is required to submit worksheets. Please subscribe to continue.');
+        setError('An active subscription is required to submit worksheets. Please subscribe to continue.');
+        return { success: false, error: 'subscription_required' };
       }
       
       console.log('Submitting worksheet for AI feedback:', submission.worksheetId);

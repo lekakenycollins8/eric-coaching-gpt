@@ -217,10 +217,23 @@ export function useTracker(trackerId: string) {
     [trackerId]
   );
 
+  // Get subscription status
+  const { subscription } = useSubscription();
+
   // Update or create a tracker entry
   const updateEntry = useCallback(
     async (entryData: TrackerEntryData) => {
       try {
+        // Check if user has an active subscription
+        if (!subscription || subscription.status !== 'active') {
+          toast({
+            title: "Subscription Required",
+            description: "An active subscription is required to update tracker entries. Please subscribe to continue.",
+            variant: "destructive"
+          });
+          return { success: false, error: 'subscription_required' };
+        }
+
         const response = await fetch(`/api/trackers/${trackerId}/entries`, {
           method: 'POST',
           headers: {
@@ -239,19 +252,34 @@ export function useTracker(trackerId: string) {
         // Revalidate the tracker data
         await revalidate();
         
-        return updatedEntry;
+        return { success: true, data: updatedEntry };
       } catch (error) {
         console.error('Error updating entry:', error);
-        throw error;
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to update tracker entry",
+          variant: "destructive"
+        });
+        return { success: false, error: 'update_failed' };
       }
     },
-    [trackerId, revalidate]
+    [trackerId, revalidate, subscription]
   );
 
   // Update or create tracker reflection
   const updateReflection = useCallback(
     async (reflectionData: TrackerReflectionData) => {
       try {
+        // Check if user has an active subscription
+        if (!subscription || subscription.status !== 'active') {
+          toast({
+            title: "Subscription Required",
+            description: "An active subscription is required to update tracker reflections. Please subscribe to continue.",
+            variant: "destructive"
+          });
+          return { success: false, error: 'subscription_required' };
+        }
+
         const response = await fetch(`/api/trackers/${trackerId}/reflection`, {
           method: 'POST',
           headers: {
@@ -270,13 +298,18 @@ export function useTracker(trackerId: string) {
         // Revalidate the tracker data
         await revalidate();
         
-        return updatedReflection;
+        return { success: true, data: updatedReflection };
       } catch (error) {
         console.error('Error updating reflection:', error);
-        throw error;
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to update tracker reflection",
+          variant: "destructive"
+        });
+        return { success: false, error: 'update_failed' };
       }
     },
-    [trackerId, revalidate]
+    [trackerId, revalidate, subscription]
   );
 
   // Generate and download PDF

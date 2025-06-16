@@ -116,14 +116,18 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
           <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Subscription Required</AlertTitle>
-            <AlertDescription>
-              An active subscription is required to submit worksheets and receive AI coaching feedback.
-              <div className="mt-2">
-                <Link 
-                  href="/dashboard/subscription" 
-                  className="inline-flex items-center px-3 py-1.5 border border-red-700 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                  Subscribe Now &rarr;
+            <AlertDescription className="flex flex-col gap-4">
+              <p>You need an active subscription to submit worksheets and receive AI coaching feedback. Save your progress as a draft and subscribe to unlock this feature.</p>
+              <div className="flex gap-3">
+                <Link href="/dashboard/subscription">
+                  <Button variant="default" size="sm" className="bg-red-600 hover:bg-red-700">
+                    Subscribe Now &rarr;
+                  </Button>
+                </Link>
+                <Link href="/dashboard/worksheets">
+                  <Button variant="outline" size="sm">
+                    Back to Worksheets
+                  </Button>
                 </Link>
               </div>
             </AlertDescription>
