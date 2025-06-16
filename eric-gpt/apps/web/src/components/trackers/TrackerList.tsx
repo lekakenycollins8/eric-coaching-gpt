@@ -1,20 +1,28 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTrackers } from '@/hooks/useTrackers';
+import { useSubscription } from '@/hooks/useSubscription';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import { CalendarDays, ChevronRight, PlusCircle } from 'lucide-react';
+import { AlertCircle, CalendarDays, ChevronRight, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type TrackerStatus = 'active' | 'completed' | 'abandoned';
 
 export default function TrackerList() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TrackerStatus>('active');
   const { trackers, isLoading } = useTrackers(activeTab);
+  const { subscription } = useSubscription();
+  
+  // Check if user has an active subscription
+  const hasActiveSubscription = subscription?.status === 'active';
   
   // Filter trackers by status
   const filteredTrackers = trackers?.filter(tracker => tracker.status === activeTab) || [];
@@ -35,10 +43,27 @@ export default function TrackerList() {
   
   return (
     <div className="space-y-6">
+      {!hasActiveSubscription && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Subscription Required</AlertTitle>
+          <AlertDescription>
+            An active subscription is required to view and create trackers. Please subscribe to continue.
+          </AlertDescription>
+          <Button 
+            variant="outline" 
+            className="mt-2" 
+            onClick={() => router.push('/dashboard/subscription')}
+          >
+            View Subscription Options
+          </Button>
+        </Alert>
+      )}
+      
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">My Trackers</h2>
         <Link href="/dashboard/trackers/create">
-          <Button>
+          <Button disabled={!hasActiveSubscription}>
             <PlusCircle className="mr-2 h-4 w-4" />
             New Tracker
           </Button>
@@ -47,9 +72,9 @@ export default function TrackerList() {
       
       <Tabs defaultValue="active" className="w-full" onValueChange={(value) => setActiveTab(value as TrackerStatus)}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
+          <TabsTrigger value="active" disabled={!hasActiveSubscription}>Active</TabsTrigger>
+          <TabsTrigger value="completed" disabled={!hasActiveSubscription}>Completed</TabsTrigger>
+          <TabsTrigger value="abandoned" disabled={!hasActiveSubscription}>Abandoned</TabsTrigger>
         </TabsList>
         
         <TabsContent value="active" className="mt-6">
@@ -85,6 +110,23 @@ export default function TrackerList() {
               </CardFooter>
             </Card>
           ))}
+        </div>
+      );
+    }
+    
+    if (!hasActiveSubscription) {
+      return (
+        <div className="text-center py-10">
+          <h3 className="text-lg font-medium">Subscription Required</h3>
+          <p className="text-muted-foreground mt-2">
+            An active subscription is required to view and create trackers.
+          </p>
+          <Button 
+            onClick={() => router.push('/dashboard/subscription')} 
+            className="mt-4"
+          >
+            Subscribe Now
+          </Button>
         </div>
       );
     }

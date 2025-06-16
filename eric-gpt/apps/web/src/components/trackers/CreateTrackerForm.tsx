@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,8 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTrackers } from '@/hooks/useTrackers';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 // Form schema validation
 const formSchema = z.object({
@@ -61,7 +64,11 @@ export default function CreateTrackerForm({
   const { toast } = useToast();
   const router = useRouter();
   const { createTracker } = useTrackers();
+  const { subscription } = useSubscription();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Check if user has an active subscription
+  const hasActiveSubscription = subscription?.status === 'active';
 
   // Initialize form with default values
   const form = useForm<FormData>({
@@ -121,6 +128,15 @@ export default function CreateTrackerForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {!hasActiveSubscription && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Subscription Required</AlertTitle>
+            <AlertDescription>
+              An active subscription is required to create trackers. Please subscribe to continue.
+            </AlertDescription>
+          </Alert>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -198,13 +214,24 @@ export default function CreateTrackerForm({
             />
             
             <CardFooter className="flex justify-end px-0 pt-4">
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="w-full sm:w-auto"
-              >
-                {isSubmitting ? 'Creating...' : 'Create Tracker'}
-              </Button>
+              {hasActiveSubscription ? (
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto"
+                >
+                  {isSubmitting ? 'Creating...' : 'Create Tracker'}
+                </Button>
+              ) : (
+                <Button 
+                  type="button" 
+                  variant="destructive"
+                  className="w-full sm:w-auto"
+                  onClick={() => router.push('/dashboard/subscription')}
+                >
+                  Subscribe to Create Trackers
+                </Button>
+              )}
             </CardFooter>
           </form>
         </Form>

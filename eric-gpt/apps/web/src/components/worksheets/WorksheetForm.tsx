@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { Worksheet, Field } from '@/types/worksheet';
+import { useSubscription } from '@/hooks/useSubscription';
 // Import field components
 import TextInput from '@/components/worksheets/fields/TextInput';
 import TextareaInput from '@/components/worksheets/fields/TextareaInput';
@@ -36,6 +39,11 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
 }) => {
   const { toast } = useToast();
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const { subscription } = useSubscription();
+  
+  // Check if user has an active subscription
+  const hasActiveSubscription = subscription?.status === 'active';
+  const isFormDisabled = disabled || !hasActiveSubscription;
   
   const {
     control,
@@ -104,6 +112,23 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
         <CardDescription>{worksheet.description}</CardDescription>
       </CardHeader>
       <CardContent>
+        {!hasActiveSubscription && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Subscription Required</AlertTitle>
+            <AlertDescription>
+              An active subscription is required to submit worksheets and receive AI coaching feedback.
+              <div className="mt-2">
+                <Link 
+                  href="/dashboard/subscription" 
+                  className="inline-flex items-center px-3 py-1.5 border border-red-700 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Subscribe Now &rarr;
+                </Link>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={handleSubmit(processSubmit)} id="worksheet-form">
           <div className="space-y-6">
             {worksheet.fields.map((field: Field) => (
@@ -194,13 +219,15 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
         <Button 
           type="submit" 
           form="worksheet-form" 
-          disabled={isSubmitting || disabled}
+          disabled={isSubmitting || isFormDisabled}
         >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Submitting...
             </>
+          ) : !hasActiveSubscription ? (
+            'Subscription Required'
           ) : disabled ? (
             'Quota Exceeded'
           ) : (

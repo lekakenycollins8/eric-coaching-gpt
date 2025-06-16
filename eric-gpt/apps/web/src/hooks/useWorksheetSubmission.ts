@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { WorksheetSubmission } from '@/types/worksheet';
+import { useSubscription } from './useSubscription';
 
 /**
  * Hook for worksheet submission, AI feedback, and draft saving
@@ -14,6 +15,7 @@ export function useWorksheetSubmission() {
   const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
   const [quotaLimit, setQuotaLimit] = useState<number | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const { subscription } = useSubscription();
 
   /**
    * Submit a worksheet to the API and get AI coaching feedback
@@ -25,6 +27,11 @@ export function useWorksheetSubmission() {
       setFeedback(null);
       setIsSuccess(false);
       setSubmissionId(null);
+      
+      // Check if user has an active subscription
+      if (!subscription || subscription.status !== 'active') {
+        throw new Error('An active subscription is required to submit worksheets. Please subscribe to continue.');
+      }
       
       console.log('Submitting worksheet for AI feedback:', submission.worksheetId);
       
@@ -204,5 +211,6 @@ export function useWorksheetSubmission() {
     isOverQuota: remainingQuota !== null && remainingQuota <= 0,
     quotaLimit,
     quotaUsed: quotaLimit !== null && remainingQuota !== null ? quotaLimit - remainingQuota : null,
+    hasActiveSubscription: subscription?.status === 'active',
   };
 }

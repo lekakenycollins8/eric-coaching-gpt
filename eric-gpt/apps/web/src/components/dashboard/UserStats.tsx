@@ -33,7 +33,7 @@ export default function UserStats() {
   
   // Derive stats from hooks
   const stats = React.useMemo(() => {
-    let subscriptionPlan = 'Free Trial';
+    let subscriptionPlan = 'No Active Subscription';
     let planId = '';
     let isSubscribed = false;
     let daysRemaining = 0;
@@ -41,21 +41,23 @@ export default function UserStats() {
     
     if (subscription) {
       status = subscription.status;
-      isSubscribed = status === 'active' || status === 'trialing';
+      isSubscribed = status === 'active';
       planId = subscription.planId || '';
       
       // Get plan details from the plan ID
-      if (planId) {
+      if (planId && isSubscribed) {
         const plan = getPlanById(planId as PlanId);
         if (plan) {
           subscriptionPlan = plan.name;
         }
       }
       
-      // Calculate days remaining
-      const endDate = subscription.currentPeriodEnd;
-      const now = new Date();
-      daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+      // Calculate days remaining only for active subscriptions
+      if (isSubscribed) {
+        const endDate = subscription.currentPeriodEnd;
+        const now = new Date();
+        daysRemaining = Math.max(0, Math.round((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+      }
     }
     
     return {
@@ -98,22 +100,22 @@ export default function UserStats() {
       <div className="px-4 py-5 sm:p-6 border-t border-gray-200">
         {/* Subscription Status Alert - Only show for users without an active subscription */}
         {!stats.isSubscribed && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
             <div className="flex">
               <div className="flex-shrink-0">
-                <ExclamationTriangleIcon className="h-5 w-5 text-amber-400" aria-hidden="true" />
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-amber-800">Subscription Required</h3>
-                <div className="mt-1 text-sm text-amber-700">
-                  <p>A subscription is required to complete worksheets and receive AI coaching feedback.</p>
+                <h3 className="text-sm font-medium text-red-800">Premium Features Locked</h3>
+                <div className="mt-1 text-sm text-red-700">
+                  <p>A subscription is required to access all premium features including worksheets, AI coaching feedback, and trackers.</p>
                 </div>
                 <div className="mt-2">
                   <Link
                     href="/dashboard/subscription"
-                    className="inline-flex items-center px-3 py-1.5 border border-amber-700 text-sm font-medium rounded-md text-amber-800 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                    className="inline-flex items-center px-3 py-1.5 border border-red-700 text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
-                    Subscribe Now &rarr;
+                    Get Access Now &rarr;
                   </Link>
                 </div>
               </div>
@@ -160,7 +162,7 @@ export default function UserStats() {
                     {stats.subscriptionPlan}
                   </span>
                   <span className="ml-2 text-sm text-gray-500">
-                    ({stats.status === 'active' ? 'Active' : stats.status})
+                    (Active)
                   </span>
                   {stats.daysRemaining > 0 && (
                     <span className="ml-2 text-sm text-gray-500">
@@ -169,8 +171,8 @@ export default function UserStats() {
                   )}
                 </>
               ) : (
-                <span className="text-gray-600">
-                  {stats.subscriptionPlan}
+                <span className="text-red-600 font-bold">
+                  No Active Subscription
                 </span>
               )}
             </dd>

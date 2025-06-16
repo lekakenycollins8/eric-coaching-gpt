@@ -9,7 +9,12 @@ import fs from 'fs';
 import path from 'path';
 import { generateCoachingFeedback } from '@/services/openai';
 import { formatUserPrompt, getSystemPromptForWorksheet } from '@/config/prompts';
-import { hasUserExceededQuota, recordSubmissionUsage, getUserRemainingQuota } from '@/services/quotaManager';
+import { 
+  hasUserExceededQuota, 
+  recordSubmissionUsage, 
+  getUserRemainingQuota,
+  hasActiveSubscription 
+} from '@/services/quotaManager';
 
 // Define validation schema for submission requests
 const submissionSchema = z.object({
@@ -94,6 +99,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
+      );
+    }
+    
+    // Check if the user has an active subscription
+    const hasSubscription = await hasActiveSubscription(userId);
+    if (!hasSubscription) {
+      return NextResponse.json(
+        { 
+          error: 'Subscription required',
+          message: 'An active subscription is required to submit worksheets. Please subscribe to continue.'
+        },
+        { status: 403 }
       );
     }
     

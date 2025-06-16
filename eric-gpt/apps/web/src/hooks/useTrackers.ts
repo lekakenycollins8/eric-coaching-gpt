@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 import useSWR, { mutate, type SWRResponse } from 'swr';
+import { useSubscription } from './useSubscription';
+import { toast } from '@/components/ui/use-toast';
 
 interface Tracker {
   _id: string;
@@ -87,10 +89,23 @@ export function useTrackers(status?: string) {
     fetcher
   );
 
+  // Get subscription status
+  const { subscription } = useSubscription();
+  
   // Create a new tracker
   const createTracker = useCallback(
     async (trackerData: CreateTrackerData) => {
       try {
+        // Check if user has an active subscription
+        if (!subscription || subscription.status !== 'active') {
+          toast({
+            title: "Subscription Required",
+            description: "An active subscription is required to create trackers. Please subscribe to continue.",
+            variant: "destructive"
+          });
+          throw new Error('Active subscription required');
+        }
+        
         // Calculate endDate as 5 days after startDate if not provided
         const dataToSend = { ...trackerData };
         if (!dataToSend.endDate) {

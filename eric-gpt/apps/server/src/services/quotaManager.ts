@@ -3,6 +3,7 @@ import User from '../models/User';
 import Submission from '../models/Submission';
 import { connectToDatabase } from '../db/connection';
 import 'server-only'; // Ensure this module is never bundled for the client
+import mongoose from 'mongoose';
 
 /**
  * Quota Manager Service
@@ -19,7 +20,7 @@ export async function getUserSubscriptionTier(userId: string): Promise<Subscript
     await connectToDatabase();
     const user = await User.findById(userId);
     
-    if (!user || !user.subscription) {
+    if (!user || !user.subscription || user.subscription.status !== 'active') {
       return null;
     }
     
@@ -146,6 +147,35 @@ export async function getUserRemainingQuota(userId: string): Promise<number> {
 }
 
 /**
+ * Checks if a user has an active subscription
+ * @param userId - The ID of the user
+ * @returns Whether the user has an active subscription
+ */
+export async function hasActiveSubscription(userId: string): Promise<boolean> {
+  try {
+    await connectToDatabase();
+    
+    // Validate userId format to avoid MongoDB errors
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error(`Invalid userId format: ${userId}`);
+      return false;
+    }
+    
+    const user = await User.findById(userId);
+    
+    if (!user || !user.subscription) {
+      return false;
+    }
+    
+    // Check if subscription status is active
+    return user.subscription.status === 'active';
+  } catch (error) {
+    console.error('Error checking user subscription status:', error);
+    return false;
+  }
+}
+
+/**
  * Records a submission and updates the user's quota usage
  * @param userId - The ID of the user
  * @param tokensUsed - The number of tokens used in the submission
@@ -159,6 +189,12 @@ export async function recordSubmissionUsage(userId: string, tokensUsed: number):
     
     if (!user) {
       throw new Error('User not found');
+    }
+    
+    // Ensure user has required fields
+    if (!user.name) {
+      console.warn(`User ${userId} is missing required field 'name'. Adding default value.`);
+      user.name = 'User';
     }
     
     // Update the user's usage statistics
