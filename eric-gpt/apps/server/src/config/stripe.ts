@@ -4,48 +4,36 @@
  */
 
 export const STRIPE_PLANS = {
-  // Solo Leader Plan
-  SOLO_MONTHLY: {
-    id: "solo_monthly",
-    name: "Solo Leader Monthly",
+  // Foundation Builder Plan
+  FOUNDATION_MONTHLY: {
+    id: "foundation_monthly",
+    name: "Foundation Builder",
     limit: 10,
-    priceId: "price_1RMCyVP1DJ8H8ccarTX30pgj", // Solo Monthly Plan Price ID
-  },
-  SOLO_YEARLY: {
-    id: "solo_yearly",
-    name: "Solo Leader Yearly",
-    limit: 10,
-    priceId: "price_1RMCyVP1DJ8H8ccaFG3rYjz9", // Solo Yearly Plan Price ID
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY || "", // Foundation Monthly Plan Price ID
   },
   
-  // Pro Builder Plan
-  PRO_MONTHLY: {
-    id: "pro_monthly",
-    name: "Pro Builder Monthly",
-    limit: 40,
-    teamSize: 5,
-    priceId: "price_1RMD3MP1DJ8H8ccaRa5Mc4TR", // Pro Monthly Plan Price ID
-  },
-  PRO_YEARLY: {
-    id: "pro_yearly",
-    name: "Pro Builder Yearly",
-    limit: 40,
-    teamSize: 5,
-    priceId: "price_1RMD4AP1DJ8H8ccaKSuVZrNR", // Pro Yearly Plan Price ID
+  // Momentum Maker Plan
+  MOMENTUM_MONTHLY: {
+    id: "momentum_monthly",
+    name: "Momentum Maker",
+    limit: 25,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY || "", // Momentum Monthly Plan Price ID
   },
   
-  // Executive VIP Plan
-  VIP_MONTHLY: {
-    id: "vip_monthly",
-    name: "Executive VIP Monthly",
-    limit: null, // Unlimited
-    priceId: "price_1RMD4jP1DJ8H8ccaYCqHj8t4", // VIP Monthly Plan Price ID
+  // Legacy Leader Plan
+  LEGACY_MONTHLY: {
+    id: "legacy_monthly",
+    name: "Legacy Leader",
+    limit: 40,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY || "", // Legacy Monthly Plan Price ID
   },
-  VIP_YEARLY: {
-    id: "vip_yearly",
-    name: "Executive VIP Yearly",
+  
+  // Executive Accelerator Plan
+  EXECUTIVE_MONTHLY: {
+    id: "executive_monthly",
+    name: "Executive Accelerator",
     limit: null, // Unlimited
-    priceId: "price_1RMD5AP1DJ8H8ccaJ5QrFOzq", // VIP Yearly Plan Price ID
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY || "", // Executive Monthly Plan Price ID
   },
 };
 
@@ -75,15 +63,43 @@ export function getPlanByPriceId(priceId: string) {
   
   // If no match is found, try to determine the plan by price amount
   console.log('No direct match found for price ID:', priceId);
+  
+  // If we still couldn't map the price ID to a plan, use a direct mapping approach
+  console.log('Could not map price ID to plan using getPlanByPriceId');
+  
+  // Direct mapping of known price IDs to plan IDs using environment variables
+  const priceToPlanMapping: Record<string, string> = {};
+  
+  // Dynamically build the mapping from environment variables
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY) {
+    priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY] = 'foundation_monthly';
+  }
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY) {
+    priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY] = 'momentum_monthly';
+  }
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY) {
+    priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY] = 'legacy_monthly';
+  }
+  if (process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY) {
+    priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY] = 'executive_monthly';
+  }
+  
+  // Try to find the plan using the direct mapping
+  const planId = priceToPlanMapping[priceId];
+  if (planId) {
+    return getPlanById(planId);
+  }
+  
   return null;
 }
 
 // Helper function to check if a plan is a team plan
 export function isTeamPlan(planId: string) {
-  return planId.startsWith('pro_');
+  // No team plans in the new pricing model
+  return false;
 }
 
 // Helper function to check if a plan has unlimited submissions
 export function hasUnlimitedSubmissions(planId: string) {
-  return planId.startsWith('vip_');
+  return planId.startsWith('executive_');
 }

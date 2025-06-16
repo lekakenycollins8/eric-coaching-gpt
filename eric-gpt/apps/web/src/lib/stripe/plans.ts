@@ -4,12 +4,10 @@
  */
 
 export type PlanId = 
-  | 'solo_monthly' 
-  | 'solo_yearly' 
-  | 'pro_monthly' 
-  | 'pro_yearly' 
-  | 'vip_monthly' 
-  | 'vip_yearly';
+  | 'foundation_monthly'
+  | 'momentum_monthly'
+  | 'legacy_monthly'
+  | 'executive_monthly';
 
 export interface Plan {
   id: PlanId;
@@ -27,80 +25,58 @@ export interface Plan {
 
 // Plan definitions with features and pricing
 export const STRIPE_PLANS: Record<PlanId, Plan> = {
-  // Solo Leader Plan
-  solo_monthly: {
-    id: 'solo_monthly',
-    name: 'Solo Leader',
-    description: 'Perfect for individual leaders looking to improve their skills',
-    price: 29.99,
+  // Foundation Builder Plan
+  foundation_monthly: {
+    id: 'foundation_monthly',
+    name: 'Foundation Builder',
+    description: 'For early-stage leaders who want tools, structure, and momentum',
+    price: 99,
     features: {
-     submissionsPerMonth: 10
+      submissionsPerMonth: 10
     },
     submissionLimit: 10,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_SOLO_MONTHLY || '',
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY || '',
     billingCycle: 'monthly'
-  },
-  solo_yearly: {
-    id: 'solo_yearly',
-    name: 'Solo Leader (Annual)',
-    description: 'Perfect for individual leaders looking to improve their skills',
-    price: 299.99, // Save ~$60 compared to monthly
-    features: {
-     submissionsPerMonth: 10
-    },
-    submissionLimit: 10,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_SOLO_YEARLY || '',
-    billingCycle: 'yearly'
   },
   
-  // Pro Builder Plan
-  pro_monthly: {
-    id: 'pro_monthly',
-    name: 'Pro Builder',
-    description: 'Ideal for team leaders and growing organizations',
-    price: 99.99,
+  // Momentum Maker Plan
+  momentum_monthly: {
+    id: 'momentum_monthly',
+    name: 'Momentum Maker',
+    description: 'For emerging leaders ready to go beyond tools and into transformation',
+    price: 199,
     features: {
-     submissionsPerMonth: 40
+      submissionsPerMonth: 25
     },
-    submissionLimit: 40,
-    teamSize: 5,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || '',
+    submissionLimit: 25,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY || '',
     billingCycle: 'monthly'
-  },
-  pro_yearly: {
-    id: 'pro_yearly',
-    name: 'Pro Builder (Annual)',
-    description: 'Ideal for team leaders and growing organizations',
-    price: 999.99, // Save ~$200 compared to monthly
-    features: {
-     submissionsPerMonth: 40
-    },
-    submissionLimit: 40,
-    teamSize: 5,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || '',
-    billingCycle: 'yearly'
   },
   
-  // Executive VIP Plan
-  vip_monthly: {
-    id: 'vip_monthly',
-    name: 'Executive VIP',
-    description: 'Complete solution for executive leadership development',
-    price: 199.99,
-    features: {},
-    submissionLimit: null, // Unlimited
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_VIP_MONTHLY || '',
+  // Legacy Leader Plan
+  legacy_monthly: {
+    id: 'legacy_monthly',
+    name: 'Legacy Leader',
+    description: 'For leaders who want coaching, connection, and a path to lasting impact',
+    price: 499,
+    features: {
+      submissionsPerMonth: 40
+    },
+    submissionLimit: 40,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY || '',
     billingCycle: 'monthly'
   },
-  vip_yearly: {
-    id: 'vip_yearly',
-    name: 'Executive VIP (Annual)',
-    description: 'Complete solution for executive leadership development',
-    price: 1999.99, // Save ~$400 compared to monthly
+  
+  // Executive Accelerator Plan
+  executive_monthly: {
+    id: 'executive_monthly',
+    name: 'Executive Accelerator',
+    description: 'For high-potential leaders who want elite coaching, full accountability, and strategic alignment',
+    price: 999,
     features: {},
     submissionLimit: null, // Unlimited
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_VIP_YEARLY || '',
-    billingCycle: 'yearly'
+    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY || '',
+    billingCycle: 'monthly'
   }
 };
 
@@ -148,12 +124,13 @@ export function hasReachedSubmissionLimit(
  * Check if a plan is a team plan
  */
 export function isTeamPlan(planId: PlanId): boolean {
-  return planId.startsWith('pro_');
+  // No team plans in the new pricing model
+  return false;
 }
 
 /**
  * Check if a plan has unlimited submissions
  */
 export function hasUnlimitedSubmissions(planId: PlanId): boolean {
-  return planId.startsWith('vip_');
+  return planId.startsWith('executive_');
 }

@@ -256,15 +256,22 @@ export async function POST(request: Request) {
                     // If we still couldn't map the price ID to a plan, use a direct mapping approach
                     console.log('Could not map price ID to plan using getPlanByPriceId');
                     
-                    // Direct mapping of known price IDs to plan IDs
-                    const priceToPlanMapping: Record<string, string> = {
-                      'price_1RMCyVP1DJ8H8ccarTX30pgj': 'solo_monthly',
-                      'price_1RMCyVP1DJ8H8ccaFG3rYjz9': 'solo_yearly',
-                      'price_1RMD3MP1DJ8H8ccaRa5Mc4TR': 'pro_monthly',
-                      'price_1RMD4AP1DJ8H8ccaKSuVZrNR': 'pro_yearly',
-                      'price_1RMD4jP1DJ8H8ccaYCqHj8t4': 'vip_monthly',
-                      'price_1RMD5AP1DJ8H8ccaJ5QrFOzq': 'vip_yearly'
-                    };
+                    // Direct mapping of known price IDs to plan IDs using environment variables
+                    const priceToPlanMapping: Record<string, string> = {};
+                    
+                    // Dynamically build the mapping from environment variables
+                    if (process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY) {
+                      priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY] = 'foundation_monthly';
+                    }
+                    if (process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY) {
+                      priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY] = 'momentum_monthly';
+                    }
+                    if (process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY) {
+                      priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY] = 'legacy_monthly';
+                    }
+                    if (process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY) {
+                      priceToPlanMapping[process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY] = 'executive_monthly';
+                    }
                     
                     if (priceToPlanMapping[priceId]) {
                       planId = priceToPlanMapping[priceId];
@@ -278,28 +285,22 @@ export async function POST(request: Request) {
                         console.log(`Price amount: $${amount}`);
                         
                         // Determine plan based on price amount
-                        if (amount >= 1900) {
-                          planId = 'vip_yearly';
-                          console.log('Identified as vip_yearly based on price amount');
-                        } else if (amount >= 190) {
-                          planId = 'vip_monthly';
-                          console.log('Identified as vip_monthly based on price amount');
-                        } else if (amount >= 900) {
-                          planId = 'pro_yearly';
-                          console.log('Identified as pro_yearly based on price amount');
-                        } else if (amount >= 90) {
-                          planId = 'pro_monthly';
-                          console.log('Identified as pro_monthly based on price amount');
-                        } else if (amount >= 290) {
-                          planId = 'solo_yearly';
-                          console.log('Identified as solo_yearly based on price amount');
+                        if (amount >= 999) {
+                          planId = 'executive_monthly';
+                          console.log('Identified as executive_monthly based on price amount');
+                        } else if (amount >= 499) {
+                          planId = 'legacy_monthly';
+                          console.log('Identified as legacy_monthly based on price amount');
+                        } else if (amount >= 199) {
+                          planId = 'momentum_monthly';
+                          console.log('Identified as momentum_monthly based on price amount');
                         } else {
-                          planId = 'solo_monthly';
-                          console.log('Identified as solo_monthly based on price amount');
+                          planId = 'foundation_monthly';
+                          console.log('Identified as foundation_monthly based on price amount');
                         }
                       } catch (error) {
                         console.error('Error getting price details:', error);
-                        planId = 'pro_monthly'; // Default fallback only if everything else fails
+                        planId = 'foundation_monthly'; // Default fallback only if everything else fails
                         console.log('Using default fallback plan ID:', planId);
                       }
                     }
@@ -328,7 +329,7 @@ export async function POST(request: Request) {
           
           // If we still don't have a plan ID, use a default
           if (!planId) {
-            planId = 'pro_monthly'; // Default to pro_monthly as a last resort
+            planId = 'foundation_monthly'; // Default to foundation_monthly as a last resort
             console.log('Using default plan ID:', planId);
           }
           
