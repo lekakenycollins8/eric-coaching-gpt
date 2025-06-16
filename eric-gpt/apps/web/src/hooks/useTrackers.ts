@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import useSWR, { mutate, type SWRResponse } from 'swr';
 import { useSubscription } from './useSubscription';
 import { toast } from '@/components/ui/use-toast';
-import { hasActiveSubscription } from '@/lib/subscription-utils';
+import { hasActiveSubscription, hasFeatureAccess } from '@/lib/subscription-utils';
 
 interface Tracker {
   _id: string;
@@ -97,8 +97,27 @@ export function useTrackers(status?: string) {
   const createTracker = useCallback(
     async (trackerData: CreateTrackerData) => {
       try {
-        // Check if user has an active subscription
-        if (!hasActiveSubscription(subscription)) {
+        // If subscription data is still loading, wait for it with multiple retries
+        const { loading: subscriptionLoading } = useSubscription();
+        let retries = 0;
+        const maxRetries = 3;
+        
+        while (subscriptionLoading && retries < maxRetries) {
+          console.log(`[DEBUG] useTrackers - Subscription data is loading, waiting... (retry ${retries + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+          retries++;
+        }
+        
+        // Special handling for subscription data
+        // If we have a valid subscription object with active status, override the loading state
+        const isActiveSubscription = subscription && 
+          (subscription.status === 'active' || subscription.status === 'past_due');
+        
+        // Use hasFeatureAccess instead of hasActiveSubscription for more robust checking
+        if (!hasFeatureAccess(subscription, 'trackerCreate', { 
+          isLoading: subscriptionLoading && !isActiveSubscription,
+          hasJustSubscribed: false 
+        })) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to create trackers. Please subscribe to continue.",
@@ -225,8 +244,27 @@ export function useTracker(trackerId: string) {
   const updateEntry = useCallback(
     async (entryData: TrackerEntryData) => {
       try {
-        // Check if user has an active subscription
-        if (!hasActiveSubscription(subscription)) {
+        // If subscription data is still loading, wait for it with multiple retries
+        const { loading: subscriptionLoading } = useSubscription();
+        let retries = 0;
+        const maxRetries = 3;
+        
+        while (subscriptionLoading && retries < maxRetries) {
+          console.log(`[DEBUG] useTrackers - Subscription data is loading for updateEntry, waiting... (retry ${retries + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+          retries++;
+        }
+        
+        // Special handling for subscription data
+        // If we have a valid subscription object with active status, override the loading state
+        const isActiveSubscription = subscription && 
+          (subscription.status === 'active' || subscription.status === 'past_due');
+        
+        // Use hasFeatureAccess instead of hasActiveSubscription for more robust checking
+        if (!hasFeatureAccess(subscription, 'trackerEntryUpdate', { 
+          isLoading: subscriptionLoading && !isActiveSubscription,
+          hasJustSubscribed: false 
+        })) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to update tracker entries. Please subscribe to continue.",
@@ -271,8 +309,27 @@ export function useTracker(trackerId: string) {
   const updateReflection = useCallback(
     async (reflectionData: TrackerReflectionData) => {
       try {
-        // Check if user has an active subscription
-        if (!hasActiveSubscription(subscription)) {
+        // If subscription data is still loading, wait for it with multiple retries
+        const { loading: subscriptionLoading } = useSubscription();
+        let retries = 0;
+        const maxRetries = 3;
+        
+        while (subscriptionLoading && retries < maxRetries) {
+          console.log(`[DEBUG] useTrackers - Subscription data is loading for updateReflection, waiting... (retry ${retries + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+          retries++;
+        }
+        
+        // Special handling for subscription data
+        // If we have a valid subscription object with active status, override the loading state
+        const isActiveSubscription = subscription && 
+          (subscription.status === 'active' || subscription.status === 'past_due');
+        
+        // Use hasFeatureAccess instead of hasActiveSubscription for more robust checking
+        if (!hasFeatureAccess(subscription, 'trackerReflectionUpdate', { 
+          isLoading: subscriptionLoading && !isActiveSubscription,
+          hasJustSubscribed: false 
+        })) {
           toast({
             title: "Subscription Required",
             description: "An active subscription is required to update tracker reflections. Please subscribe to continue.",
