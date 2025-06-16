@@ -30,7 +30,9 @@ export default function TrackerEntryForm({
   const { subscription } = useSubscription();
   
   // Check if user has an active subscription
+  // Consider subscription as not active if it's null (still loading) or not 'active'
   const hasActiveSubscription = subscription?.status === 'active';
+  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
   
   // Local state for form fields
   const [completed, setCompleted] = useState(initialCompleted);
@@ -160,7 +162,7 @@ export default function TrackerEntryForm({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {subscriptionError && (
+          {showSubscriptionAlert && (
             <Alert variant="destructive" className="mb-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Subscription Required</AlertTitle>

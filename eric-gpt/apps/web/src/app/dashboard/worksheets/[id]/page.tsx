@@ -4,11 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useWorksheet } from '@/hooks/useWorksheets';
 import { useWorksheetSubmission } from '@/hooks/useWorksheetSubmission';
+import { useSubscription } from '@/hooks/useSubscription';
 import WorksheetForm from '@/components/worksheets/WorksheetForm';
 import FeedbackPanel from '@/components/worksheets/FeedbackPanel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaExceededAlert } from '@/components/usage/QuotaExceededAlert';
-import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
@@ -20,7 +21,13 @@ export default function WorksheetPage() {
   const worksheetId = params.id as string;
   
   const { worksheet, isLoading, error } = useWorksheet(worksheetId);
+  const { subscription } = useSubscription();
   const worksheetSubmission = useWorksheetSubmission();
+  
+  // Check if user has an active subscription
+  // Consider subscription as not active if it's null (still loading) or not 'active'
+  const hasActiveSubscription = subscription?.status === 'active';
+  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
   const { 
     submitWorksheet, 
     saveDraft,
@@ -154,6 +161,24 @@ export default function WorksheetPage() {
           </Button>
         </Link>
       </div>
+
+      {showSubscriptionAlert && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Subscription Required</AlertTitle>
+          <AlertDescription className="flex flex-col gap-4">
+            <p>You need an active subscription to submit this worksheet and receive AI coaching feedback.</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button asChild variant="default">
+                <Link href="/dashboard/subscription">Subscribe Now</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/dashboard/worksheets">Back to Worksheets</Link>
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {submissionError && (
         <Alert variant="destructive" className="mb-6">

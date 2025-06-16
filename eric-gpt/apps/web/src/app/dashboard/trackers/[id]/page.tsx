@@ -4,13 +4,22 @@ import { useSession } from 'next-auth/react';
 import { redirect, useParams } from 'next/navigation';
 import React from 'react';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TrackerDetails from '@/components/trackers/TrackerDetails';
+import { useSubscription } from '@/hooks/useSubscription';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function TrackerDetailsPage() {
   const { id } = useParams();
   const trackerId = Array.isArray(id) ? id[0] : (id || '');
+  
+  const { subscription } = useSubscription();
+  
+  // Check if user has an active subscription
+  // Consider subscription as not active if it's null (still loading) or not 'active'
+  const hasActiveSubscription = subscription?.status === 'active';
+  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
   
   const { data: session, status } = useSession({
     required: true,
@@ -38,6 +47,24 @@ export default function TrackerDetailsPage() {
           </Button>
         </Link>
       </div>
+      
+      {showSubscriptionAlert && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Subscription Required</AlertTitle>
+          <AlertDescription className="flex flex-col gap-4">
+            <p>You need an active subscription to update tracker entries and reflections.</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button asChild variant="default">
+                <Link href="/dashboard/subscription">Subscribe Now</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/dashboard/trackers">Back to Trackers</Link>
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
       
       <TrackerDetails trackerId={trackerId} />
     </div>

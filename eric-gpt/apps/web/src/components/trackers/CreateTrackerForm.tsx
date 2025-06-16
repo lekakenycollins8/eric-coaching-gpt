@@ -68,7 +68,9 @@ export default function CreateTrackerForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Check if user has an active subscription
+  // Consider subscription as not active if it's null (still loading) or not 'active'
   const hasActiveSubscription = subscription?.status === 'active';
+  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
 
   // Initialize form with default values
   const form = useForm<FormData>({
@@ -128,7 +130,7 @@ export default function CreateTrackerForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {!hasActiveSubscription && (
+        {showSubscriptionAlert && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Subscription Required</AlertTitle>

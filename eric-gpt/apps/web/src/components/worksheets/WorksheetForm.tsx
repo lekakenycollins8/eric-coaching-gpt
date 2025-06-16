@@ -105,6 +105,10 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
     }
   };
 
+  // Determine if we should show the subscription alert
+  // We'll show it if subscription is null (loading) or not active
+  const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
+  
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
@@ -112,23 +116,19 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
         <CardDescription>{worksheet.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        {!hasActiveSubscription && (
+        {showSubscriptionAlert && (
           <Alert variant="destructive" className="mb-6">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Subscription Required</AlertTitle>
             <AlertDescription className="flex flex-col gap-4">
-              <p>You need an active subscription to submit worksheets and receive AI coaching feedback. Save your progress as a draft and subscribe to unlock this feature.</p>
-              <div className="flex gap-3">
-                <Link href="/dashboard/subscription">
-                  <Button variant="default" size="sm" className="bg-red-600 hover:bg-red-700">
-                    Subscribe Now &rarr;
-                  </Button>
-                </Link>
-                <Link href="/dashboard/worksheets">
-                  <Button variant="outline" size="sm">
-                    Back to Worksheets
-                  </Button>
-                </Link>
+              <p>You need an active subscription to submit this worksheet.</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button asChild variant="default">
+                  <Link href="/dashboard/subscription">Subscribe Now</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/worksheets">Back to Worksheets</Link>
+                </Button>
               </div>
             </AlertDescription>
           </Alert>
