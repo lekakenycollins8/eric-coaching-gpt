@@ -8,8 +8,9 @@ import Link from 'next/link';
 export default function WelcomeHero() {
   const { data: session } = useSession();
   
-  // Get user's name if available
-  const userName = session?.user?.name || 'there';
+  // Get user's name if available, otherwise use email or default greeting
+  const userName = session?.user?.name || 
+    (session?.user?.email ? session?.user?.email.split('@')[0] : 'there');
   
   return (
     <div className="bg-gradient-to-r from-green-600 to-green-700 shadow-lg rounded-lg overflow-hidden">
