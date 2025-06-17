@@ -71,10 +71,6 @@ export default function ProfilePage() {
                     <Separator className="my-2" />
                     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">User ID</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{user?.id}</dd>
-                      </div>
-                      <div>
                         <dt className="text-sm font-medium text-gray-500">Email</dt>
                         <dd className="mt-1 text-sm text-gray-900">{user?.email}</dd>
                       </div>
@@ -85,6 +81,21 @@ export default function ProfilePage() {
                         </dd>
                       </div>
                     </dl>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <h3 className="text-lg font-medium">Preferences</h3>
+                    <Separator className="my-2" />
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-500">
+                        Customize your experience with Coach Eric GPT. More preference options coming soon.
+                      </p>
+                      <div className="mt-4">
+                        <Button variant="outline" className="mr-2">
+                          Edit Profile
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>

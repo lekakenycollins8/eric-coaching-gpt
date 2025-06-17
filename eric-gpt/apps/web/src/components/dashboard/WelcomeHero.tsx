@@ -8,8 +8,8 @@ import Link from 'next/link';
 export default function WelcomeHero() {
   const { data: session } = useSession();
   
-  // Get user's first name if available
-  const firstName = session?.user?.name?.split(' ')[0] || 'there';
+  // Get user's name if available
+  const userName = session?.user?.name || 'there';
   
   return (
     <div className="bg-gradient-to-r from-green-600 to-green-700 shadow-lg rounded-lg overflow-hidden">
@@ -20,7 +20,7 @@ export default function WelcomeHero() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
           </div>
-          <h2 className="ml-4 text-2xl font-bold text-white">Welcome, {firstName}!</h2>
+          <h2 className="ml-4 text-2xl font-bold text-white">Hello {userName}, Welcome to Coach Eric GPT</h2>
         </div>
         <p className="mt-4 text-lg text-white opacity-90">
           Your leadership coaching journey begins here. Discover insights, track your progress, and grow your leadership skills.
