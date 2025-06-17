@@ -9,15 +9,18 @@ export default function HeroSection() {
     <div className="relative bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative z-10 pt-8 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-          <svg
-            className="hidden lg:block absolute right-0 inset-y-0 h-full w-48 text-white transform translate-x-1/2"
-            fill="currentColor"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <polygon points="50,0 100,0 50,100 0,100" />
-          </svg>
+          {/* Responsive polygon divider - only visible on lg screens and up */}
+          <div className="hidden lg:block absolute right-0 inset-y-0 h-full">
+            <svg
+              className="h-full w-48 text-white transform translate-x-1/2"
+              fill="currentColor"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <polygon points="50,0 100,0 50,100 0,100" />
+            </svg>
+          </div>
 
           <div className="pt-6 sm:pt-16 lg:pt-8 xl:pt-16">
             <div className="text-center lg:text-left">
@@ -50,8 +53,8 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
-      <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-        <div className="h-56 w-full bg-gradient-to-r from-green-400 to-green-600 sm:h-72 md:h-96 lg:w-full lg:h-full"></div>
+      <div className="relative h-64 sm:h-72 md:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 lg:h-full">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-600 w-full h-full"></div>
       </div>
     </div>
   );
