@@ -6,7 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     // Forward the request to the server application
-    const response = await fetch('http://localhost:3000/api/worksheets');
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const response = await fetch(`${serverUrl}/api/worksheets`);
     
     if (!response.ok) {
       throw new Error(`Server responded with status: ${response.status}`);

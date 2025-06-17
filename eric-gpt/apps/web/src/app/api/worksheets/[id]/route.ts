@@ -19,7 +19,8 @@ export async function GET(
     }
     
     // Forward the request to the server application
-    const response = await fetch(`http://localhost:3000/api/worksheets/${id}`);
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const response = await fetch(`${serverUrl}/api/worksheets/${id}`);
     
     if (!response.ok) {
       if (response.status === 404) {

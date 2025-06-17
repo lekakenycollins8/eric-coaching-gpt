@@ -17,28 +17,28 @@ export default function FeaturedContent() {
   // These would ideally be fetched from an API based on user progress
   const featuredWorksheets: FeaturedItem[] = [
     {
-      id: 'leadership-mindset-1',
-      title: 'Leadership Self-Assessment',
+      id: 'pillar1_leadership_mindset',
+      title: 'Leadership Mindset',
       description: 'Evaluate your current leadership style and identify areas for growth.',
       pillar: 'Leadership Mindset',
       pillarColor: 'bg-blue-100 text-blue-800',
-      link: '/dashboard/worksheets/leadership-mindset-1'
+      link: '/dashboard/worksheets/pillar1_leadership_mindset'
     },
     {
-      id: 'goal-setting-1',
-      title: 'SMART Goal Setting',
+      id: 'pillar2_goal_setting',
+      title: 'Goal Setting',
       description: 'Learn to set Specific, Measurable, Achievable, Relevant, and Time-bound goals.',
       pillar: 'Goal Setting',
       pillarColor: 'bg-green-100 text-green-800',
-      link: '/dashboard/worksheets/goal-setting-1'
+      link: '/dashboard/worksheets/pillar2_goal_setting'
     },
     {
-      id: 'communication-mastery-1',
-      title: 'Effective Communication',
+      id: 'pillar3_communication_mastery',
+      title: 'Communication Mastery',
       description: 'Develop strategies for clear and impactful communication with your team.',
       pillar: 'Communication Mastery',
       pillarColor: 'bg-purple-100 text-purple-800',
-      link: '/dashboard/worksheets/communication-mastery-1'
+      link: '/dashboard/worksheets/pillar3_communication_mastery'
     }
   ];
 
