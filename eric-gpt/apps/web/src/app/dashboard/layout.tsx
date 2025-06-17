@@ -32,7 +32,6 @@ export default function DashboardLayout({
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
-    { name: 'Settings', href: '/dashboard/settings', icon: Cog6ToothIcon },
   ];
 
   return (
@@ -75,9 +74,11 @@ export default function DashboardLayout({
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <div className="hidden sm:flex sm:items-center sm:ml-6">
-                <div className="text-sm font-medium text-gray-900">
-                  {session?.user?.email}
-                </div>
+                <Link href="/dashboard/profile">
+                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-medium cursor-pointer hover:bg-green-200 transition-colors">
+                    {session?.user?.email?.substring(0, 2).toUpperCase() || 'U'}
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
