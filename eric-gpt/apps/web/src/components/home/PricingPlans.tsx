@@ -66,7 +66,7 @@ export default function PricingPlans() {
             Choose the Right Plan for Your Leadership Journey
           </p>
           <p className="mt-5 text-xl text-gray-500 max-w-3xl mx-auto text-center">
-            All plans include access to the Eric GPT coaching platform, worksheets based on the 12 Pillars of Crystal Clear Leadership, and AI-powered feedback.
+            All plans include a 7-day free trial, access to the Eric GPT coaching platform, worksheets based on the 12 Pillars of Crystal Clear Leadership, and AI-powered feedback.
           </p>
         </div>
 
@@ -87,11 +87,12 @@ export default function PricingPlans() {
                   <span className="text-4xl font-extrabold text-gray-900">${plan.price}</span>
                   <span className="text-base font-medium text-gray-500">/mo</span>
                 </p>
+                <p className="mt-2 text-sm text-green-600 font-medium">7-day free trial</p>
                 <Link
                   href="/auth/signin"
-                  className={`mt-8 block w-full bg-${plan.mostPopular ? 'green-600 hover:bg-green-700' : 'gray-800 hover:bg-gray-900'} border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center`}
+                  className={`mt-4 block w-full bg-${plan.mostPopular ? 'green-600 hover:bg-green-700' : 'gray-800 hover:bg-gray-900'} border border-transparent rounded-md py-2 text-sm font-semibold text-white text-center`}
                 >
-                  {plan.cta}
+                  {plan.cta} with 7-Day Trial
                 </Link>
               </div>
               <div className="pt-6 pb-8 px-6">
