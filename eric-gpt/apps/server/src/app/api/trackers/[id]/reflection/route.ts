@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
-import { Tracker, TrackerReflection } from '@/models';
+import { Tracker, TrackerReflection, User } from '@/models';
 import mongoose from 'mongoose';
+import { hasActiveSubscription } from '@/services/quotaManager';
 
 export const dynamic = 'force-dynamic';
 
@@ -230,6 +231,16 @@ export async function POST(
         { error: 'You do not have permission to update this tracker' },
         { status: 403 }
       );
+    }
+    
+    // Check if the user has an active subscription
+    console.log(`[DEBUG] trackers/[id]/reflection/route.ts - Checking subscription for userId: ${userId}`);
+    const hasSubscription = await hasActiveSubscription(userId);
+    console.log(`[DEBUG] trackers/[id]/reflection/route.ts - hasActiveSubscription result: ${hasSubscription}`);
+    
+    if (!hasSubscription) {
+      console.log(`[DEBUG] trackers/[id]/reflection/route.ts - Subscription check failed for userId: ${userId}`);
+      return NextResponse.json({ error: 'Subscription required' }, { status: 403 });
     }
 
     // Get request body

@@ -184,10 +184,24 @@ export function useTracker(trackerId: string) {
         body: JSON.stringify(entryData),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to update entry');
+        let errorMessage = 'Failed to update entry';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
-      const updated = await res.json();
+      
+      // Parse the response once
+      let updated;
+      try {
+        updated = await res.json();  
+      } catch (parseError) {
+        console.error('Error parsing success response:', parseError);
+        throw new Error('Failed to parse server response');
+      }
       await revalidate();
       return { success: true, data: updated };
     },
@@ -213,10 +227,24 @@ export function useTracker(trackerId: string) {
         body: JSON.stringify(reflectionData),
       });
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to update reflection');
+        let errorMessage = 'Failed to update reflection';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
-      const updated = await res.json();
+      
+      // Parse the response once
+      let updated;
+      try {
+        updated = await res.json();  
+      } catch (parseError) {
+        console.error('Error parsing success response:', parseError);
+        throw new Error('Failed to parse server response');
+      }
       await revalidate();
       return { success: true, data: updated };
     },

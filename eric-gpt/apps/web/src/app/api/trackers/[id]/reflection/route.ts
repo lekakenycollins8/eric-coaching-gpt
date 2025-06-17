@@ -46,16 +46,26 @@ export async function GET(
     // Check if response is ok before trying to parse JSON
     if (!response.ok) {
       // Try to get error details if possible
-      let errorDetails = '';
+      let errorData;
       try {
-        const errorData = await response.text();
-        errorDetails = errorData;
+        const errorText = await response.text();
+        try {
+          // Try to parse as JSON
+          errorData = JSON.parse(errorText);
+        } catch {
+          // If not valid JSON, use as plain text
+          errorData = { message: errorText };
+        }
       } catch (e) {
         // Ignore error in getting error details
+        errorData = { message: 'Unknown error' };
       }
       
       return NextResponse.json(
-        { error: `Server returned error: ${response.status}`, details: errorDetails },
+        { 
+          error: `Server returned error: ${response.status}`, 
+          message: errorData?.error || errorData?.message || 'Unknown error' 
+        },
         { status: response.status }
       );
     }
@@ -130,16 +140,35 @@ export async function POST(
     // Check if response is ok before trying to parse JSON
     if (!response.ok) {
       // Try to get error details if possible
-      let errorDetails = '';
+      let errorData;
       try {
-        const errorData = await response.text();
-        errorDetails = errorData;
+        const errorText = await response.text();
+        try {
+          // Try to parse as JSON
+          errorData = JSON.parse(errorText);
+        } catch {
+          // If not valid JSON, use as plain text
+          errorData = { message: errorText };
+        }
       } catch (e) {
         // Ignore error in getting error details
+        errorData = { message: 'Unknown error' };
+      }
+      
+      // Special handling for subscription errors
+      if (response.status === 403 && errorData && errorData.error === 'Subscription required') {
+        console.log('[DEBUG] Subscription required error detected for reflection');
+        return NextResponse.json(
+          { error: 'Subscription required', message: 'An active subscription is required to update tracker reflections.' },
+          { status: 403 }
+        );
       }
       
       return NextResponse.json(
-        { error: `Server returned error: ${response.status}`, details: errorDetails },
+        { 
+          error: `Server returned error: ${response.status}`, 
+          message: errorData?.error || errorData?.message || 'Unknown error' 
+        },
         { status: response.status }
       );
     }

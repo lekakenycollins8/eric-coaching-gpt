@@ -24,8 +24,8 @@ export default function TrackerReflectionForm({
   const { subscription } = useSubscription();
   
   // Check if user has an active subscription
-  // Consider subscription as not active if it's null (still loading) or not 'active'
-  const hasActiveSubscription = subscription?.status === 'active';
+  // Both 'active' and 'past_due' statuses are considered valid
+  const hasActiveSubscription = subscription?.status === 'active' || subscription?.status === 'past_due';
   const showSubscriptionAlert = subscription === null || !hasActiveSubscription;
   
   // Local state for form fields
