@@ -16,7 +16,10 @@ export function validateServerEnvironment(): void {
     'OPENAI_API_KEY',
     'NEXT_PUBLIC_API_URL',
     'NEXT_PUBLIC_APP_URL',
-    'EMAIL_SERVER',
+    'EMAIL_SERVER_HOST',
+    'EMAIL_SERVER_PORT',
+    'EMAIL_SERVER_USER',
+    'EMAIL_SERVER_PASSWORD',
     'EMAIL_FROM'
   ];
 
