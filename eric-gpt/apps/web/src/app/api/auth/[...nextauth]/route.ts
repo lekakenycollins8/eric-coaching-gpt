@@ -88,8 +88,19 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production', // Only use secure in production
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
+  debug: process.env.NODE_ENV === 'development' ? true : false, // Explicitly disable in production
 };
 
 const handler = NextAuth(authOptions);

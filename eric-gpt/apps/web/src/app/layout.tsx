@@ -5,6 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import type { Session } from "next-auth";
 import { Toaster } from "@/components/ui/toaster";
 
+
 export const metadata = {
   title: "Eric GPT Coaching Platform",
   description: "AI-powered leadership coaching with the Jackier Method",

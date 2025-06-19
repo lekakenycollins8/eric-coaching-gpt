@@ -296,7 +296,7 @@ export default function TrackerDetails({ trackerId }: TrackerDetailsProps) {
           {tracker.submissionId && (
             <div className="flex items-center mt-2 text-xs">
               <FileText className="mr-1 h-3 w-3" />
-              <Link href={`/submissions/${tracker.submissionId}`} className="text-primary hover:underline">
+              <Link href={`/dashboard/submissions/${tracker.submissionId}`} className="text-primary hover:underline">
                 View related worksheet submission
               </Link>
             </div>

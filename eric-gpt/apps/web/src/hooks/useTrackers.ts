@@ -256,6 +256,18 @@ export function useTracker(trackerId: string) {
     return true;
   }, [trackerId]);
 
+  const deleteTracker = useCallback(async () => {
+    const res = await fetch(`/api/trackers/${trackerId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to delete tracker');
+    }
+    await mutate('/api/trackers');
+    return true;
+  }, [trackerId]);
+
   return {
     trackerData: data,
     isLoading,
@@ -264,6 +276,7 @@ export function useTracker(trackerId: string) {
     updateEntry,
     updateReflection,
     downloadPdf,
+    deleteTracker,
     revalidate,
   };
 }

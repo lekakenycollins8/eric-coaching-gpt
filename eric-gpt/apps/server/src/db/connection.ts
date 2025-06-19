@@ -4,6 +4,9 @@ import { dbOptions, DATABASE_NAME } from './config';
 import path from 'path';
 import fs from 'fs';
 
+// Import server initialization to run validation
+import '../lib/serverInit';
+
 // Load environment variables
 config();
 
