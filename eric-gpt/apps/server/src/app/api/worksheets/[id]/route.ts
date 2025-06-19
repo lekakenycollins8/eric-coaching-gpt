@@ -104,7 +104,7 @@ interface Worksheet {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Destructure id from params to comply with Next.js 14+ requirements
@@ -134,7 +134,7 @@ export async function GET(
 
     return NextResponse.json(worksheet, { status: 200 });
   } catch (error) {
-    console.error(`Error fetching worksheet with ID ${params.id}:`, error);
+    console.error(`Error fetching worksheet:`, error);
     return NextResponse.json(
       { error: 'Failed to fetch worksheet' },
       { status: 500 }
