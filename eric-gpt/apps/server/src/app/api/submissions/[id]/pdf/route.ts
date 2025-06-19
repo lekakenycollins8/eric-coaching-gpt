@@ -44,11 +44,11 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Access id from params using proper pattern for Next.js 14+
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     
     // Validate submission ID format
     if (!mongoose.Types.ObjectId.isValid(id)) {

@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ISubmission extends Document {
+  _id: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   orgId?: Schema.Types.ObjectId;
   worksheetId: string;
