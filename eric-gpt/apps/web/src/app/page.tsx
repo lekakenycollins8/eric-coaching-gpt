@@ -12,15 +12,17 @@ import {
 import WelcomeHero from '@/components/dashboard/WelcomeHero';
 import FeaturedContent from '@/components/dashboard/FeaturedContent';
 import Link from 'next/link';
+import { useState } from 'react';
 import { 
   ClipboardDocumentCheckIcon, 
-  ChartBarIcon, 
-  UserGroupIcon, 
-  CreditCardIcon 
+  CreditCardIcon,
+  ArrowRightOnRectangleIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 export default function Home() {
   const { data: session } = useSession();
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   
   // If user is authenticated, show a dashboard-like homepage
   if (session) {
@@ -56,6 +58,48 @@ export default function Home() {
                         <CreditCardIcon className="h-6 w-6 text-green-600" />
                         <span className="ml-3 text-sm font-medium text-gray-900">Manage Subscription</span>
                       </Link>
+                      
+                      <button 
+                        onClick={() => setShowSignOutModal(true)}
+                        className="flex items-center p-3 rounded-lg hover:bg-gray-50 w-full text-left"
+                      >
+                        <ArrowRightOnRectangleIcon className="h-6 w-6 text-green-600" />
+                        <span className="ml-3 text-sm font-medium text-gray-900">Sign Out</span>
+                      </button>
+                      
+                      {/* Sign Out Confirmation Modal */}
+                      {showSignOutModal && (
+                        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="text-lg font-medium text-gray-900">Sign out</h3>
+                              <button 
+                                onClick={() => setShowSignOutModal(false)}
+                                className="text-gray-400 hover:text-gray-500"
+                              >
+                                <XMarkIcon className="h-6 w-6" />
+                              </button>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-6">
+                              Are you sure you want to sign out?
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                              <Link
+                                href="/api/auth/signout"
+                                className="inline-flex justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+                              >
+                                Sign out
+                              </Link>
+                              <button
+                                onClick={() => setShowSignOutModal(false)}
+                                className="inline-flex justify-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
