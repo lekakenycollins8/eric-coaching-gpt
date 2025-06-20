@@ -1,8 +1,7 @@
 import "../index.css";
 import { Providers } from '@/app/providers';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import type { Session } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { Toaster } from "@/components/ui/toaster";
 
 

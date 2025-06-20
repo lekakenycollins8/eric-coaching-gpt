@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth'
+import { authOptions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,11 +9,11 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     // Access params using proper pattern for Next.js 14+
-    const { id } = await Promise.resolve(params);
+    const { id } = await context.params;
     
     // Get the authenticated user
     const session = await getServerSession(authOptions);

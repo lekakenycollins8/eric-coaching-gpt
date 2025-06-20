@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -22,7 +22,7 @@ export async function GET(
     }
 
     // Access id from params - in Next.js 15, params must be awaited
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: 'Tracker ID is required' },
@@ -88,7 +88,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -101,7 +101,7 @@ export async function PUT(
     }
 
     // Access id from params - in Next.js 15, params must be awaited
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: 'Tracker ID is required' },
@@ -171,7 +171,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -184,7 +184,7 @@ export async function DELETE(
     }
 
     // Access id from params - in Next.js 15, params must be awaited
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: 'Tracker ID is required' },

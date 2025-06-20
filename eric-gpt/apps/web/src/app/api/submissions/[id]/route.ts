@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the authenticated user
@@ -19,7 +19,9 @@ export async function GET(
         { status: 401 }
       );
     }
-    const resolvedParams = await Promise.resolve(params);
+    
+    // Await the params Promise in Next.js 15
+    const resolvedParams = await params;
     const submissionId = resolvedParams.id;
     
     // Forward the request to the server application

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -22,7 +22,7 @@ export async function GET(
     }
 
     // Access id from params
-    const { id } = params;
+    const { id } = await params;
     const userId = session.user.id;
 
     // Forward the request to the server API

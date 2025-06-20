@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -22,7 +22,7 @@ export async function GET(
     }
 
     // Access id from params - in Next.js 15, params must be awaited
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
@@ -99,7 +99,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id?: string } }
+  { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
     // Get the authenticated user session
@@ -112,7 +112,7 @@ export async function POST(
     }
 
     // Access id from params - in Next.js 15, params must be awaited
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(
