@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "migrate": "NODE_OPTIONS='--loader ts-node/esm' ts-node --project tsconfig.scripts.json src/scripts/migrate.ts",
@@ -14,8 +14,8 @@
   "dependencies": {
     "@trpc/client": "^11.0.0",
     "@trpc/server": "^11.0.0",
+    "@auth/mongodb-adapter": "^3.7.1",
     "dotenv": "^16.5.0",
-    "mongodb-adapter": "^0.0.4",
     "mongoose": "^8.14.0",
     "next": "^15.3.4",
     "next-auth": "^4.24.11",
