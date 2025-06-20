@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2025-05-28.basil', // Use the latest stable API version
+      apiVersion: '2025-04-30.basil' // Use the latest stable API version
     });
 
     // Find the user's Stripe customer ID from the database
