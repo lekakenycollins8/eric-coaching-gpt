@@ -1,0 +1,22 @@
+.swaggerContainer {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .swaggerHeader {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .loading {
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+  }
+  
+  .swaggerUiWrapper {
+    margin-top: 20px;
+  }

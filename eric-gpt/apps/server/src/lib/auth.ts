@@ -11,7 +11,7 @@ import 'server-only';
  * Uses Nodemailer for sending emails and MongoDB for storing sessions and users
  */
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise) as Adapter,
+  adapter: MongoDBAdapter(clientPromise as any) as Adapter,
   providers: [
     EmailProvider({
       server: {
