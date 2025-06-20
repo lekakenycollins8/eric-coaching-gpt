@@ -24,8 +24,7 @@
     "puppeteer": "^21.7.0",
     "stripe": "^18.1.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-react": "^5.25.2",
-    "trpc": "*"
+    "swagger-ui-react": "^5.25.2"
   },
   "devDependencies": {
     "@types/node": "^20",

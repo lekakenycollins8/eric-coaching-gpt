@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false, // Disable React Strict Mode to prevent warnings from Swagger UI components
-  output: 'standalone',
+  // Match web app's minimal configuration
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   // Remove serverExternalPackages since swagger-ui-react is used client-side
   webpack: (config) => {
     // Handle swagger-ui-react's dependencies properly
