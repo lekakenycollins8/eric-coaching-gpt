@@ -14,6 +14,9 @@ export async function middleware(request: NextRequest) {
     '/api/stripe/create-checkout-session',
     '/api/stripe/webhook',
     '/api/stripe/customer-portal',
+    '/api/trackers',
+    '/api/user/subscription',
+    '/api/pdf',
     // Add other known API routes here
   ];
   
