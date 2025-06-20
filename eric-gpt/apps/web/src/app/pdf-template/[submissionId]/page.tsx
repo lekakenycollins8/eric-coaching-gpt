@@ -18,11 +18,11 @@ export default async function PdfTemplatePage({
   params,
   searchParams,
 }: {
-  params: { submissionId?: string };
-  searchParams: { userId?: string };
+  params: Promise<{ submissionId?: string }>;
+  searchParams: Promise<{ userId?: string }>;
 }) {
   // Access params using proper pattern for Next.js 14+
-  const { submissionId } = await Promise.resolve(params);
+  const { submissionId } = await params;
   
   // Check if submissionId exists before proceeding
   if (!submissionId) {
@@ -30,7 +30,7 @@ export default async function PdfTemplatePage({
   }
   
   // Get the userId from searchParams - must await in Next.js 14+
-  const { userId } = await Promise.resolve(searchParams);
+  const { userId } = await searchParams;
   
   // Fetch the submission data from the API
   const submission = await getSubmission(submissionId, userId);

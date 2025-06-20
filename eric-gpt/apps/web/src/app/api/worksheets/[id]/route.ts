@@ -5,11 +5,11 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Access params.id asynchronously to comply with Next.js 14+ requirements
-    const { id } = await Promise.resolve(params);
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json(

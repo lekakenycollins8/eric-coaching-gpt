@@ -1,8 +1,8 @@
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
-import type { AppRouter } from '../../../server/src/routers';
 import { toast } from 'sonner';
+import type { AppRouter } from 'trpc';
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -25,10 +25,9 @@ const trpcClient = createTRPCClient<AppRouter>({
       url: `${process.env.NEXT_PUBLIC_API_URL}/trpc`,
     }),
   ],
-})
+});
 
 export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: trpcClient,
   queryClient,
 });
-

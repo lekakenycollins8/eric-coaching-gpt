@@ -2,12 +2,8 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 
 interface TrackerPDFTemplateProps {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    userId?: string;
-  };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ userId?: string }>;
 }
 
 interface TrackerData {
@@ -44,8 +40,8 @@ interface TrackerData {
 
 export default async function TrackerPDFTemplate({ params, searchParams }: TrackerPDFTemplateProps) {
   // In Next.js 15, params and searchParams must be awaited
-  const { id } = await Promise.resolve(params);
-  const { userId } = await Promise.resolve(searchParams);
+  const { id } = await params;
+  const { userId } = await searchParams;
 
   if (!id) {
     return notFound();

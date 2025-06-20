@@ -1,12 +1,2 @@
-
-import {
-  publicProcedure,
-  router,
-} from "../lib/trpc";
-
-export const appRouter = router({
-  healthCheck: publicProcedure.query(() => {
-    return "OK";
-  }),
-});
-export type AppRouter = typeof appRouter;
+// Re-export the appRouter and AppRouter type from the shared trpc package
+export { appRouter, type AppRouter } from "trpc";
