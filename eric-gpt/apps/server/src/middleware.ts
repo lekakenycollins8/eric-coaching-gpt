@@ -3,6 +3,25 @@ import { NextRequest } from 'next/server';
 import { rateLimitMiddleware, sensitiveRouteRateLimit } from './middleware/rateLimit';
 
 export async function middleware(request: NextRequest) {
+  // Check if the requested path doesn't match any existing routes
+  // This is a simplified check. In a real app, you'd need a more comprehensive route check.
+  const path = request.nextUrl.pathname;
+  
+  // List of known API routes - expand this based on your app's routes
+  const knownApiRoutes = [
+    '/api/worksheets',
+    '/api/submissions',
+    '/api/stripe/create-checkout-session',
+    '/api/stripe/webhook',
+    '/api/stripe/customer-portal',
+    // Add other known API routes here
+  ];
+  
+  // Check if the path starts with /api/ but doesn't match known routes
+  if (path.startsWith('/api/') && !knownApiRoutes.some(route => path.startsWith(route))) {
+    return NextResponse.redirect(new URL('/page-not-found', request.url));
+  }
+
   // Apply rate limiting to specific routes
   if (request.nextUrl.pathname.startsWith('/api/submissions')) {
     // Apply stricter rate limiting to submission endpoints (OpenAI calls)
