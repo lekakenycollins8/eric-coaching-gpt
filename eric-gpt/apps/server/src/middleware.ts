@@ -21,6 +21,15 @@ export async function middleware(request: NextRequest) {
     '/api/pdf',
     '/api/swagger',
     '/api/404',
+    '/api/auth',  // Auth related routes
+    '/api/auth/signin',
+    '/api/auth/signout',
+    '/api/auth/session',
+    '/api/auth/providers',
+    '/api/auth/csrf',
+    '/api/auth/callback',
+    '/api/auth/verify-request',
+    '/api/auth/error',
     // Add other known API routes here
   ];
   
@@ -46,11 +55,16 @@ export async function middleware(request: NextRequest) {
   // Apply CORS headers to all responses
   const res = NextResponse.next();
   res.headers.append('Access-Control-Allow-Credentials', "true");
-  res.headers.append('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_APP_URL || "");
-  res.headers.append('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  
+  // Use a more permissive CORS origin setting
+  // In production, you should restrict this to your actual domains
+  const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL || "*";
+  res.headers.append('Access-Control-Allow-Origin', allowedOrigin);
+  
+  res.headers.append('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.headers.append(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization'
+    'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept'
   );
   return res;
 }
