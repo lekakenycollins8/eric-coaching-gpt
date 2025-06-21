@@ -14,8 +14,10 @@
       "maxDuration": 10
     }
   },
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "status": 404, "dest": "/api/404" }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "fallback": {
+    "source": "/(.*)",
+    "destination": "/api/404"
+  }
 }
