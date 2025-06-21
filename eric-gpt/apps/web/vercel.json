@@ -1,18 +1,9 @@
 {
-  "buildCommand": "next build",
-  "outputDirectory": ".next",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/api/(?!auth/)(.*)",
-      "destination": "${NEXT_PUBLIC_API_URL}/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
-  "env": {
-    "NEXTAUTH_URL": "${NEXT_PUBLIC_APP_URL}"
-  }
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [],
+  "redirects": [],
+  "headers": []
 }
