@@ -12,6 +12,26 @@ const nextConfig = {
     };
     return config;
   },
+  // Ensure API routes are properly handled
+  async rewrites() {
+    return [
+      {
+        source: '/',
+        destination: '/api',
+      },
+      {
+        source: '/:path*',
+        destination: '/api/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'accept',
+            value: '(.*application/json.*)',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
