@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
     const userId = session.user.id;
     const userQueryParam = queryString ? `&userId=${userId}` : `?userId=${userId}`;
     
-    const response = await fetch(`${serverUrl}/api/trackers${queryPart}${userQueryParam}`, {
+    const apiUrl = `${serverUrl}/api/trackers${queryPart}${userQueryParam}`;
+    console.log('Web app: Forwarding request to:', apiUrl);
+    
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

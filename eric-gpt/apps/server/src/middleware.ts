@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
   
   // Check if the path starts with /api/ but doesn't match known routes
   if (path.startsWith('/api/') && !knownApiRoutes.some(route => path.startsWith(route))) {
-    return NextResponse.redirect(new URL('/page-not-found', request.url));
+    console.log(`Unknown API route requested: ${path}`);
+    // Return a JSON error response instead of redirecting to an HTML page
+    return NextResponse.json({ error: 'API endpoint not found' }, { status: 404 });
   }
 
   // Apply rate limiting to specific routes
