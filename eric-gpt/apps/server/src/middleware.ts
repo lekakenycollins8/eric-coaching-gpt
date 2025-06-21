@@ -9,6 +9,8 @@ export async function middleware(request: NextRequest) {
   
   // List of known API routes - expand this based on your app's routes
   const knownApiRoutes = [
+    '/',
+    '/api',  // Root API route
     '/api/worksheets',
     '/api/submissions',
     '/api/stripe/create-checkout-session',
@@ -17,6 +19,8 @@ export async function middleware(request: NextRequest) {
     '/api/trackers',
     '/api/user/subscription',
     '/api/pdf',
+    '/api/swagger',
+    '/api/404',
     // Add other known API routes here
   ];
   
