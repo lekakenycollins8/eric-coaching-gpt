@@ -41,28 +41,19 @@ export async function getUserSubscriptionTier(userId: string): Promise<Subscript
       return 'EXECUTIVE';
     }
     
-    // If we can't determine from planId, try to use the price ID
-    const priceId = user.subscription.priceId || '';
-    if (priceId.includes('price_')) {
-      // Get price IDs from environment variables
-      const foundationMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_FOUNDATION_MONTHLY || '';
-      const momentumMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MOMENTUM_MONTHLY || '';
-      const legacyMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_LEGACY_MONTHLY || '';
-      const executiveMonthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_EXECUTIVE_MONTHLY || '';
-      
-      if (priceId === foundationMonthlyPriceId) {
-        return 'FOUNDATION';
-      } else if (priceId === momentumMonthlyPriceId) {
-        return 'MOMENTUM';
-      } else if (priceId === legacyMonthlyPriceId) {
-        return 'LEGACY';
-      } else if (priceId === executiveMonthlyPriceId) {
-        return 'EXECUTIVE';
-      }
+    // Additional checks for different plan ID formats
+    if (planId.includes('foundation') || planId.includes('solo')) {
+      return 'FOUNDATION';
+    } else if (planId.includes('momentum') || planId.includes('pro')) {
+      return 'MOMENTUM';
+    } else if (planId.includes('legacy')) {
+      return 'LEGACY';
+    } else if (planId.includes('executive') || planId.includes('vip')) {
+      return 'EXECUTIVE';
     }
     
     // Default to the lowest tier if no match is found
-    console.warn(`Could not determine subscription tier for plan: ${planId}, price: ${priceId}. Defaulting to FOUNDATION tier.`);
+    console.warn(`Could not determine subscription tier for plan: ${planId}. Defaulting to FOUNDATION tier.`);
     return 'FOUNDATION';
   } catch (error) {
     console.error('Error getting user subscription tier:', error);
@@ -199,7 +190,7 @@ export async function hasActiveSubscription(userId: string): Promise<boolean> {
     const isValid = validStatuses.includes(user.subscription.status);
     
     console.log(`[DEBUG] hasActiveSubscription - User: ${userId}, Status: ${user.subscription.status}, Valid: ${isValid}`);
-    console.log(`[DEBUG] hasActiveSubscription - Plan ID: ${user.subscription.planId}, Price ID: ${user.subscription.priceId || 'N/A'}`);
+    console.log(`[DEBUG] hasActiveSubscription - Plan ID: ${user.subscription.planId}`);
     
     return isValid;
   } catch (error) {
@@ -230,23 +221,14 @@ export async function recordSubmissionUsage(userId: string, tokensUsed: number):
       user.name = 'User';
     }
     
-    // Update the user's usage statistics
-    // This could be expanded to track more detailed usage metrics
-    if (!user.usage) {
-      user.usage = {
-        totalSubmissions: 1,
-        totalTokensUsed: tokensUsed
-      };
-    } else {
-      user.usage.totalSubmissions = (user.usage.totalSubmissions || 0) + 1;
-      user.usage.totalTokensUsed = (user.usage.totalTokensUsed || 0) + tokensUsed;
-    }
-    
-    // Also update the submissionsThisPeriod counter in the subscription object
-    // This ensures the counter is in sync with the actual submissions count
+    // Update the submissionsThisPeriod counter in the subscription object
+    // This tracks usage for quota enforcement
     if (user.subscription) {
       user.subscription.submissionsThisPeriod = (user.subscription.submissionsThisPeriod || 0) + 1;
     }
+    
+    // Note: We're no longer tracking lifetime usage statistics to simplify the model
+    // If analytics are needed in the future, consider using the Submission model
     
     await user.save();
   } catch (error) {
