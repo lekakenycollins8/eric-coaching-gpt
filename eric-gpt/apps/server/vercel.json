@@ -1,7 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "ignoreCommand": "echo 'Skipping unused files'",
   "cleanUrls": true,
   "rewrites": [],
   "redirects": [],
