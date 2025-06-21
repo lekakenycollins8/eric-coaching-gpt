@@ -51,5 +51,6 @@ import { Collections } from '@/db/config';
 
 // Use the configured collection name
 // Make sure we don't try to recompile the model if it already exists
-const User = mongoose.models.User || mongoose.model<IUser>(Collections.USERS, UserSchema);
+const modelName = Collections.USERS;
+const User = mongoose.models[modelName] as mongoose.Model<IUser> || mongoose.model<IUser>(modelName, UserSchema);
 export default User;
