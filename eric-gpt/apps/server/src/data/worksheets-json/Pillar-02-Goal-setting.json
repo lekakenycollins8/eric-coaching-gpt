@@ -1,0 +1,208 @@
+[
+  {
+    "id": "pillar2_goal_setting",
+    "title": "Goal Setting",
+    "description": "Setting clear, measurable goals isn't just about checking boxes—it's about aligning your daily actions with your long-term leadership vision. The most effective leaders turn their intentions into reality by mastering the art of goal clarity.",
+    "systemPromptKey": "pillar2_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Setting clear, measurable goals isn't just about checking boxes—it's about aligning your daily actions with your long-term leadership vision. The most effective leaders turn their intentions into reality by mastering the art of goal clarity.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You've been asked to lead a new project with a tight deadline, a cross-functional team, and unclear deliverables. The success of this project could elevate your reputation—or hurt it. You know the first step is to set strong goals, but you're not sure where to start.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "goal_setting_approach",
+        "label": "How would you begin setting goals for yourself and your team in this situation?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_measurable_goals",
+        "label": "I set goals that are measurable and trackable (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_goal_alignment",
+        "label": "I align my personal goals with my team's and company's direction (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_follow_through",
+        "label": "I follow through on my stated goals consistently (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "Why did you give yourself those ratings? What's one goal you set recently that went off course?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_smart_goal",
+        "label": "Set one SMART goal and break it into 3 actionable steps",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_peer_accountability",
+        "label": "Share one of my goals with a peer for accountability",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_realign_goal",
+        "label": "Review and realign one long-term goal with my current daily actions",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Marcus has big dreams for his department—he wants to double revenue by next year and improve team morale. However, his team is overwhelmed and unclear about their weekly targets. Projects are started and abandoned quickly, and morale is dropping instead of rising.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What's missing in Marcus's goal-setting approach? What would you advise him to do differently using the Crystal Clear Goal Setting Method?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Goal Breakdown Tool",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "main_goal",
+        "label": "Main Goal:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_1",
+        "label": "Subgoal 1:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_1_date",
+        "label": "by date:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_2",
+        "label": "Subgoal 2:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_2_date",
+        "label": "by date:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_3",
+        "label": "Subgoal 3:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "subgoal_3_date",
+        "label": "by date:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about setting or achieving goals more effectively, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What goal are you fully committing to this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "support_needed",
+        "label": "What support or resources do you need to follow through?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

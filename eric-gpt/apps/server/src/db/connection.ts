@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { config } from 'dotenv';
 import { dbOptions, DATABASE_NAME } from './config';
 import path from 'path';
-import fs from 'fs';
+import { loadAllWorksheets } from '@/utils/worksheetLoader';
 
 // Import server initialization to run validation
 import '../lib/serverInit';
@@ -85,9 +85,8 @@ async function initializeWorksheets() {
     if (worksheetCount === 0) {
       console.log('No worksheets found in database. Seeding from JSON file...');
       
-      // Read the worksheets JSON file
-      const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
-      const worksheetsData = JSON.parse(fs.readFileSync(worksheetsPath, 'utf8'));
+      // Load worksheets from individual JSON files
+      const worksheetsData = await loadAllWorksheets();
       
       console.log(`Loaded ${worksheetsData.length} worksheets from JSON file`);
       

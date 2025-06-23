@@ -1,0 +1,202 @@
+[
+  {
+    "id": "pillar8_change_uncertainty",
+    "title": "Leading Through Change and Uncertainty",
+    "description": "Uncertainty reveals leadership. Great leaders don't always have the answers—but they do provide stability, direction, and reassurance. Mastering this Pillar means learning to lead with clarity even when the path ahead is unclear.",
+    "systemPromptKey": "pillar8_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Uncertainty reveals leadership. Great leaders don't always have the answers—but they do provide stability, direction, and reassurance. Mastering this Pillar means learning to lead with clarity even when the path ahead is unclear.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: Your company just announced a major organizational shift. Morale is shaken. People are whispering, productivity is dropping, and everyone's waiting for your reaction.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "first_move",
+        "label": "What's your first move? How do you lead your team through uncertainty—even if you don't have all the answers?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_steady_calm",
+        "label": "I remain steady and calm when things around me are changing (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_communicate_clearly",
+        "label": "I communicate clearly even when outcomes are unknown (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_optimism_transparency",
+        "label": "I lead with optimism and transparency in uncertain times (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "Think back to the last time you experienced major change. What did you do well as a leader—and what would you do differently now?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_host_checkin",
+        "label": "Host a 10-minute check-in to address my team's biggest questions",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_acknowledge_unknown",
+        "label": "Acknowledge what I *don't* know—and share what I *do* know",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_model_calm",
+        "label": "Choose one new challenge to model calm, clarity, and flexibility",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Raj avoids conflict and change like the plague. When a crisis hits, he either shuts down or disappears into work, avoiding tough conversations. His team feels abandoned and anxious whenever something shifts.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What new behaviors would help Raj grow into a leader who thrives during change?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Change Clarity Framework\n\n**Step 1:** Identify a current or upcoming change affecting your role or team.\n\n**Step 2:** Answer these questions:\n\n* What do I know for sure?\n* What don’t I know (yet)?\n* What does my team need to hear from me right now?\n* How can I lead with stability this week?\n\n**Step 3:** Craft a short, calming message you can share with your team.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "current_change",
+        "label": "Identify a current or upcoming change affecting your role or team:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "know_for_sure",
+        "label": "What do I know for sure?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "dont_know_yet",
+        "label": "What don't I know (yet)?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "team_needs",
+        "label": "What does my team need to hear from me right now?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "lead_with_stability",
+        "label": "How can I lead with stability this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "team_message",
+        "label": "Craft a short, calming message you can share with your team:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about leading confidently through uncertainty, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What's one step you'll take this week to lead with confidence during change?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "team_remember",
+        "label": "What do you want your team to remember about how you showed up?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

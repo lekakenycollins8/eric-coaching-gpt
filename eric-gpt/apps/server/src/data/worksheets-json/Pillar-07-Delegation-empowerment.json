@@ -1,0 +1,196 @@
+[
+  {
+    "id": "pillar7_delegation_empowerment",
+    "title": "Delegation and Team Empowerment",
+    "description": "Delegation isn't giving tasks away—it's giving others a chance to rise. Empowered leaders build empowered teams by assigning responsibility, setting expectations, and allowing others to succeed (and sometimes fail) without micromanagement.",
+    "systemPromptKey": "pillar7_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Delegation isn't giving tasks away—it's giving others a chance to rise. Empowered leaders build empowered teams by assigning responsibility, setting expectations, and allowing others to succeed (and sometimes fail) without micromanagement.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You're managing a large project and realize you're the bottleneck—every major task flows through you. You feel pressure to maintain control but you're falling behind, and your team feels underutilized.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "delegation_blockers",
+        "label": "What's stopping you from delegating more effectively? Who on your team could grow if given the chance?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_trust_team",
+        "label": "I trust my team to complete important tasks without me (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_delegate_responsibilities",
+        "label": "I delegate responsibilities—not just tasks (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_coach_support",
+        "label": "I coach and support instead of micromanaging (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What's one task you're holding onto that someone else could own—and why haven't you let it go yet?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_identify_task",
+        "label": "Identify one task I currently do that I will delegate by end of week",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_ask_team_member",
+        "label": "Ask a team member what responsibility they'd like to grow into",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_provide_expectations",
+        "label": "Provide clear expectations and check-in milestones for a delegated assignment",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Lena is known for high standards and flawless work. But her team is disengaged—she redoes their work, takes on too much, and doesn't trust others to execute. Her department is stuck, and Lena is exhausted.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What mindset shift would help Lena delegate effectively? What systems could help her empower her team without sacrificing quality?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Delegation Planner\n\n**Step 1:** Choose one recurring task you handle each week.\n\n**Step 2:** Answer these questions:\n\n* Is this task essential to me or could someone else own it?\n* What training or context would they need?\n* How will I follow up without micromanaging?\n\n**Step 3:** Create a short delegation plan with a timeline and check-in point.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "recurring_task",
+        "label": "Choose one recurring task you handle each week:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "task_essential",
+        "label": "Is this task essential to me or could someone else own it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "training_needed",
+        "label": "What training or context would they need?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "follow_up",
+        "label": "How will I follow up without micromanaging?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "delegation_plan",
+        "label": "Create a short delegation plan with a timeline and check-in point:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about improving delegation or empowering your team, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What's one delegation step you're committing to take this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "measure_success",
+        "label": "How will you measure whether the task was delegated successfully?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

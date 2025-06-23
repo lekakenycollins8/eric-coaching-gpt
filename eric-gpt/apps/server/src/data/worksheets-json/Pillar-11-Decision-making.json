@@ -1,0 +1,190 @@
+[
+  {
+    "id": "pillar11_decision_making",
+    "title": "Decision-Making with Clarity and Confidence",
+    "description": "Leadership is decision-making. Every choice you make shapes your influence, your results, and your team's trust in you. When you make decisions rooted in clarity, confidence, and consistency, you create momentum and credibility—even in uncertainty.",
+    "systemPromptKey": "pillar11_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Leadership is decision-making. Every choice you make shapes your influence, your results, and your team's trust in you. When you make decisions rooted in clarity, confidence, and consistency, you create momentum and credibility—even in uncertainty.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You're facing a big decision: two strong paths, each with pros and cons. One feels safer, the other bolder. You're getting mixed feedback, and your team is waiting for clarity.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "decision_approach",
+        "label": "How do you move forward without second-guessing yourself? What decision-making tools or principles will guide you?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_timely_decisions",
+        "label": "I make timely decisions without overthinking (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_data_intuition",
+        "label": "I base decisions on data and intuition (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_explain_decisions",
+        "label": "I explain my decisions with clarity and confidence (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What's one recent decision you've struggled with—and what made it difficult?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_identify_decision",
+        "label": "Identify one decision I've delayed—and make it within 24 hours",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_use_tool",
+        "label": "Use a structured tool to evaluate a current choice",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_communicate_decision",
+        "label": "Communicate one decision with clarity to my team",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Alvin is thoughtful, smart, and careful—but he's known for dragging out decisions. He constantly asks for more input, changes his mind, and misses windows of opportunity. His team is losing confidence in his leadership.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What structure or mindset shift would help Alvin make faster, clearer decisions without sacrificing quality?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear 4-Question Decision Framework\n\nChoose a real decision you’re facing right now and answer:\n\n1. What are my two (or more) real options?\n2. What is the best long-term impact of each?\n3. What am I afraid of—and is that fear justified?\n4. What does leadership look like in this situation?\n\nThen—make the call.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "real_options",
+        "label": "What are my two (or more) real options?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "long_term_impact",
+        "label": "What is the best long-term impact of each?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "fear_assessment",
+        "label": "What am I afraid of—and is that fear justified?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "leadership_look",
+        "label": "What does leadership look like in this situation?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about decision-making as a leader, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What decision will you make and communicate this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "build_clarity",
+        "label": "How will you ensure that decision builds clarity and momentum?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

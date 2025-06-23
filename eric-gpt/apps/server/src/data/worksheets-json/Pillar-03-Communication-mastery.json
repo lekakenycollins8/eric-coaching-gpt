@@ -1,0 +1,178 @@
+[
+  {
+    "id": "pillar3_communication_mastery",
+    "title": "Communication Mastery",
+    "description": "Effective communication isn't about talking more—it's about connecting deeply, listening actively, and leading clearly. The most successful leaders use communication as a tool to build trust, reduce friction, and drive performance.",
+    "systemPromptKey": "pillar3_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Effective communication isn't about talking more—it's about connecting deeply, listening actively, and leading clearly. The most successful leaders use communication as a tool to build trust, reduce friction, and drive performance.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You've just led a team meeting to announce a new strategic initiative. But afterward, several team members seem confused, and two are even resistant. You realize your message may not have landed the way you intended.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "communication_approach",
+        "label": "How would you clarify your message and rebuild alignment? What communication mistakes might you have made?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_clarity_confidence",
+        "label": "I communicate with clarity and confidence under pressure (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_active_listening",
+        "label": "I listen as actively as I speak (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_message_adaptation",
+        "label": "I adapt my message based on who I'm speaking to (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What's one recent communication moment you'd like to do over? What would you change?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_feedback",
+        "label": "Ask 3 team members for honest feedback on my communication clarity",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_active_listening",
+        "label": "Use active listening in at least one difficult conversation",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_pause_reflect",
+        "label": "Pause before responding in conversations to reflect and clarify",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Elena is a passionate project leader who tends to speak in long-winded monologues. Her updates are thorough—but her team often tunes out, missing key points. They've stopped asking questions, and miscommunications are piling up.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What specific strategies could help Elena improve clarity and engagement in her communication?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear \"Less is More\" Message Filter",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "original_message",
+        "label": "Original Message:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "simplified_message",
+        "label": "Simplified Message:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about improving communication as a leader, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What's one communication habit you're committing to improve this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "accountability",
+        "label": "Who will you ask for feedback or accountability?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

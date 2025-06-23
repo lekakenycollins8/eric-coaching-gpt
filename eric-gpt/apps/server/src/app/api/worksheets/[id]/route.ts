@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { loadWorksheetById } from '@/utils/worksheetLoader';
 
 // Define interfaces for worksheet data
 interface WorksheetField {
@@ -117,13 +116,8 @@ export async function GET(
       );
     }
 
-    // Read the worksheets.json file
-    const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
-    const worksheetsData = fs.readFileSync(worksheetsPath, 'utf8');
-    const worksheets: Worksheet[] = JSON.parse(worksheetsData);
-
-    // Find the worksheet with the matching ID
-    const worksheet = worksheets.find((w: Worksheet) => w.id === id);
+    // Load the worksheet directly from its individual JSON file
+    const worksheet = await loadWorksheetById(id);
 
     if (!worksheet) {
       return NextResponse.json(

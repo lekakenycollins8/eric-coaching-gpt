@@ -1,0 +1,178 @@
+[
+  {
+    "id": "pillar1_leadership_mindset",
+    "title": "Leadership Mindset",
+    "description": "Your mindset as a leader sets the tone for everything else—your confidence, your decisions, your team's morale. Mastering it is the first step toward becoming a Crystal Clear Leader.",
+    "systemPromptKey": "pillar1_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Your mindset as a leader sets the tone for everything else—your confidence, your decisions, your team's morale. Mastering it is the first step toward becoming a Crystal Clear Leader.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You've just received news that your top performer is leaving the company unexpectedly. It's a blow to morale, and you're feeling personally deflated. Your team looks to you for direction—but you're struggling to stay focused and optimistic.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "mindset_default",
+        "label": "What would your current mindset default be in this moment?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_growth_mindset",
+        "label": "I maintain a growth mindset under pressure (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_resilience",
+        "label": "I model resilience when things go wrong (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_internal_dialogue",
+        "label": "I actively manage my internal dialogue (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "Why did you rate yourself this way? What came up as you thought about each one?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following mindset actions:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_morning_affirmation",
+        "label": "Start each morning with a 2-minute leadership affirmation",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_limiting_belief",
+        "label": "Identify and write down 1 limiting belief to replace with a growth belief",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_mindset_reset",
+        "label": "Conduct a 15-minute mindset reset with my team or colleague",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Tamika is a new department head who constantly second-guesses her decisions, especially around senior staff. She finds herself apologizing frequently and tends to rework plans even when they were solid.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What belief about herself might be driving Tamika's behavior? How could you coach her to shift it using leadership mindset tools?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Self-Talk Reframing Tool",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "original_thought",
+        "label": "Original Thought:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "reframed_statement",
+        "label": "Reframed Leadership Mindset Statement:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about improving your leadership mindset, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What mindset shift are you committing to this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "accountability",
+        "label": "How will you hold yourself accountable?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

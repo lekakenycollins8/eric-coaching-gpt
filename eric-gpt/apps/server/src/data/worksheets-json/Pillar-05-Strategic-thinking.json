@@ -1,0 +1,244 @@
+[
+  {
+    "id": "pillar5_strategic_thinking",
+    "title": "Strategic Thinking",
+    "description": "Tactical leaders solve problems. Strategic leaders prevent them. Strategic thinking is the ability to pause, assess, and plan with clarity—so that you're not just busy, but intentionally moving your team and business forward.",
+    "systemPromptKey": "pillar5_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Tactical leaders solve problems. Strategic leaders prevent them. Strategic thinking is the ability to pause, assess, and plan with clarity—so that you're not just busy, but intentionally moving your team and business forward.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You're leading a team that consistently hits short-term goals but seems disconnected from the company's larger mission. They're productive—but not purposeful. You've realized they're working hard, but not strategically.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "strategic_approach",
+        "label": "How would you help your team see the bigger picture and align their daily work with the broader vision?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_long_term",
+        "label": "I take time each week to reflect and think long-term (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_bigger_impact",
+        "label": "I ask 'what's the bigger impact?' before committing to new work (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_align_vision",
+        "label": "I align short-term actions with long-term vision (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "When was the last time you stepped back to think instead of react? What did you learn?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_strategic_hour",
+        "label": "Schedule a 'strategic hour' for big-picture thinking",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_connect_dots",
+        "label": "Connect three daily tasks to larger strategic goals",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_opportunity_cost",
+        "label": "Consider opportunity cost before saying 'yes' to new requests",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Michael is a talented director who excels at execution but struggles with anticipating market shifts. His team consistently delivers on current projects but has been blindsided twice by competitor moves that changed their industry.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What strategic thinking practices would help Michael become more forward-looking? How could he balance execution with anticipation?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Strategic Filter Tool\n\n**Step 1:** List 3 major projects or priorities you’re currently handling.\n\n**Step 2:** For each one, answer:\n\n* What is the long-term value of this project?\n* What would happen if I paused or dropped it?\n* Who else needs to be aligned or informed?\n\n**Step 3:** Make one strategic decision based on your answers.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "project1",
+        "label": "Project/Priority 1:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "project1_value",
+        "label": "What is the long-term value of this project?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project1_pause",
+        "label": "What would happen if I paused or dropped it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project1_alignment",
+        "label": "Who else needs to be aligned or informed?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project2",
+        "label": "Project/Priority 2:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "project2_value",
+        "label": "What is the long-term value of this project?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project2_pause",
+        "label": "What would happen if I paused or dropped it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project2_alignment",
+        "label": "Who else needs to be aligned or informed?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project3",
+        "label": "Project/Priority 3:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "project3_value",
+        "label": "What is the long-term value of this project?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project3_pause",
+        "label": "What would happen if I paused or dropped it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "project3_alignment",
+        "label": "Who else needs to be aligned or informed?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "strategic_decision",
+        "label": "Make one strategic decision based on your answers:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about improving your strategic thinking, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What strategic thinking practice are you committing to this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "accountability",
+        "label": "How will you make space for this practice in your schedule?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

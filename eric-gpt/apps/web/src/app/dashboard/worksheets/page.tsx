@@ -1,6 +1,23 @@
 'use client';
 
 import React from 'react';
+
+/**
+ * Helper function to extract pillar number from worksheet ID
+ * Handles the format used in the JSON files: pillar1_leadership_mindset
+ */
+function getPillarNumber(id: string): string {
+  // The actual format used in the JSON files is pillar1_leadership_mindset
+  if (id && id.toLowerCase().startsWith('pillar')) {
+    const match = id.match(/pillar(\d+)/i);
+    if (match && match[1]) {
+      return `Pillar #${match[1]}`;
+    }
+  }
+  
+  // If we can't parse the ID, just return a generic label
+  return 'Worksheet';
+}
 import Link from 'next/link';
 import { useWorksheets } from '@/hooks/useWorksheets';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +78,7 @@ export default function WorksheetsPage() {
               <CardHeader>
                 <CardTitle>{worksheet.title}</CardTitle>
                 <CardDescription>
-                  Pillar #{worksheet.id.split('_')[0].replace('pillar', '')}
+                  {getPillarNumber(worksheet.id)}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">

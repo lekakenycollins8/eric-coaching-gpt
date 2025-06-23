@@ -1,0 +1,196 @@
+[
+  {
+    "id": "pillar6_emotional_intelligence",
+    "title": "Emotional Intelligence",
+    "description": "Emotional Intelligence (EQ) is the ability to recognize and regulate your emotions—and to understand and influence the emotions of others. Great leaders don't just lead with intellect. They lead with insight, empathy, and control.",
+    "systemPromptKey": "pillar6_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Emotional Intelligence (EQ) is the ability to recognize and regulate your emotions—and to understand and influence the emotions of others. Great leaders don't just lead with intellect. They lead with insight, empathy, and control.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You're in a team meeting when a colleague unexpectedly challenges your decision in front of others. You feel defensive, even a bit angry. Everyone is watching to see how you'll respond.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "emotional_response",
+        "label": "What's your internal response? How would an emotionally intelligent leader handle this situation?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_calm_focused",
+        "label": "I stay calm and focused in emotionally charged situations (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_body_language",
+        "label": "I am aware of how my tone and body language affect others (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_emotional_triggers",
+        "label": "I recognize emotional triggers and manage them effectively (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "When was the last time your emotions took over in a leadership moment? What was the result?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_identify_trigger",
+        "label": "Identify one emotional trigger and track it for 3 days",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_pause_response",
+        "label": "Practice 'pause before response' in all feedback conversations",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_ask_colleague",
+        "label": "Ask a trusted colleague how they experience my emotional leadership",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Jared is a passionate, high-performing manager—but his emotions often get the best of him. He interrupts people, reacts defensively to feedback, and shows visible frustration when things go off track. His team respects his skills but fears his moods.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "How could Jared improve his emotional intelligence without losing his passion or energy?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Self-Awareness Tracker\n\n**Step 1:** Think of a recent situation where you felt emotionally triggered.\n\n**Step 2:** Answer these questions:\n\n* What emotion did I feel?\n* What caused it?\n* How did I react?\n* What could I have done differently?\n\n**Step 3:** What will you do next time a similar situation occurs?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "emotion_felt",
+        "label": "What emotion did I feel?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "emotion_cause",
+        "label": "What caused it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "reaction",
+        "label": "How did I react?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "alternative_response",
+        "label": "What could I have done differently?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "future_strategy",
+        "label": "What will you do next time a similar situation occurs?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about improving your emotional intelligence as a leader, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What's one emotional leadership habit you're committing to improve this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "accountability",
+        "label": "Who can give you honest feedback on this progress?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

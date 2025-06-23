@@ -1,0 +1,202 @@
+[
+  {
+    "id": "pillar9_conflict_resolution",
+    "title": "Conflict Resolution and Difficult Conversations",
+    "description": "Conflict avoided is leadership postponed. Great leaders don't fear difficult conversations—they master them. This Pillar gives you the tools to address friction, create clarity, and lead through tension instead of around it.",
+    "systemPromptKey": "pillar9_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Conflict avoided is leadership postponed. Great leaders don't fear difficult conversations—they master them. This Pillar gives you the tools to address friction, create clarity, and lead through tension instead of around it.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: Two key team members aren't speaking after a disagreement. One has come to you for support; the other is disengaged and distant. You know you need to step in—but you're not sure how to start.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "conflict_handling",
+        "label": "How would you handle this conflict as a leader? What's your first step in restoring trust and resolving the tension?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_address_conflict",
+        "label": "I address conflict directly and respectfully (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_create_space",
+        "label": "I create space for others to express disagreement (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_stay_calm",
+        "label": "I stay calm and focused during tense conversations (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What's one conversation you've avoided—and what's the cost of continuing to avoid it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_schedule_conversation",
+        "label": "Schedule one conversation I've been putting off",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_neutral_language",
+        "label": "Use neutral language to describe behavior, not character",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_active_listening",
+        "label": "Practice active listening and summarize what I hear before responding",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Carlos is respected and kind—but he avoids hard conversations. When team members underperform or create tension, he says nothing. As a result, standards slide, resentment builds, and his credibility suffers.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What scripts or tools could help Carlos step into conflict instead of sidestepping it?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Difficult Conversation Prep Sheet\n\n**Step 1:** Identify one unresolved conflict or tense relationship.\n\n**Step 2:** Answer these questions:\n\n* What is the issue?\n* What outcome do I want from the conversation?\n* What does the other person need to hear from me?\n* What do I need to hear from them?\n\n**Step 3:** Plan the opening 2–3 sentences you’ll use to begin the conversation.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "unresolved_conflict",
+        "label": "Identify one unresolved conflict or tense relationship:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "issue",
+        "label": "What is the issue?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "desired_outcome",
+        "label": "What outcome do I want from the conversation?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "other_person_needs",
+        "label": "What does the other person need to hear from me?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "i_need_to_hear",
+        "label": "What do I need to hear from them?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "opening_sentences",
+        "label": "Plan the opening 2–3 sentences you'll use to begin the conversation:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about handling conflict or tough conversations, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What difficult conversation are you committing to have this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "build_trust",
+        "label": "How will you ensure the conversation builds—not breaks—trust?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

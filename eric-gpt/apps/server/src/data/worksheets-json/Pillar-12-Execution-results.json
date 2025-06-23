@@ -1,0 +1,208 @@
+[
+  {
+    "id": "pillar12_execution_results",
+    "title": "Execution: Turning Plans Into Results",
+    "description": "A brilliant plan means nothing without follow-through. Leaders who execute consistently turn goals into outcomes, vision into momentum, and effort into measurable success. This Pillar is about doing the work that matters—on time and with purpose.",
+    "systemPromptKey": "pillar12_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "A brilliant plan means nothing without follow-through. Leaders who execute consistently turn goals into outcomes, vision into momentum, and effort into measurable success. This Pillar is about doing the work that matters—on time and with purpose.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You've created a detailed strategy and your team is fired up. But two weeks in, progress has stalled. Deadlines are slipping. Everyone agrees the plan is great—but no one seems to be executing it consistently.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "missing_link",
+        "label": "What's the missing link? How do you reestablish execution and drive your plan across the finish line?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_follow_through",
+        "label": "I follow through consistently on the most important tasks (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_track_progress",
+        "label": "I track progress and hold myself/team accountable to deadlines (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_break_goals",
+        "label": "I break big goals into manageable, time-bound action steps (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What is one plan or project you've started but not finished—and why did execution break down?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_schedule_steps",
+        "label": "Choose one priority and schedule the next three action steps on my calendar",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_clarify_roles",
+        "label": "Clarify team roles and deadlines for one stalled project",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_use_tracker",
+        "label": "Use a visual tracker or checklist to monitor execution this week",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Tasha is full of ideas—she sets big goals and inspires others easily. But execution often breaks down after kickoff. She's easily distracted, struggles to follow through, and finds herself apologizing for missed milestones.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What structure, tools, or accountability would help Tasha become an execution-driven leader?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear Execution Snapshot\n\n**Step 1:** Pick one goal or project in progress.\n\n**Step 2:** List the next 3 actions required to move it forward:\n\n* Action 1: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ (Deadline: \\_\\_\\_\\_\\_\\_\\_\\_)\n* Action 2: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ (Deadline: \\_\\_\\_\\_\\_\\_\\_\\_)\n* Action 3: \\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_\\_ (Deadline: \\_\\_\\_\\_\\_\\_\\_\\_)\n\n**Step 3:** Block time on your calendar today to complete Action 1.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "goal_project",
+        "label": "Pick one goal or project in progress:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action1",
+        "label": "Action 1:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "deadline1",
+        "label": "Deadline for Action 1:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "action2",
+        "label": "Action 2:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "deadline2",
+        "label": "Deadline for Action 2:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "action3",
+        "label": "Action 3:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "deadline3",
+        "label": "Deadline for Action 3:",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about getting things done as a leader, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What key action will you complete this week to move something forward?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ensure_completion",
+        "label": "What will you do to make sure it gets done—not just started?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]

@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import Submission from '@/models/Submission';
 // Import fs and path for reading the JSON file directly
-import fs from 'fs';
+import { loadWorksheetById } from '@/utils/worksheetLoader';
 import path from 'path';
 import { generateCoachingFeedback } from '@/services/openai';
 import { formatUserPrompt, getSystemPromptForWorksheet } from '@/config/prompts';
@@ -146,13 +146,8 @@ export async function POST(request: NextRequest) {
     // Connect to the database (still needed for submissions)
     await connectToDatabase();
     
-    // Get the worksheet from the JSON file instead of the database
-    const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
-    const worksheetsData = fs.readFileSync(worksheetsPath, 'utf8');
-    const worksheets = JSON.parse(worksheetsData);
-    
-    // Find the worksheet with the matching ID
-    const worksheet = worksheets.find((w: any) => w.id === worksheetId);
+    // Get the worksheet directly from its individual JSON file
+    const worksheet = await loadWorksheetById(worksheetId);
     
     if (!worksheet) {
       console.error(`Worksheet not found: ${worksheetId}`);

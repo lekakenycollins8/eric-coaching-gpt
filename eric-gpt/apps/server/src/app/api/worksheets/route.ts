@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { loadAllWorksheets } from '@/utils/worksheetLoader';
 
 /**
  * @swagger
@@ -74,14 +73,12 @@ import path from 'path';
 
 /**
  * GET handler for the worksheets API endpoint
- * Implemented in Sprint 2
+ * Updated to read from individual JSON files instead of the combined worksheets.json
  */
 export async function GET() {
   try {
-    // Read the worksheets.json file
-    const worksheetsPath = path.join(process.cwd(), 'src/data/worksheets.json');
-    const worksheetsData = fs.readFileSync(worksheetsPath, 'utf8');
-    const worksheets = JSON.parse(worksheetsData);
+    // Load worksheets from individual JSON files
+    const worksheets = await loadAllWorksheets();
     
     return NextResponse.json({ worksheets }, { status: 200 });
   } catch (error) {

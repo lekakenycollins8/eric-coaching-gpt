@@ -1,0 +1,196 @@
+[
+  {
+    "id": "pillar4_time_mastery",
+    "title": "Time Mastery",
+    "description": "Time is your most valuable asset as a leader—and the most easily lost. Mastering your time means mastering your priorities, energy, and focus. This Pillar will help you stop reacting and start directing how your time is used.",
+    "systemPromptKey": "pillar4_prompt",
+    "fields": [
+      {
+        "name": "intro",
+        "label": "Time is your most valuable asset as a leader—and the most easily lost. Mastering your time means mastering your priorities, energy, and focus. This Pillar will help you stop reacting and start directing how your time is used.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "scenario_challenge",
+        "label": "Leadership Scenario Challenge: You're constantly in motion—calls, meetings, emails, follow-ups. Yet, at the end of each day, your most important leadership tasks remain untouched. You know you're busy—but not productive.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "time_recovery_action",
+        "label": "What's pulling you off course? What time recovery action could you take today to regain focus?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "rate_protect_time",
+        "label": "I protect time for my most important leadership work (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_say_no",
+        "label": "I say no to distractions and low-value requests (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "rate_plan_day",
+        "label": "I plan my day with clarity and structure (1-10):",
+        "type": "rating",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "required": true
+      },
+      {
+        "name": "reflection",
+        "label": "What is your biggest time-waster during the workday? What keeps showing up and stealing your time?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "action_steps_info",
+        "label": "This week, I will commit to the following:",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "action_identify_distractions",
+        "label": "Use the 4-Column Exercise to identify distractions and eliminate one time-wasting task",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_deep_work",
+        "label": "Block 90 minutes for uninterrupted deep work each day",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_boundaries",
+        "label": "Communicate clear availability boundaries to my team or clients",
+        "type": "checkbox",
+        "required": false
+      },
+      {
+        "name": "action_optional",
+        "label": "Optional action step",
+        "type": "text",
+        "required": false
+      },
+      {
+        "name": "case_study",
+        "label": "Mini Case Study: Derek is a team lead who's constantly responding to urgent issues, putting out fires left and right. He's available to everyone, all the time—but his strategic initiatives are months behind.",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "case_study_response",
+        "label": "What mindset and schedule shifts would help Derek reclaim his focus? How could the Jackier Method help him regain control?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "challenge_info",
+        "label": "15-Minute Challenge: Crystal Clear 4-Column Exercise\n\n**Step 1:** Pick 5 recent tasks or activities you’ve done in the last 48 hours.\n\n**Step 2:** Sort them into the following categories:\n\n* Only I Can Do This:\n* Needs to Be Done but Can Be Delegated:\n* Routine – Can Be Outsourced Later:\n* Should Be Eliminated:\n\n**Step 3:** What will you delegate or remove this week?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "only_i_can_do",
+        "label": "Only I Can Do This:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "can_be_delegated",
+        "label": "Needs to Be Done but Can Be Delegated:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "can_be_outsourced",
+        "label": "Routine – Can Be Outsourced Later:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "should_be_eliminated",
+        "label": "Should Be Eliminated:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "delegate_remove",
+        "label": "What will you delegate or remove this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "ask_eric_info",
+        "label": "If you could ask Eric GPT one question about reclaiming your time or handling distractions, what would it be?",
+        "type": "info",
+        "required": false
+      },
+      {
+        "name": "ask_eric",
+        "label": "Write your question here:",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "commitment",
+        "label": "What time recovery strategy are you committing to implement this week?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "distractions_eliminate",
+        "label": "What distractions will you eliminate or reduce?",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "name": "revisit_date",
+        "label": "Date to revisit this worksheet:",
+        "type": "text",
+        "required": true
+      }
+    ]
+  }
+]
