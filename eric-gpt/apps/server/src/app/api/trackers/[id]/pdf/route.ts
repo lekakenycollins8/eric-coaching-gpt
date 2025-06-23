@@ -148,6 +148,8 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
     : `${webAppUrl}/tracker-pdf-template/${trackerId}`;
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
+  console.log(`Environment: NODE_ENV=${process.env.NODE_ENV}, VERCEL=${process.env.VERCEL}`);
+  console.log(`CHROMIUM_PATH=${process.env.CHROMIUM_PATH}`);
   
   let browser;
   try {

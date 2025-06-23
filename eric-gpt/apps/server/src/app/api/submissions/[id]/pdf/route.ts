@@ -141,6 +141,8 @@ async function generatePDF(submissionId: string, userId?: string): Promise<Buffe
     : `${webAppUrl}/pdf-template/${submissionId}`;
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
+  console.log(`Environment: NODE_ENV=${process.env.NODE_ENV}, VERCEL=${process.env.VERCEL}`);
+  console.log(`CHROMIUM_PATH=${process.env.CHROMIUM_PATH}`);
   
   let browser;
   try {
@@ -148,19 +150,35 @@ async function generatePDF(submissionId: string, userId?: string): Promise<Buffe
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
       console.log('Running in production environment, using chromium-min');
       
-      // Use chromium-min for production/Vercel environment
-      browser = await puppeteerCore.launch({
-        executablePath: await chromium.executablePath(process.env.CHROMIUM_PATH),
-        args: chromium.args.concat([
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--no-first-run',
-          '--single-process',
-          '--no-zygote',
-          '--ignore-certificate-errors'
-        ])
-      });
+      try {
+        console.log('Attempting to get executablePath...');
+        const execPath = await chromium.executablePath(process.env.CHROMIUM_PATH);
+        console.log(`Got executablePath: ${execPath}`);
+        
+        console.log('Launching browser...');
+        browser = await puppeteerCore.launch({
+          executablePath: execPath,
+          args: chromium.args.concat([
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-setuid-sandbox',
+            '--no-first-run',
+            '--single-process',
+            '--no-zygote',
+            '--ignore-certificate-errors',
+            '--disable-web-security',
+            '--allow-file-access-from-files',
+            '--allow-running-insecure-content',
+            '--disable-features=IsolateOrigins,site-per-process'
+          ]),
+          headless: true
+        });
+        console.log('Browser launched successfully');
+      } catch (chromiumError: unknown) {
+        console.error('Error during chromium setup:', chromiumError);
+        const errorMessage = chromiumError instanceof Error ? chromiumError.message : 'Unknown error';
+        throw new Error(`Chromium setup failed: ${errorMessage}`);
+      }
     } else {
       // For local development, use regular puppeteer if available
       // This requires dynamic import since we don't have puppeteer in production
@@ -180,32 +198,85 @@ async function generatePDF(submissionId: string, userId?: string): Promise<Buffe
       });
     }
     
-    // Create a new page
+    console.log('Creating new page...');
     const page = await browser.newPage();
+    console.log('Page created successfully');
     
     // Set a reasonable timeout for serverless functions
+    console.log('Setting navigation timeout...');
     await page.setDefaultNavigationTimeout(25000); // 25 seconds max
     
-    // Navigate to the template URL
-    await page.goto(templateUrl, {
-      waitUntil: 'networkidle2', // Wait until the network is idle
-    });
-    
-    // Generate the PDF with optimized settings
-    const pdf = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px',
-      },
-      // Lower quality for faster generation in serverless environment
-      preferCSSPageSize: true,
-    });
-    
-    return pdf as Buffer;
+    try {
+      // Navigate to the template URL
+      console.log(`Navigating to template URL: ${templateUrl}`);
+      try {
+        await page.goto(templateUrl, {
+          waitUntil: 'networkidle2', // Wait until the network is idle
+          timeout: 30000 // 30 seconds timeout
+        });
+        console.log('Navigation completed successfully');
+        
+        // Log the page content for debugging
+        const pageContent = await page.content();
+        console.log(`Page content length: ${pageContent.length} characters`);
+        if (pageContent.includes('Error') || pageContent.includes('error')) {
+          console.log('Warning: Page content contains error messages');
+        }
+      } catch (navigationError: unknown) {
+        console.error('Navigation error:', navigationError);
+        const errorMessage = navigationError instanceof Error ? navigationError.message : 'Unknown navigation error';
+        
+        // Try a different approach with a longer timeout
+        console.log('Trying alternative navigation approach...');
+        await page.goto(templateUrl, {
+          waitUntil: 'domcontentloaded',
+          timeout: 45000 // 45 seconds timeout
+        });
+        console.log('Alternative navigation completed');
+      }
+      
+      // Wait a bit to ensure everything is loaded
+      console.log('Waiting for network to be idle...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate the PDF with optimized settings
+      console.log('Generating PDF...');
+      try {
+        // Try with a simpler PDF configuration first
+        const pdf = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: {
+            top: '20px',
+            right: '20px',
+            bottom: '20px',
+            left: '20px',
+          },
+          // Lower quality for faster generation in serverless environment
+          preferCSSPageSize: true,
+        });
+        console.log('PDF generated successfully');
+        
+        return pdf as Buffer;
+      } catch (pdfError: unknown) {
+        console.error('Error generating PDF with standard options:', pdfError);
+        
+        // Try with minimal options as a fallback
+        console.log('Trying minimal PDF options as fallback...');
+        const fallbackPdf = await page.pdf({
+          format: 'A4',
+          printBackground: false,
+          preferCSSPageSize: false,
+        });
+        console.log('Fallback PDF generated successfully');
+        
+        return fallbackPdf as Buffer;
+      }
+    } catch (pageError: unknown) {
+      console.error('Error during page operations:', pageError);
+      const errorMessage = pageError instanceof Error ? pageError.message : 'Unknown page error';
+      throw new Error(`Page operation failed: ${errorMessage}`);
+    }
   } catch (error) {
     console.error('Error in PDF generation:', error);
     throw error;
