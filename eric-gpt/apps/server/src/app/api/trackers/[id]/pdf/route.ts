@@ -4,7 +4,10 @@ import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { Tracker, TrackerEntry, TrackerReflection } from '@/models';
 import mongoose from 'mongoose';
+// Import puppeteer with proper type definitions
 import puppeteer from 'puppeteer';
+import type { PuppeteerLaunchOptions } from 'puppeteer';
+// For Vercel, we'll use optimized settings
 
 export const dynamic = 'force-dynamic';
 
@@ -146,9 +149,8 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
   
-  // Launch a headless browser with additional arguments to improve compatibility
-  const browser = await puppeteer.launch({
-    headless: 'new',
+  // Configure browser launch options based on environment
+  const options = {
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -158,19 +160,37 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
       '--no-zygote',
       '--disable-gpu'
     ],
+    headless: true,
     ignoreHTTPSErrors: true
-  });
+  };
   
+  // Special handling for Vercel environment
+  if (process.env.VERCEL) {
+    console.log('Running in Vercel environment, using optimized settings');
+    // Add additional Vercel-specific options if needed
+    options.args.push(
+      '--single-process',
+      '--disable-extensions'
+    );
+  }
+  
+  let browser;
   try {
+    // Launch browser with appropriate options
+    browser = await puppeteer.launch(options);
+    
     // Create a new page
     const page = await browser.newPage();
+    
+    // Set a reasonable timeout for Vercel serverless functions
+    await page.setDefaultNavigationTimeout(25000); // 25 seconds max
     
     // Navigate to the template URL
     await page.goto(templateUrl, {
       waitUntil: 'networkidle2', // Wait until the network is idle
     });
     
-    // Generate the PDF
+    // Generate the PDF with optimized settings
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
@@ -180,11 +200,18 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
         bottom: '20px',
         left: '20px',
       },
+      // Lower quality for faster generation in serverless environment
+      preferCSSPageSize: true,
     });
     
     return pdf;
+  } catch (error) {
+    console.error('Error in PDF generation:', error);
+    throw error;
   } finally {
     // Always close the browser
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 }
