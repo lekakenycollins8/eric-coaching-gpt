@@ -16,6 +16,7 @@
     }
   },
   "env": {
-    "PUPPETEER_CACHE_DIR": "/tmp/puppeteer"
+    "PUPPETEER_CACHE_DIR": "/tmp/puppeteer",
+    "AWS_LAMBDA_JS_RUNTIME": "nodejs22.x"
   }
 }

@@ -4,10 +4,10 @@ import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { Tracker, TrackerEntry, TrackerReflection } from '@/models';
 import mongoose from 'mongoose';
-// Import puppeteer with proper type definitions
-import puppeteer from 'puppeteer';
-import type { PuppeteerLaunchOptions } from 'puppeteer';
-// For Vercel, we'll use optimized settings
+// Import puppeteer-core and chromium-min for Vercel compatibility
+import puppeteerCore from 'puppeteer-core';
+import chromium from '@sparticuz/chromium-min';
+// Conditionally import regular puppeteer for development environment
 
 export const dynamic = 'force-dynamic';
 
@@ -149,40 +149,47 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
   
   console.log(`Generating PDF from template URL: ${templateUrl}`);
   
-  // Configure browser launch options based on environment
-  const options = {
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--disable-gpu'
-    ],
-    headless: true,
-    ignoreHTTPSErrors: true
-  };
-  
-  // Special handling for Vercel environment
-  if (process.env.VERCEL) {
-    console.log('Running in Vercel environment, using optimized settings');
-    // Add additional Vercel-specific options if needed
-    options.args.push(
-      '--single-process',
-      '--disable-extensions'
-    );
-  }
-  
   let browser;
   try {
-    // Launch browser with appropriate options
-    browser = await puppeteer.launch(options);
+    // Choose browser launch strategy based on environment
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      console.log('Running in production environment, using chromium-min');
+      
+      // Use chromium-min for production/Vercel environment
+      browser = await puppeteerCore.launch({
+        executablePath: await chromium.executablePath(process.env.CHROMIUM_PATH),
+        args: chromium.args.concat([
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--no-first-run',
+          '--single-process',
+          '--no-zygote'
+        ])
+      });
+    } else {
+      // For local development, use regular puppeteer if available
+      // This requires dynamic import since we don't have puppeteer in production
+      const puppeteer = await import('puppeteer');
+      browser = await puppeteer.default.launch({
+        headless: 'new',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--disable-gpu'
+        ],
+        ignoreHTTPSErrors: true
+      });
+    }
     
     // Create a new page
     const page = await browser.newPage();
     
-    // Set a reasonable timeout for Vercel serverless functions
+    // Set a reasonable timeout for serverless functions
     await page.setDefaultNavigationTimeout(25000); // 25 seconds max
     
     // Navigate to the template URL
@@ -204,7 +211,7 @@ async function generatePDF(trackerId: string, userId?: string): Promise<Buffer> 
       preferCSSPageSize: true,
     });
     
-    return pdf;
+    return pdf as Buffer;
   } catch (error) {
     console.error('Error in PDF generation:', error);
     throw error;

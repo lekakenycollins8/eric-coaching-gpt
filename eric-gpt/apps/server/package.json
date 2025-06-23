@@ -13,6 +13,7 @@
   "type": "module",
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.1",
+    "@sparticuz/chromium-min": "^137.0.1",
     "@trpc/client": "^11.0.0",
     "@trpc/server": "^11.0.0",
     "dotenv": "^16.5.0",
@@ -23,6 +24,7 @@
     "nodemailer": "^6.9.8",
     "openai": "^4.28.0",
     "puppeteer": "^21.7.0",
+    "puppeteer-core": "^24.10.2",
     "stripe": "^18.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.25.2"
