@@ -1,0 +1,134 @@
+{
+  "id": "jackier-method-workbook",
+  "title": "The Jackier Method of Leadership",
+  "description": "Your Crystal Clear Guide to Leadership Excellence for New and Emerging Leaders",
+  "isRequired": true,
+  "sections": [
+    {
+      "title": "Welcome from Eric",
+      "description": "Welcome to this transformative leadership journey. This guide is built on the Jackier Method of Leadership - a clear, practical system that will help you discover root issues, craft smart solutions, and execute with discipline.\n\nLeadership today is more complex than ever. As a new or emerging leader, you face immense pressure to deliver, often with limited support. This guide will give you tools to build clarity, courage, and consistency - three pillars of sustainable leadership success.\n\nUse this workbook as your personal leadership lab. Fill it out fully. Bring your questions to me or to Eric GPT. Challenge yourself to be honest and direct. This is where real growth happens.",
+      "questions": [
+        {
+          "id": "welcome-reflection",
+          "text": "What are your primary goals for using this leadership workbook?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Part 1: Ask the Right Questions",
+      "description": "Most leaders fail by solving the wrong problem. They assume too quickly and leap to action. Powerful leaders pause to ask better questions, revealing realities others miss.\n\nChris, a new COO, was frustrated by missed targets. Instead of pushing harder, he asked: 'What obstacles are you facing that I might not see?' This unlocked a hidden supply chain issue.\n\nUse these high-impact questions whenever facing a challenge:\n- What might I be missing?\n- Who else should I be listening to?\n- What is the real impact if nothing changes?\n- Where are we making assumptions?\n- What does success truly look like here?\n\n\"Great leaders aren't know-it-alls - they're ask-it-alls.\"",
+      "questions": [
+        {
+          "id": "leadership-challenge",
+          "text": "Describe a leadership challenge you're facing right now. Write it in detail.",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "reframed-challenge",
+          "text": "Now rewrite your challenge by asking at least five new questions to see it from different angles.",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "afraid-question",
+          "text": "What question are you most afraid to ask - and why?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Part 2: Identify the Issues",
+      "description": "The surface problem is rarely the real problem. Ego, fear, and assumptions hide root causes. Real leadership means having the courage to dig deeper, even if it's uncomfortable.\n\nDana, a hospital director, thought morale was low due to pay. But deeper analysis showed unclear procedures were the stress trigger. Fixing clarity - not compensation - transformed her team.\n\nUse this Quick Root Cause Test:\n- Is this a symptom or the source?\n- What evidence do I have?\n- Who disagrees, and why?\n\n\"The surface problem is rarely the real problem.\"",
+      "questions": [
+        {
+          "id": "original-problem",
+          "text": "Describe what you originally thought the problem was.",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "root-issue",
+          "text": "Now push yourself to uncover the deeper root issue.",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "uncomfortable-truth",
+          "text": "What's uncomfortable to admit here? Who have you asked for input?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Part 3: Find the Best Solution",
+      "description": "Most solutions fail because they're chosen for convenience, not true effectiveness. Use smart filters to ensure your solution tackles the root cause and fits your resources.\n\nA software team spent months on a tool nobody needed. Talking directly to customers changed everything.\n\nAsk these before finalizing:\n- Will this solve the real issue?\n- Can we execute with current resources?\n- Does this align with our bigger goals?\n\n\"Brilliant strategies are worthless without honest problem solving first.\"",
+      "questions": [
+        {
+          "id": "solution-options",
+          "text": "List three possible solutions to your problem. Rate each on impact, ease, and alignment.",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "solution-bias",
+          "text": "Am I leaning toward what's easiest or what's truly best?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Part 4: Execute and Succeed",
+      "description": "Plans fail without disciplined follow-through. Consistency builds trust - with your team and with yourself.\n\nLiam's team had a perfect plan on paper, but no follow-through. Weekly check-ins created accountability and real results.\n\nUse this Commit-Calendar-Check system:\n- Commit: What exactly will I do?\n- Calendar: When will I do it? Block it.\n- Check: Who will hold me accountable?\n\n\"Success belongs to the consistent, not the occasional.\"",
+      "questions": [
+        {
+          "id": "action-plan",
+          "text": "Write your clear plan for this week. Who holds you accountable?",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "broken-commitment",
+          "text": "What commitment do you keep breaking, and why?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Putting It All Together",
+      "description": "Review your commitments, insights, and reflections across all four parts.",
+      "questions": [
+        {
+          "id": "biggest-breakthrough",
+          "text": "What stands out as your biggest breakthrough?",
+          "type": "textarea",
+          "required": true
+        },
+        {
+          "id": "habits-practice",
+          "text": "What habits will you keep practicing to maintain crystal clear leadership?",
+          "type": "textarea",
+          "required": true
+        }
+      ]
+    },
+    {
+      "title": "Final Note & Next Steps",
+      "description": "Thank you for investing in your growth. This is just the beginning. If you want more personalized support, to explore the full Crystal Clear Leadership System with coaching, or to use Eric GPT to deepen your journey, reach out anytime.\n\nTo your clarity, courage, and consistency - Eric Jackier.",
+      "questions": [
+        {
+          "id": "next-steps",
+          "text": "Would you like to schedule a call with Eric to discuss your results?",
+          "type": "text",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
