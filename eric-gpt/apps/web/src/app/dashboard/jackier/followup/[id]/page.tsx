@@ -28,6 +28,9 @@ export default function FollowupWorksheetPage() {
   const worksheetId = params.id as string;
   
   const { userSubmission } = useJackierWorkbook();
+  // Get the submission ID from the userSubmission or use an empty string if not available
+  const submissionId = userSubmission?.id || '';
+  
   const { 
     worksheet, 
     isLoading, 
@@ -37,7 +40,7 @@ export default function FollowupWorksheetPage() {
     existingAnswers,
     isSubmitting,
     isSaving
-  } = useFollowupWorksheet(worksheetId);
+  } = useFollowupWorksheet(worksheetId, submissionId);
   
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);

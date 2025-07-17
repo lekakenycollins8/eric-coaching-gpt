@@ -81,6 +81,13 @@ export function useJackierWorkbook() {
     queryFn: async () => {
       const response = await fetch('/api/jackier/workbook');
       if (!response.ok) {
+        // Check if response is JSON or not
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text().catch(() => 'Could not read error response');
+          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+          throw new Error(`Server error: ${response.status}`);
+        }
         throw new Error(`Failed to fetch workbook: ${response.status}`);
       }
       return response.json() as Promise<JackierWorkbook>;
@@ -96,8 +103,16 @@ export function useJackierWorkbook() {
   } = useQuery({
     queryKey: ['jackier', 'submission'],
     queryFn: async () => {
-      const response = await fetch('/api/jackier/workbook');
+      const response = await fetch('/api/jackier/workbook/submission');
       if (!response.ok) {
+        // Check if response is JSON or not
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text().catch(() => 'Could not read error response');
+          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
         if (response.status === 404) {
           // No submission found, return null
           return null;
@@ -126,6 +141,13 @@ export function useJackierWorkbook() {
       });
       
       if (!response.ok) {
+        // Check if response is JSON or not
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text().catch(() => 'Could not read error response');
+          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+          throw new Error(`Server error: ${response.status}`);
+        }
         throw new Error(`Failed to save draft: ${response.status}`);
       }
       
@@ -167,6 +189,13 @@ export function useJackierWorkbook() {
       });
       
       if (!response.ok) {
+        // Check if response is JSON or not
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text().catch(() => 'Could not read error response');
+          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+          throw new Error(`Server error: ${response.status}`);
+        }
         throw new Error(`Failed to submit workbook: ${response.status}`);
       }
       
@@ -208,6 +237,13 @@ export function useJackierWorkbook() {
       });
       
       if (!response.ok) {
+        // Check if response is JSON or not
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text().catch(() => 'Could not read error response');
+          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+          throw new Error(`Server error: ${response.status}`);
+        }
         throw new Error(`Failed to mark diagnosis as viewed: ${response.status}`);
       }
       

@@ -5,9 +5,9 @@ import { authOptions } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 /**
- * Proxy endpoint to forward Jackier diagnosis POST requests to the server API
+ * Proxy endpoint to forward Jackier workbook status requests to the server API
  */
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     // Get the authenticated user session
     const session = await getServerSession(authOptions);
@@ -18,27 +18,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse the request body
-    const body = await request.json().catch(() => ({}));
-    
-    // Add the user ID to the body
-    const bodyWithUser = {
-      ...body,
-      userId: session.user.id
-    };
-
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const apiUrl = `${serverUrl}/api/diagnosis`;
     
-    console.log('Web app: Forwarding POST request to:', apiUrl);
+    // Add the user ID to the query parameters
+    const userId = session.user.id;
+    const apiUrl = `${serverUrl}/api/workbook/status?userId=${userId}`;
+    
+    console.log('Web app: Forwarding workbook status request to:', apiUrl);
     
     const response = await fetch(apiUrl, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(bodyWithUser),
     });
 
     // Check if response is OK before trying to parse JSON
@@ -56,6 +49,7 @@ export async function POST(request: NextRequest) {
       }
       
       const errorData = await response.json().catch(() => ({ error: 'Could not parse error response' }));
+      console.error('Server returned an error:', response.status, errorData);
       return NextResponse.json(
         errorData,
         { status: response.status }
@@ -70,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error in diagnosis POST API route:', error);
+    console.error('Error in workbook status API route:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
