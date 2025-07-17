@@ -30,6 +30,13 @@ export async function middleware(request: NextRequest) {
     '/api/auth/callback',
     '/api/auth/verify-request',
     '/api/auth/error',
+    // Jackier Method Workbook routes
+    '/api/workbook',
+    '/api/workbook/status',
+    '/api/workbook/save',
+    '/api/workbook/submit',
+    '/api/diagnosis',
+    '/api/followup',
     // Add other known API routes here
   ];
   
