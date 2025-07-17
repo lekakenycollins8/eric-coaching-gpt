@@ -48,8 +48,9 @@ export interface IWorkbookSubmission extends Document {
   emailSent: boolean;              // Whether email notification was sent
   schedulingPrompted: boolean;     // Whether scheduling was prompted
   createdAt: Date;                 // Creation timestamp
-  updatedAt: Date;                 // Last update timestamp
   diagnosisGeneratedAt?: Date;     // When the diagnosis was generated
+  diagnosisViewedAt?: Date;        // When the user viewed the diagnosis
+  updatedAt: Date;                 // Last update timestamp
 }
 
 // Schema for follow-up worksheet recommendations
@@ -145,6 +146,10 @@ const WorkbookSubmissionSchema = new Schema({
     default: undefined
   },
   diagnosisGeneratedAt: {
+    type: Date,
+    default: undefined
+  },
+  diagnosisViewedAt: {
     type: Date,
     default: undefined
   },
