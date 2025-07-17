@@ -209,18 +209,100 @@ export function determineFollowupWorksheets(diagnosis: DiagnosisResponse): {
   pillars: PillarType[];
   followup: FollowupType;
 } {
-  // If the AI already suggested follow-ups, use those
-  const pillars = diagnosis.followupWorksheets.pillars.length > 0 
-    ? diagnosis.followupWorksheets.pillars 
-    : determineDefaultPillars(diagnosis);
+  // Start with any explicitly identified pillars from the AI response
+  let pillars = [...(diagnosis.followupWorksheets.pillars || [])];
   
-  // If no follow-up was suggested, determine one based on the diagnosis
+  // If we don't have enough pillars, supplement with content-based analysis
+  if (pillars.length < 3) {
+    const contentBasedPillars = determineDefaultPillars(diagnosis);
+    
+    // Add content-based pillars that aren't already included
+    for (const pillar of contentBasedPillars) {
+      if (!pillars.includes(pillar) && pillars.length < 3) {
+        pillars.push(pillar);
+      }
+    }
+  }
+  
+  // If we still don't have any pillars, use the defaults
+  if (pillars.length === 0) {
+    pillars = ['pillar1_leadership_mindset', 'pillar3_communication_mastery', 'pillar7_delegation_empowerment'];
+  }
+  
+  // Prioritize pillars based on the diagnosis content
+  pillars = prioritizePillars(pillars, diagnosis);
+  
+  // Determine the most appropriate follow-up worksheet
   const followup = diagnosis.followupWorksheets.followup || determineDefaultFollowup(diagnosis);
   
   return {
     pillars: pillars.slice(0, 3), // Limit to 3 pillars max
     followup
   };
+}
+
+/**
+ * Prioritizes pillar worksheets based on relevance to the diagnosis
+ * @param pillars Array of pillar IDs
+ * @param diagnosis Structured diagnosis object
+ * @returns Prioritized array of pillar IDs
+ */
+function prioritizePillars(pillars: PillarType[], diagnosis: DiagnosisResponse): PillarType[] {
+  // Create a map of pillar IDs to their relevance scores
+  const pillarScores: Record<string, number> = {};
+  
+  // Initialize scores for all pillars
+  pillars.forEach(pillar => {
+    pillarScores[pillar] = 0;
+  });
+  
+  // Combine all text from the diagnosis for analysis
+  const allText = [
+    diagnosis.summary,
+    ...diagnosis.strengths,
+    ...diagnosis.challenges,
+    ...diagnosis.recommendations
+  ].join(' ').toLowerCase();
+  
+  // Define keywords for each pillar
+  const pillarKeywords: Record<string, string[]> = {
+    'pillar1_leadership_mindset': ['mindset', 'confidence', 'belief', 'attitude', 'perspective', 'self-doubt'],
+    'pillar2_goal_setting': ['goal', 'objective', 'target', 'aspiration', 'achievement', 'milestone'],
+    'pillar3_communication_mastery': ['communicat', 'listen', 'express', 'articulate', 'message', 'dialogue'],
+    'pillar4_time_mastery': ['time', 'schedule', 'priorit', 'deadline', 'efficiency', 'procrastination'],
+    'pillar5_strategic_thinking': ['strateg', 'vision', 'plan', 'foresight', 'big picture', 'direction'],
+    'pillar6_emotional_intelligence': ['emotion', 'empath', 'self-aware', 'feeling', 'interpersonal', 'social'],
+    'pillar7_delegation_empowerment': ['delegat', 'micromanag', 'trust', 'empower', 'responsibility', 'control'],
+    'pillar8_change_uncertainty': ['change', 'adapt', 'uncertain', 'flexible', 'resilient', 'transition'],
+    'pillar9_conflict_resolution': ['conflict', 'disagree', 'tension', 'resolution', 'mediate', 'harmony'],
+    'pillar10_high_performance': ['perform', 'excel', 'achieve', 'productivity', 'efficiency', 'results'],
+    'pillar11_decision_making': ['decision', 'choice', 'judg', 'evaluate', 'option', 'analysis'],
+    'pillar12_execution_results': ['execut', 'result', 'implement', 'action', 'deliver', 'outcome']
+  };
+  
+  // Score each pillar based on keyword matches
+  pillars.forEach(pillar => {
+    const keywords = pillarKeywords[pillar] || [];
+    keywords.forEach(keyword => {
+      // Count occurrences of the keyword in the diagnosis text
+      const regex = new RegExp(keyword, 'gi');
+      const matches = allText.match(regex);
+      if (matches) {
+        pillarScores[pillar] += matches.length;
+      }
+    });
+    
+    // Add extra weight for explicit mentions in recommendations
+    diagnosis.recommendations.forEach(rec => {
+      const pillarName = pillar.replace('pillar', '').replace('_', ' ').toLowerCase();
+      if (rec.toLowerCase().includes(pillarName)) {
+        pillarScores[pillar] += 5;
+      }
+    });
+  });
+  
+  // Sort pillars by score (descending)
+  return pillars.sort((a, b) => pillarScores[b] - pillarScores[a]);
 }
 
 /**

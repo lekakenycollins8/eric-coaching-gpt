@@ -3,9 +3,9 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { User } from '@/models';
-import WorkbookSubmission from '@/models/WorkbookSubmission';
+import WorkbookSubmission, { IWorksheetSubmission } from '@/models/WorkbookSubmission';
 import mongoose from 'mongoose';
-import { loadWorksheet, validateFollowupAnswers, WorksheetType, PillarType, FollowupType } from '@/utils/followupUtils';
+import { loadWorksheet, validateFollowupAnswers, PILLAR_TYPES, FOLLOWUP_TYPES, PillarType, FollowupType, WorksheetType } from '@/utils/followupUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,19 +79,30 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: Request) {
   try {
-    // Get the submission ID from the URL query parameters
-    const url = new URL(request.url);
-    const submissionId = url.searchParams.get('submissionId');
+    // Get the submission ID from the query parameters
+    const { searchParams } = new URL(request.url);
+    const submissionId = searchParams.get('submissionId');
 
-    // Check if submissionId is provided
     if (!submissionId) {
       return NextResponse.json(
-        { error: 'Missing required parameter: submissionId' },
+        { error: 'Submission ID is required' },
         { status: 400 }
       );
     }
 
-    // Check authentication
+    // Connect to the database
+    await connectToDatabase();
+
+    // Find the submission
+    const submission = await WorkbookSubmission.findById(submissionId);
+    if (!submission) {
+      return NextResponse.json(
+        { error: 'Submission not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if the submission belongs to the user
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return NextResponse.json(
@@ -99,64 +110,64 @@ export async function GET(request: Request) {
         { status: 401 }
       );
     }
-
-    // Check if user has an active subscription
-    await connectToDatabase();
-    const user = await User.findById(session.user.id);
-    if (!user) {
+    if (submission.userId.toString() !== session.user.id) {
       return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Check if user has an active subscription
-    const validStatuses = ['active', 'past_due'];
-    if (!user.subscription || !validStatuses.includes(user.subscription.status)) {
-      return NextResponse.json(
-        { error: 'Active subscription required' },
+        { error: 'Unauthorized' },
         { status: 403 }
       );
     }
 
-    // Find the submission with diagnosis
-    const submission = await WorkbookSubmission.findOne({
-      _id: submissionId,
-      userId: session.user.id,
-      status: 'submitted',
-      diagnosis: { $exists: true }
-    }).exec();
-
-    if (!submission) {
+    // Check if the submission has a diagnosis with follow-up recommendations
+    if (!submission.diagnosis?.followupWorksheets) {
       return NextResponse.json(
-        { error: 'Submission not found or diagnosis not available' },
+        { error: 'No follow-up worksheets recommended' },
         { status: 404 }
       );
     }
 
-    // Get the follow-up worksheet IDs from the diagnosis
-    const followupWorksheets = submission.diagnosis?.followupWorksheets;
-    if (!followupWorksheets) {
+    // Get the recommended follow-up worksheet ID
+    const { pillars = [], followup } = submission.diagnosis.followupWorksheets;
+    
+    // Check if we have any worksheet recommendations
+    if (!followup && pillars.length === 0) {
       return NextResponse.json(
-        { error: 'No follow-up worksheets recommended in diagnosis' },
+        { error: 'No worksheets recommended' },
         { status: 404 }
       );
     }
+
+    // Get the worksheet type from the query parameters
+    const worksheetType = searchParams.get('type') || 'followup';
+    const worksheetId = searchParams.get('worksheetId');
     
-    // Get the worksheet type from query parameters or use the first recommended pillar
-    const worksheetType = url.searchParams.get('worksheetType') as WorksheetType || 
-                         followupWorksheets.pillars[0] || 
-                         followupWorksheets.followup;
+    let targetWorksheetId;
     
-    if (!worksheetType) {
-      return NextResponse.json(
-        { error: 'No worksheet type specified or recommended' },
-        { status: 400 }
-      );
+    if (worksheetType === 'pillar') {
+      // For pillar worksheets, use the provided ID or the first recommended pillar
+      if (worksheetId && pillars.includes(worksheetId as any)) {
+        targetWorksheetId = worksheetId;
+      } else if (pillars.length > 0) {
+        targetWorksheetId = pillars[0];
+      } else {
+        return NextResponse.json(
+          { error: 'No pillar worksheets recommended' },
+          { status: 404 }
+        );
+      }
+    } else {
+      // For follow-up worksheets, use the provided ID or the recommended follow-up
+      targetWorksheetId = worksheetId || followup;
+      
+      if (!targetWorksheetId) {
+        return NextResponse.json(
+          { error: 'No follow-up worksheet recommended' },
+          { status: 404 }
+        );
+      }
     }
 
     // Load the worksheet
-    const worksheet = await loadWorksheet(worksheetType);
+    const worksheet = await loadWorksheet(targetWorksheetId as WorksheetType);
     if (!worksheet) {
       return NextResponse.json(
         { error: 'Worksheet not found' },
@@ -164,10 +175,31 @@ export async function GET(request: Request) {
       );
     }
 
-    // Return the worksheet
+    // Check if the user has already completed this worksheet
+    let existingAnswers = {};
+    let submittedAt = null;
+    
+    if (worksheetType === 'pillar' && submission.pillars && submission.pillars.length > 0) {
+      const existingPillar = submission.pillars.find(
+        (p: IWorksheetSubmission) => p.worksheetId === targetWorksheetId
+      );
+      if (existingPillar) {
+        existingAnswers = existingPillar.answers;
+        submittedAt = existingPillar.submittedAt;
+      }
+    } else if (worksheetType === 'followup' && submission.followup?.worksheetId === targetWorksheetId) {
+      existingAnswers = submission.followup.answers;
+      submittedAt = submission.followup.submittedAt;
+    }
+
+    // Return the worksheet with any existing answers
     return NextResponse.json({
-      success: true,
-      worksheet
+      worksheet,
+      existingAnswers,
+      submittedAt,
+      worksheetType,
+      recommendedPillars: pillars,
+      recommendedFollowup: followup
     });
   } catch (error) {
     console.error('Error retrieving follow-up worksheet:', error);
@@ -294,26 +326,67 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate the answers against the worksheet
+    // Validate the answers
     const isValid = await validateFollowupAnswers(worksheetId as WorksheetType, answers);
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Invalid answers for the specified worksheet' },
+        { error: 'Invalid answers provided for worksheet' },
         { status: 400 }
       );
     }
 
-    // Save the follow-up answers to the submission
-    submission.followup = {
-      worksheetId,
-      answers,
-      submittedAt: new Date()
-    };
+    // Determine if this is a pillar or follow-up worksheet
+    const isPillar = PILLAR_TYPES.includes(worksheetId as any);
+    const isFollowup = FOLLOWUP_TYPES.includes(worksheetId as any);
+    
+    if (!isPillar && !isFollowup) {
+      return NextResponse.json(
+        { error: 'Invalid worksheet type' },
+        { status: 400 }
+      );
+    }
+    
+    if (isPillar) {
+      // For pillar worksheets, store in the pillars array
+      if (!submission.pillars) {
+        submission.pillars = [];
+      }
+      
+      // Check if this pillar has already been submitted
+      const existingPillarIndex = submission.pillars.findIndex(
+        (p: IWorksheetSubmission) => p.worksheetId === worksheetId
+      );
+      
+      if (existingPillarIndex >= 0) {
+        // Update existing pillar submission
+        submission.pillars[existingPillarIndex] = {
+          worksheetId,
+          answers,
+          submittedAt: new Date()
+        };
+      } else {
+        // Add new pillar submission
+        submission.pillars.push({
+          worksheetId,
+          answers,
+          submittedAt: new Date()
+        });
+      }
+    } else {
+      // For follow-up worksheets, use the followup field
+      submission.followup = {
+        worksheetId,
+        answers,
+        submittedAt: new Date()
+      };
+    }
+    
     await submission.save();
 
     return NextResponse.json({
       success: true,
-      followupId: worksheetId
+      worksheetId,
+      worksheetType: isPillar ? 'pillar' : 'followup'
     });
   } catch (error) {
     console.error('Error submitting follow-up worksheet:', error);

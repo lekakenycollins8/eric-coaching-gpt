@@ -16,12 +16,12 @@ export interface FollowupWorksheet {
 }
 
 /**
- * Interface for follow-up worksheet questions
+ * Interface for worksheet questions (both pillar and follow-up)
  */
 export interface FollowupQuestion {
   id: string;
   text: string;
-  type: 'text' | 'multiline' | 'scale' | 'choice';
+  type: 'text' | 'multiline' | 'scale' | 'choice' | 'textarea' | 'rating' | 'checkbox' | 'info';
   options?: string[];
 }
 
@@ -136,7 +136,7 @@ function extractQuestions(worksheet: any): FollowupQuestion[] {
  * @param fieldType The field type from pillar worksheet
  * @returns The corresponding question type
  */
-function mapFieldTypeToQuestionType(fieldType: string): string {
+function mapFieldTypeToQuestionType(fieldType: string): FollowupQuestion['type'] {
   switch (fieldType) {
     case 'textarea':
       return 'textarea';
@@ -146,6 +146,14 @@ function mapFieldTypeToQuestionType(fieldType: string): string {
       return 'rating';
     case 'text':
       return 'text';
+    case 'info':
+      return 'info';
+    case 'scale':
+      return 'scale';
+    case 'choice':
+      return 'choice';
+    case 'multiline':
+      return 'multiline';
     default:
       return 'text';
   }
@@ -161,35 +169,105 @@ export async function loadFollowupWorksheet(followupType: FollowupType): Promise
 }
 
 /**
- * Validates follow-up worksheet answers
- * @param worksheetId ID of the follow-up worksheet
- * @param answers User's answers to the follow-up questions
+ * Validates worksheet answers for both pillar and follow-up worksheets
+ * @param worksheetId ID of the worksheet (pillar or follow-up)
+ * @param answers User's answers to the worksheet questions
  * @returns True if answers are valid, false otherwise
  */
 export async function validateFollowupAnswers(
-  worksheetId: string,
-  answers: Record<string, string>
+  worksheetId: WorksheetType,
+  answers: Record<string, string | number | boolean | string[]>
 ): Promise<boolean> {
   try {
     // Load the worksheet to validate against
-    const worksheet = await loadFollowupWorksheet(worksheetId as FollowupType);
+    const worksheet = await loadWorksheet(worksheetId);
     if (!worksheet) {
+      console.error(`Worksheet not found for validation: ${worksheetId}`);
       return false;
     }
     
     // Check if we have at least some answers
     const answerKeys = Object.keys(answers);
     if (answerKeys.length === 0) {
+      console.warn(`No answers provided for worksheet: ${worksheetId}`);
       return false;
     }
     
-    // Check that all answers correspond to valid questions
+    // Get all valid question IDs from the worksheet
     const questionIds = worksheet.questions.map(q => q.id);
-    const validAnswers = answerKeys.every(key => questionIds.includes(key));
     
-    return validAnswers;
+    // Check that all provided answers correspond to valid questions
+    const invalidAnswerKeys = answerKeys.filter(key => !questionIds.includes(key));
+    if (invalidAnswerKeys.length > 0) {
+      console.warn(`Invalid answer keys found: ${invalidAnswerKeys.join(', ')}`);
+      return false;
+    }
+    
+    // Validate answer types based on question types
+    for (const question of worksheet.questions) {
+      const answer = answers[question.id];
+      
+      // Skip validation for questions that weren't answered
+      if (answer === undefined) continue;
+      
+      // Validate based on question type
+      switch (question.type) {
+        case 'scale':
+        case 'rating':
+          // Rating should be a number between 1-5 or 1-10
+          if (typeof answer !== 'number' && typeof answer !== 'string') {
+            console.warn(`Invalid rating answer type for question ${question.id}: ${typeof answer}`);
+            return false;
+          }
+          const numValue = Number(answer);
+          if (isNaN(numValue) || numValue < 1 || numValue > 10) {
+            console.warn(`Invalid rating value for question ${question.id}: ${answer}`);
+            return false;
+          }
+          break;
+          
+        case 'choice':
+          // Choice should be one of the available options
+          if (!question.options?.includes(answer as string)) {
+            console.warn(`Invalid choice for question ${question.id}: ${answer}`);
+            return false;
+          }
+          break;
+          
+        case 'checkbox':
+          // Checkbox answers should be boolean or array of selected options
+          if (typeof answer !== 'boolean' && !Array.isArray(answer)) {
+            console.warn(`Invalid checkbox answer type for question ${question.id}: ${typeof answer}`);
+            return false;
+          }
+          break;
+          
+        case 'text':
+        case 'textarea':
+        case 'multiline':
+          // Text answers should be strings and not empty
+          if (typeof answer !== 'string') {
+            console.warn(`Invalid text answer type for question ${question.id}: ${typeof answer}`);
+            return false;
+          }
+          if ((answer as string).trim().length === 0) {
+            console.warn(`Empty text answer for question ${question.id}`);
+            return false;
+          }
+          break;
+          
+        default:
+          // For any other type, just ensure the answer exists
+          if (answer === null || answer === undefined) {
+            console.warn(`Missing answer for question ${question.id}`);
+            return false;
+          }
+      }
+    }
+    
+    return true;
   } catch (error) {
-    console.error('Error validating follow-up answers:', error);
+    console.error('Error validating worksheet answers:', error);
     return false;
   }
 }

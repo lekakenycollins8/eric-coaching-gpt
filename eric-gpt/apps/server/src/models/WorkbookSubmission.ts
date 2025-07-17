@@ -6,7 +6,7 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
  */
 export interface IFollowupWorksheets {
   pillars: string[];              // Recommended pillar worksheet IDs
-  followup: string;              // Recommended follow-up worksheet ID
+  followup?: string;             // Recommended follow-up worksheet ID (optional)
 }
 
 /**
@@ -23,13 +23,13 @@ export interface IDiagnosisResult {
 }
 
 /**
- * Interface for follow-up worksheet submission
- * @interface IFollowupSubmission
+ * Interface for worksheet submission (both pillar and follow-up)
+ * @interface IWorksheetSubmission
  */
-export interface IFollowupSubmission {
-  worksheetId: string;             // ID of the follow-up worksheet
-  answers: Record<string, string>; // User's answers to follow-up questions
-  submittedAt: Date;              // When the follow-up was submitted
+export interface IWorksheetSubmission {
+  worksheetId: string;                // ID of the worksheet
+  answers: Record<string, any>;      // User's answers to worksheet questions
+  submittedAt: Date;                 // When the worksheet was submitted
 }
 
 /**
@@ -43,11 +43,13 @@ export interface IWorkbookSubmission extends Document {
   status: 'draft' | 'submitted';   // Submission status
   answers: Record<string, any>;    // User's answers to questions
   diagnosis?: IDiagnosisResult;    // Diagnosis results (if submitted)
-  followup?: IFollowupSubmission;  // Follow-up worksheet submission
+  followup?: IWorksheetSubmission; // Follow-up worksheet submission
+  pillars?: IWorksheetSubmission[]; // Pillar worksheet submissions
   emailSent: boolean;              // Whether email notification was sent
   schedulingPrompted: boolean;     // Whether scheduling was prompted
   createdAt: Date;                 // Creation timestamp
   updatedAt: Date;                 // Last update timestamp
+  diagnosisGeneratedAt?: Date;     // When the diagnosis was generated
 }
 
 // Schema for follow-up worksheet recommendations
@@ -91,8 +93,8 @@ const DiagnosisResultSchema = new Schema({
   }
 });
 
-// Schema for follow-up worksheet submission
-const FollowupSubmissionSchema = new Schema({
+// Schema for worksheet submission (both pillar and follow-up)
+const WorksheetSubmissionSchema = new Schema({
   worksheetId: {
     type: String,
     required: true
@@ -135,7 +137,15 @@ const WorkbookSubmissionSchema = new Schema({
     default: undefined
   },
   followup: {
-    type: FollowupSubmissionSchema,
+    type: WorksheetSubmissionSchema,
+    default: undefined
+  },
+  pillars: {
+    type: [WorksheetSubmissionSchema],
+    default: undefined
+  },
+  diagnosisGeneratedAt: {
+    type: Date,
     default: undefined
   },
   emailSent: {
