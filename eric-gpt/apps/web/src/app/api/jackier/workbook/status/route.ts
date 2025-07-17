@@ -23,15 +23,23 @@ export async function GET(request: NextRequest) {
     
     // Add the user ID to the query parameters
     const userId = session.user.id;
-    const apiUrl = `${serverUrl}/api/workbook/status?userId=${userId}`;
+    const apiUrl = `${serverUrl}/api/workbook/status`;
     
     console.log('Web app: Forwarding workbook status request to:', apiUrl);
     
+    // Create a cookie string from the request headers
+    const cookieHeader = request.headers.get('cookie') || '';
+    
+    // Forward the request with cookies and session data
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Cookie': cookieHeader, // Forward cookies for session authentication
+        'Authorization': `Bearer ${session.user.id}`, // Add authorization header as backup
+        'X-User-Id': session.user.id, // Add custom header with user ID
       },
+      credentials: 'include', // Include cookies in the request
     });
 
     // Check if response is OK before trying to parse JSON

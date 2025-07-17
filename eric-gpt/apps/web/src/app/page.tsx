@@ -11,6 +11,7 @@ import {
 } from '@/components/home';
 import WelcomeHero from '@/components/dashboard/WelcomeHero';
 import FeaturedContent from '@/components/dashboard/FeaturedContent';
+import { WorkbookCallToAction } from '@/components/jackier/WorkbookCallToAction';
 import Link from 'next/link';
 import { useState } from 'react';
 import { 
@@ -34,6 +35,9 @@ export default function Home() {
             <div className="mb-8">
               <WelcomeHero />
             </div>
+            
+            {/* Jackier Workbook Call to Action - Full Width */}
+            <WorkbookCallToAction className="mb-8" />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left column - Featured Content */}

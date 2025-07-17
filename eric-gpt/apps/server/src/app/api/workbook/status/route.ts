@@ -52,11 +52,25 @@ import mongoose from 'mongoose';
  * GET handler for the workbook status API endpoint
  * Returns the user's workbook completion status
  */
-export async function GET() {
+export async function GET(request: Request) {
+  // Parse URL to get query parameters
+  const { searchParams } = new URL(request.url);
+  const queryUserId = searchParams.get('userId');
   try {
-    // Check authentication
+    // Try to authenticate via session first
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    let userId;
+    
+    // If session exists, use the user ID from the session
+    if (session && session.user) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query parameters
+    else if (queryUserId) {
+      userId = queryUserId;
+    } 
+    // If no authentication method worked, return 401
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -65,7 +79,7 @@ export async function GET() {
 
     // Check if user has an active subscription
     await connectToDatabase();
-    const user = await User.findById(session.user.id);
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -88,7 +102,6 @@ export async function GET() {
     }
 
     // Find the user's workbook submission
-    const userId = session.user.id;
     const workbookId = 'jackier-method-workbook';
     
     const submission = await WorkbookSubmission.findOne({
