@@ -11,11 +11,13 @@ import { AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { hasFeatureAccess } from '@/lib/subscription-utils';
 import { useJackierWorkbook } from '@/hooks/useJackierWorkbook';
+import { useWorkbookStatus } from '@/hooks/useWorkbookStatus';
 
 export default function JackierWorkbookPage() {
   const router = useRouter();
   const { subscription, loading: subscriptionLoading } = useSubscription();
-  const { workbook, isLoading, error, userSubmission } = useJackierWorkbook();
+  const { workbook, isLoading: workbookLoading, error: workbookError, userSubmission } = useJackierWorkbook();
+  const { status, isLoading: statusLoading, error: statusError, refetch: refetchStatus } = useWorkbookStatus();
   
   // Check if user has access to the Jackier Workbook feature
   const hasAccess = hasFeatureAccess(subscription, 'worksheetSubmit', { 
@@ -42,6 +44,9 @@ export default function JackierWorkbookPage() {
     router.push(`/dashboard/jackier/followup/${worksheetId}`);
   };
 
+  // Combine errors from both hooks
+  const error = workbookError || statusError;
+  
   if (error) {
     return (
       <div className="container mx-auto py-8">
@@ -49,14 +54,17 @@ export default function JackierWorkbookPage() {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>
-            {error}
+            {String(error)}
           </AlertDescription>
         </Alert>
       </div>
     );
   }
 
-  if (isLoading || subscriptionLoading) {
+  // Check if any data is still loading
+  const isLoading = workbookLoading || statusLoading || subscriptionLoading;
+  
+  if (isLoading) {
     return (
       <div className="container mx-auto py-8">
         <div className="mb-8">
@@ -121,20 +129,46 @@ export default function JackierWorkbookPage() {
       {!userSubmission && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Leadership Assessment</CardTitle>
+            <CardTitle>Start Your Assessment</CardTitle>
             <CardDescription>
-              Start your leadership journey with the Jackier Method assessment
+              The Jackier Method Workbook helps identify your leadership strengths and areas for growth
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              This comprehensive assessment will help identify your leadership strengths and areas for growth.
-              After completion, you'll receive a personalized diagnosis and recommended follow-up worksheets.
+              Complete this assessment to receive a personalized leadership diagnosis and targeted follow-up worksheets.
+              The assessment takes approximately 15-20 minutes to complete.
             </p>
+            
+            {status && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                <h3 className="text-sm font-medium mb-2">Workbook Status</h3>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Status:</span>
+                  <span className="text-sm font-medium">
+                    {status.status === 'not_started' && 'Not Started'}
+                    {status.status === 'in_progress' && 'In Progress'}
+                    {status.status === 'completed' && 'Completed'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Progress:</span>
+                  <span className="text-sm font-medium">{Math.round(status.progress * 100)}%</span>
+                </div>
+                {status.lastUpdated && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Last Updated:</span>
+                    <span className="text-sm font-medium">
+                      {new Date(status.lastUpdated).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
           <CardFooter>
             <Button onClick={handleStartWorkbook} className="w-full">
-              Start Assessment <ArrowRight className="ml-2 h-4 w-4" />
+              Start Workbook <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardFooter>
         </Card>

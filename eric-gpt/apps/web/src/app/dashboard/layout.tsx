@@ -32,6 +32,7 @@ export default function DashboardLayout({
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
+    { name: 'Jackier Workbook', href: '/dashboard/jackier', icon: DocumentTextIcon },
   ];
 
   return (
