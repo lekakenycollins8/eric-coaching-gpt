@@ -3,7 +3,7 @@
  * Functions for handling follow-up worksheets based on diagnosis results
  */
 
-import { loadWorkbook } from './workbookLoader';
+import { loadFollowupById } from './workbookLoader';
 
 /**
  * Interface for follow-up worksheet metadata
@@ -26,66 +26,138 @@ export interface FollowupQuestion {
 }
 
 /**
+ * Available pillar worksheet types
+ */
+export const PILLAR_TYPES = [
+  'pillar1_leadership_mindset',
+  'pillar2_goal_setting',
+  'pillar3_communication_mastery',
+  'pillar4_time_mastery',
+  'pillar5_strategic_thinking',
+  'pillar6_emotional_intelligence',
+  'pillar7_delegation_empowerment',
+  'pillar8_change_uncertainty',
+  'pillar9_conflict_resolution',
+  'pillar10_high_performance',
+  'pillar11_decision_making',
+  'pillar12_execution_results'
+] as const;
+
+export type PillarType = typeof PILLAR_TYPES[number];
+
+/**
  * Available follow-up worksheet types
  */
 export const FOLLOWUP_TYPES = [
-  'communication',
-  'delegation',
-  'strategic-thinking',
-  'emotional-intelligence',
-  'conflict-resolution'
+  'followup-1',
+  'followup-2',
+  'followup-3',
+  'followup-4'
 ] as const;
 
 export type FollowupType = typeof FOLLOWUP_TYPES[number];
 
 /**
- * Loads a follow-up worksheet by its type
- * @param followupType Type of follow-up worksheet to load
- * @returns Follow-up worksheet data or null if not found
+ * Combined worksheet types (both pillars and follow-ups)
  */
-export async function loadFollowupWorksheet(followupType: FollowupType): Promise<FollowupWorksheet | null> {
+export const WORKSHEET_TYPES = [...PILLAR_TYPES, ...FOLLOWUP_TYPES] as const;
+
+export type WorksheetType = typeof WORKSHEET_TYPES[number];
+
+/**
+ * Loads a worksheet by its type (either pillar or follow-up)
+ * @param worksheetType Type of worksheet to load
+ * @returns Worksheet data or null if not found
+ */
+export async function loadWorksheet(worksheetType: WorksheetType): Promise<FollowupWorksheet | null> {
   try {
-    // For now, we'll use a simple mapping to predefined worksheets
-    // In the future, this could be loaded from a database or file system
-    
-    // Validate the followup type
-    if (!FOLLOWUP_TYPES.includes(followupType as any)) {
-      console.error(`Invalid follow-up worksheet type: ${followupType}`);
+    // Validate the worksheet type
+    if (!WORKSHEET_TYPES.includes(worksheetType as any)) {
+      console.error(`Invalid worksheet type: ${worksheetType}`);
       return null;
     }
     
-    // Load the base workbook structure to check if the follow-up exists
-    const workbook = await loadWorkbook();
-    if (!workbook || !workbook.followupWorksheets) {
-      console.error('Failed to load workbook or follow-up worksheets');
-      return null;
-    }
+    // Load the worksheet from the workbook loader
+    const worksheet = await loadFollowupById(worksheetType);
     
-    // Find the requested follow-up worksheet
-    const followup = workbook.followupWorksheets.find(
-      (ws: any) => ws.id === followupType
-    );
-    
-    if (!followup) {
-      console.error(`Follow-up worksheet not found: ${followupType}`);
+    if (!worksheet) {
+      console.error(`Worksheet not found: ${worksheetType}`);
       return null;
     }
     
     return {
-      id: followup.id,
-      title: followup.title,
-      description: followup.description,
-      questions: followup.questions.map((q: any) => ({
+      id: worksheet.id,
+      title: worksheet.title,
+      description: worksheet.description || '',
+      questions: extractQuestions(worksheet)
+    };
+  } catch (error) {
+    console.error('Error loading worksheet:', error);
+    return null;
+  }
+}
+
+/**
+ * Extract questions from a worksheet based on its structure
+ * @param worksheet The worksheet object
+ * @returns Array of questions
+ */
+function extractQuestions(worksheet: any): FollowupQuestion[] {
+  // Handle follow-up worksheets structure
+  if (worksheet.sections && Array.isArray(worksheet.sections)) {
+    // Flatten questions from all sections
+    return worksheet.sections.flatMap((section: any) => 
+      section.questions.map((q: any) => ({
         id: q.id,
         text: q.text,
         type: q.type,
         options: q.options
       }))
-    };
-  } catch (error) {
-    console.error('Error loading follow-up worksheet:', error);
-    return null;
+    );
   }
+  
+  // Handle pillar worksheets structure
+  if (worksheet.fields && Array.isArray(worksheet.fields)) {
+    return worksheet.fields
+      .filter((field: any) => field.type !== 'info') // Skip info fields
+      .map((field: any) => ({
+        id: field.name,
+        text: field.label,
+        type: mapFieldTypeToQuestionType(field.type),
+        options: field.options
+      }));
+  }
+  
+  return [];
+}
+
+/**
+ * Maps pillar worksheet field types to follow-up question types
+ * @param fieldType The field type from pillar worksheet
+ * @returns The corresponding question type
+ */
+function mapFieldTypeToQuestionType(fieldType: string): string {
+  switch (fieldType) {
+    case 'textarea':
+      return 'textarea';
+    case 'checkbox':
+      return 'checkbox';
+    case 'rating':
+      return 'rating';
+    case 'text':
+      return 'text';
+    default:
+      return 'text';
+  }
+}
+
+/**
+ * Loads a follow-up worksheet by its type (legacy function for backward compatibility)
+ * @param followupType Type of follow-up worksheet to load
+ * @returns Follow-up worksheet data or null if not found
+ */
+export async function loadFollowupWorksheet(followupType: FollowupType): Promise<FollowupWorksheet | null> {
+  return loadWorksheet(followupType);
 }
 
 /**

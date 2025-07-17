@@ -1,14 +1,35 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 /**
+ * Interface for follow-up worksheet recommendations
+ * @interface IFollowupWorksheets
+ */
+export interface IFollowupWorksheets {
+  pillars: string[];              // Recommended pillar worksheet IDs
+  followup: string;              // Recommended follow-up worksheet ID
+}
+
+/**
  * Interface for workbook diagnosis results
  * @interface IDiagnosisResult
  */
 export interface IDiagnosisResult {
-  primaryPillars: string[];        // Primary leadership pillars identified
-  recommendedWorksheets: string[]; // Recommended worksheets based on diagnosis
   summary: string;                 // Summary of the diagnosis
-  createdAt: Date;                 // When the diagnosis was generated
+  strengths: string[];            // Key strengths identified
+  challenges: string[];           // Key challenges or growth areas
+  recommendations: string[];      // Specific recommendations for improvement
+  followupWorksheets: IFollowupWorksheets; // Recommended worksheets
+  createdAt: Date;                // When the diagnosis was generated
+}
+
+/**
+ * Interface for follow-up worksheet submission
+ * @interface IFollowupSubmission
+ */
+export interface IFollowupSubmission {
+  worksheetId: string;             // ID of the follow-up worksheet
+  answers: Record<string, string>; // User's answers to follow-up questions
+  submittedAt: Date;              // When the follow-up was submitted
 }
 
 /**
@@ -22,28 +43,65 @@ export interface IWorkbookSubmission extends Document {
   status: 'draft' | 'submitted';   // Submission status
   answers: Record<string, any>;    // User's answers to questions
   diagnosis?: IDiagnosisResult;    // Diagnosis results (if submitted)
+  followup?: IFollowupSubmission;  // Follow-up worksheet submission
   emailSent: boolean;              // Whether email notification was sent
   schedulingPrompted: boolean;     // Whether scheduling was prompted
   createdAt: Date;                 // Creation timestamp
   updatedAt: Date;                 // Last update timestamp
 }
 
+// Schema for follow-up worksheet recommendations
+const FollowupWorksheetsSchema = new Schema({
+  pillars: {
+    type: [String],
+    required: true
+  },
+  followup: {
+    type: String,
+    required: true
+  }
+});
+
 // Schema for diagnosis results
 const DiagnosisResultSchema = new Schema({
-  primaryPillars: {
-    type: [String],
-    required: true
-  },
-  recommendedWorksheets: {
-    type: [String],
-    required: true
-  },
   summary: {
     type: String,
     required: true,
     trim: true
   },
+  strengths: {
+    type: [String],
+    required: true
+  },
+  challenges: {
+    type: [String],
+    required: true
+  },
+  recommendations: {
+    type: [String],
+    required: true
+  },
+  followupWorksheets: {
+    type: FollowupWorksheetsSchema,
+    required: true
+  },
   createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+// Schema for follow-up worksheet submission
+const FollowupSubmissionSchema = new Schema({
+  worksheetId: {
+    type: String,
+    required: true
+  },
+  answers: {
+    type: Schema.Types.Mixed,
+    default: {}
+  },
+  submittedAt: {
     type: Date,
     default: Date.now
   }
@@ -74,6 +132,10 @@ const WorkbookSubmissionSchema = new Schema({
   },
   diagnosis: {
     type: DiagnosisResultSchema,
+    default: undefined
+  },
+  followup: {
+    type: FollowupSubmissionSchema,
     default: undefined
   },
   emailSent: {

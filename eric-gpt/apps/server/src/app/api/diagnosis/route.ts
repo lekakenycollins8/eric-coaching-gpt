@@ -6,7 +6,7 @@ import { User } from '@/models';
 import WorkbookSubmission from '@/models/WorkbookSubmission';
 import mongoose from 'mongoose';
 import { loadWorkbook } from '@/utils/workbookLoader';
-import { generateAIDiagnosis, FormattedQA } from '@/utils/diagnosisUtils';
+import { generateAIDiagnosis, DiagnosisResponse, FormattedQA, determineFollowupWorksheets } from '@/utils/diagnosisUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,9 +60,17 @@ export const dynamic = 'force-dynamic';
  *                       type: array
  *                       items:
  *                         type: string
- *                     followupId:
- *                       type: string
- *                       description: ID of the recommended follow-up worksheet
+ *                     followupWorksheets:
+ *                       type: object
+ *                       properties:
+ *                         pillars:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                           description: IDs of recommended pillar worksheets
+ *                         followup:
+ *                           type: string
+ *                           description: ID of the recommended follow-up worksheet
  *       400:
  *         description: Bad request - Missing required fields
  *       401:
@@ -167,8 +175,17 @@ export async function POST(request: Request) {
       // Generate the AI diagnosis using our utility function
       const diagnosis = await generateAIDiagnosis(formattedAnswers, user.name || 'Client');
       
+      // Determine the most appropriate follow-up worksheets
+      const followupWorksheets = determineFollowupWorksheets(diagnosis);
+      
       // Save the diagnosis to the submission
-      submission.diagnosis = diagnosis;
+      submission.diagnosis = {
+        summary: diagnosis.summary,
+        strengths: diagnosis.strengths,
+        challenges: diagnosis.challenges,
+        recommendations: diagnosis.recommendations,
+        followupWorksheets
+      };
       submission.diagnosisGeneratedAt = new Date();
       await submission.save();
 
