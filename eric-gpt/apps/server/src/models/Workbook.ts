@@ -1,54 +1,114 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
+/**
+ * Interface for workbook question
+ * @interface IWorkbookQuestion
+ */
 export interface IWorkbookQuestion {
-  id: string;
-  text: string;
+  id: string;                     // Unique identifier for the question
+  text: string;                   // Question text
   type: 'text' | 'textarea' | 'checkbox' | 'multiselect' | 'rating';
-  options?: string[];
-  required: boolean;
+  options?: string[];             // Options for checkbox/multiselect/rating questions
+  required: boolean;              // Whether the question is required
 }
 
+/**
+ * Interface for workbook section
+ * @interface IWorkbookSection
+ */
 export interface IWorkbookSection {
-  title: string;
-  description?: string;
-  questions: IWorkbookQuestion[];
+  title: string;                  // Section title
+  description?: string;           // Section description
+  questions: IWorkbookQuestion[]; // Questions in this section
 }
 
+/**
+ * Interface for workbook document
+ * @interface IWorkbook
+ * @extends Document
+ */
 export interface IWorkbook extends Document {
-  title: string;
-  description: string;
-  sections: IWorkbookSection[];
-  isRequired: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  title: string;                  // Workbook title
+  description: string;            // Workbook description
+  sections: IWorkbookSection[];   // Sections in the workbook
+  isRequired: boolean;            // Whether the workbook is required for all users
+  createdAt: Date;                // Creation timestamp
+  updatedAt: Date;                // Last update timestamp
 }
 
+// Schema for workbook questions
 const WorkbookQuestionSchema = new Schema({
-  id: { type: String, required: true },
-  text: { type: String, required: true },
+  id: { 
+    type: String, 
+    required: true,
+    trim: true
+  },
+  text: { 
+    type: String, 
+    required: true,
+    trim: true 
+  },
   type: { 
     type: String, 
     required: true,
-    enum: ['text', 'textarea', 'checkbox', 'multiselect', 'rating']
+    enum: ['text', 'textarea', 'checkbox', 'multiselect', 'rating'],
+    default: 'textarea'
   },
-  options: [String],
-  required: { type: Boolean, default: true }
+  options: {
+    type: [String],
+    default: undefined
+  },
+  required: { 
+    type: Boolean, 
+    default: true 
+  }
 });
 
+// Schema for workbook sections
 const WorkbookSectionSchema = new Schema({
-  title: { type: String, required: true },
-  description: String,
-  questions: [WorkbookQuestionSchema]
+  title: { 
+    type: String, 
+    required: true,
+    trim: true 
+  },
+  description: { 
+    type: String,
+    trim: true 
+  },
+  questions: {
+    type: [WorkbookQuestionSchema],
+    default: []
+  }
 });
 
+// Schema for workbook
 const WorkbookSchema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  sections: [WorkbookSectionSchema],
-  isRequired: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-}, { timestamps: true });
+  title: { 
+    type: String, 
+    required: true,
+    trim: true,
+    index: true
+  },
+  description: { 
+    type: String, 
+    required: true,
+    trim: true 
+  },
+  sections: {
+    type: [WorkbookSectionSchema],
+    default: []
+  },
+  isRequired: { 
+    type: Boolean, 
+    default: true 
+  }
+}, { 
+  timestamps: true,
+  versionKey: false
+});
+
+// Add index for faster queries
+WorkbookSchema.index({ title: 1, createdAt: -1 });
 
 // Create model only if it doesn't exist (prevents overwriting during hot reloads)
 export const Workbook = mongoose.models.Workbook || mongoose.model<IWorkbook>('Workbook', WorkbookSchema);
