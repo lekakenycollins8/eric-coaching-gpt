@@ -182,7 +182,7 @@ export function useFollowupWorksheet(worksheetId: string) {
   });
   
   // Save draft function
-  const saveDraft = async (answers: Record<string, any>) => {
+  const saveDraft = async (answers: Record<string, unknown>) => {
     try {
       await saveDraftMutation.mutateAsync(answers);
       return true;
@@ -193,7 +193,7 @@ export function useFollowupWorksheet(worksheetId: string) {
   };
   
   // Submit worksheet function
-  const submitFollowupWorksheet = async (answers: Record<string, any>) => {
+  const submitFollowupWorksheet = async (answers: Record<string, unknown>) => {
     return submitMutation.mutateAsync(answers);
   };
   
