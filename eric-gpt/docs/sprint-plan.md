@@ -8,7 +8,73 @@ After each sprint, update the Status column to ✅ Done or 🟢 In Review.
 | 2      | May 14 - May 20   | Dashboard UI and worksheet system  | ✅ Done      |
 | 3      | May 21 - May 27   | Custom GPT integration for coaching feedback | ✅ Done      |
 | 4      | May 28 - June 3   | PDF Export & Quota Enforcement UI  | ✅ Done      |
-| 5      | June 4 - June 17  | My Submissions & Trackers/Reflection Tools | ✅ Done      |
+| 5      | June 4 - June 17  | Trackers & Team Collaboration      | ✅ Done      |
+| 6      | July 20 - Aug 3   | Jackier Method Workbook Integration | 🟡 Planned   |
+
+## Sprint 6: Jackier Method Workbook Integration
+
+**Status:** Planned
+**Timeline:** July 20 - August 3, 2025
+
+### Goals
+- Implement mandatory Jackier Method Workbook assessment
+- Create AI diagnosis engine for leadership pillar identification
+- Integrate human coaching handoff with email notifications
+- Develop follow-up assessment system
+
+### Implementation Phases
+
+#### Phase 1: Data Models & Core Backend (Days 1-3)
+- [ ] Create MongoDB models for Workbook, WorkbookSubmission, and FollowupAssessment
+- [ ] Convert Jackier Method Workbook content to structured JSON format
+- [ ] Implement basic API endpoints for workbook retrieval
+- [ ] Add subscription checks for workbook access
+- [ ] Set up database seeding for initial workbook content
+
+#### Phase 2: Workbook UI & Progress Saving (Days 4-7)
+- [ ] Design multi-section workbook UI with progress tracking
+- [ ] Implement auto-save functionality for partial progress
+- [ ] Create form validation for required fields
+- [ ] Add "Save & Continue Later" and "Submit" functionality
+- [ ] Implement workbook status indicators on dashboard
+
+#### Phase 3: AI Diagnosis Engine (Days 8-10)
+- [ ] Develop GPT-4 prompt for leadership pillar diagnosis
+- [ ] Create analysis logic to identify primary leadership pillars
+- [ ] Implement worksheet recommendation algorithm
+- [ ] Build diagnosis results visualization dashboard
+- [ ] Add PDF generation for diagnosis results
+
+#### Phase 4: Email & Human Coaching Integration (Days 11-12)
+- [ ] Build email notification system using Nodemailer
+- [ ] Create HTML email template for workbook submissions
+- [ ] Implement prompt for scheduling calls with Eric
+- [ ] Add contact page link integration
+- [ ] Test email delivery to help@jackiercoaching.com
+
+#### Phase 5: Follow-up System & Final Integration (Days 13-15)
+- [ ] Implement follow-up assessment system
+- [ ] Create notification mechanism for follow-up worksheets
+- [ ] Build follow-up assessment UI
+- [ ] Integrate with existing worksheet system
+- [ ] Perform comprehensive testing and bug fixes
+
+### Environment Variables
+- `NEXT_PUBLIC_APP_URL`: Web app URL (client-facing)
+- `NEXT_PUBLIC_API_URL`: API server URL
+- `EMAIL_SERVER_HOST`: SMTP server for email notifications
+- `EMAIL_SERVER_PORT`: SMTP port
+- `EMAIL_SERVER_USER`: SMTP username
+- `EMAIL_SERVER_PASSWORD`: SMTP password
+- `EMAIL_FROM`: Sender email address
+- `COACHING_TEAM_EMAIL`: help@jackiercoaching.com
+
+### Deliverables
+- Complete Jackier Method Workbook assessment system
+- AI diagnosis engine with worksheet recommendations
+- Email integration with coaching team
+- Follow-up assessment and adaptive recommendation system
+- PDF export of diagnosis results
 
 ## Sprint 1 Completed Work
 

@@ -8,7 +8,7 @@ This document outlines the full data schema for all models used across the platf
 
 ```typescript
 interface User {
-    id: string;                     // UUID
+    id: string;                     // MongoDB ObjectId
     email: string;
     name?: string;
     createdAt: Date;
@@ -35,7 +35,7 @@ interface User {
 
 ```typescript
 interface Org {
-    id: string;                     // UUID
+    id: string;                     // MongoDB ObjectId
     ownerId: string;                // User.id
     memberIds: string[];            // User.id[] (max 5)
     stripeSubscriptionId: string;
@@ -76,7 +76,7 @@ Represents a single completed worksheet by a user and the AI feedback it generat
 
 ```typescript
 interface Submission {
-    id: string;                     // UUID
+    id: string;                     // MongoDB ObjectId
     userId: string;
     orgId?: string;
     worksheetId: string;
@@ -96,51 +96,52 @@ interface Submission {
 ### Tracker
 
 ```typescript
-interface Tracker {
-    id: string;                     // e.g. "pillar1_daily_mindset"
+interface ITracker extends Document {
+    userId: Schema.Types.ObjectId;
     title: string;
-    promptFields: Field[];          // Daily entry fields
-    reflectionFields: Field[];      // End-of-period fields
-    periodLength: number;           // e.g. 5 days
-}
-```
-
-### TrackerPeriod
-
-```typescript
-interface TrackerPeriod {
-    id: string;
-    trackerId: string;
-    userId: string;
+    description: string;
+    status: "active" | "completed" | "abandoned";
     startDate: Date;
-    status: "in_progress" | "complete";
+    endDate: Date;
+    submissionId?: Schema.Types.ObjectId; // Optional link to a worksheet submission
+    createdAt: Date;
+    updatedAt: Date;
 }
 ```
 
 ### TrackerEntry
 
 ```typescript
-interface TrackerEntry {
-    id: string;
-    periodId: string;
-    date: Date;
-    answers: Record<string, string | boolean | string[]>;
+interface ITrackerEntry extends Document {
+    trackerId: Schema.Types.ObjectId;
+    userId: Schema.Types.ObjectId;
+    day: number; // 1-5 for the 5-day tracker
+    completed: boolean;
+    notes: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 ```
 
 ### TrackerReflection
 
 ```typescript
-interface TrackerReflection {
-    id: string;
-    periodId: string;
-    answers: Record<string, string | boolean | string[]>;
-    submittedAt: Date;
+interface ITrackerReflection extends Document {
+    trackerId: Schema.Types.ObjectId;
+    userId: Schema.Types.ObjectId;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 ```
 
 ## Notes
 
-- All IDs are expected to be UUIDs.
-- Tracker flows are designed to allow one active period per tracker per user at a time.
-- Submissions are counted and quota-enforced based on worksheetId and user.subscription
+- All IDs are MongoDB ObjectIds.
+- Trackers are implemented with a simpler model than originally planned:
+  - Each tracker has a fixed 5-day duration with a start and end date
+  - Entries are linked directly to the tracker (not to a period)
+  - Each day (1-5) has a completion status and optional notes
+  - A single reflection is stored per tracker
+- Subscription enforcement is implemented on both frontend and backend for all tracker operations
+- PDF export is available for completed trackers

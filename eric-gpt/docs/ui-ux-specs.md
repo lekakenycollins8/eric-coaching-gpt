@@ -1,5 +1,7 @@
 **Eric GPT Coaching Platform — UI/UX Specification Document**
 
+**Status: Implemented**
+
 ---
 
 ## 1. Overview
@@ -29,7 +31,7 @@ This document defines the UI/UX specifications for the Eric GPT Coaching Platfor
 
 * **Flow**: Org owner visits Team Settings → Sends invites → Teammates register via emailed link → Auto-join org plan
 
-### 2.5 VIP Dashboard
+### 2.5 My Submissions
 
 * **Flow**: Navigate to “My Submissions” → View list of past submissions → Download PDFs
 
@@ -78,9 +80,20 @@ This document defines the UI/UX specifications for the Eric GPT Coaching Platfor
 * See list of added users
 * Remove access (owner only)
 
-### 3.7 My Submissions (VIP only)
+### 3.7 My Submissions
 
-* Table view: Date, Worksheet, PDF Download
+* Table view: Date, Worksheet Title, View/Download PDF buttons
+* Pagination controls for navigating through submission history
+* Empty state with call-to-action when no submissions exist
+
+### 3.8 Tracker Pages
+
+* **Tracker List**: Grid of tracker cards with title, dates, and status indicators
+* **Tracker Detail**: 
+  * 5-day view with completion status and notes for each day
+  * Final reflection section that appears after the tracking period
+  * PDF export button for completed trackers
+* **Create Tracker**: Form with title, description, and start date fields
 
 ---
 
@@ -96,13 +109,15 @@ This document defines the UI/UX specifications for the Eric GPT Coaching Platfor
 
 ## 5. Navigation Structure
 
-* **Top Nav (when logged in)**:
+* **Sidebar Navigation (when logged in)**:
 
-  * Home
-  * Worksheets
-  * Pricing
   * Dashboard
+  * Worksheets
+  * Trackers
+  * My Submissions
   * Profile
+  * Subscription
+  * Settings
   * Logout
 
 * **Top Nav (guest)**:

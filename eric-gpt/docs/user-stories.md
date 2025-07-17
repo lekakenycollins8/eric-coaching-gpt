@@ -80,15 +80,59 @@ As an Org owner, I want to invite up to 4 colleagues by email so that they can j
 
 As an invited team member, I want to click the email invite, sign up or sign in, and be added to the Org so that I can access worksheets under my team's subscription.
 
-## Executive VIP Dashboard
+## My Submissions
 
 ### View Submission History
 
-As an Executive VIP user, I want to see a table of all my past submissions with date, worksheet name, and PDF download link so that I can revisit or export my coaching history.
+As a user, I want to see a paginated table of all my past submissions with date, worksheet name, and PDF download link so that I can revisit or export my coaching history.
 
-### Unlimited Access
+### Unlimited Access for Executive VIP
 
 As an Executive VIP, I want to never be blocked on submission quota so that I can get coaching whenever I need it.
+
+## Trackers & Reflection Tools
+
+### Create New Tracker
+
+As a user, I want to create a new 5-day tracker with a title, description, and start date so that I can track my progress on a specific commitment.
+
+### Log Daily Entries
+
+As a user, I want to mark each day's completion status and add optional notes for my 5-day tracker so that I can record my progress consistently.
+
+### Submit Final Reflection
+
+As a user, I want to add a final reflection after completing my 5-day tracker so that I can document my overall experience and learnings.
+
+### View Tracker History
+
+As a user, I want to see a list of all my active and completed trackers so that I can review my progress over time.
+
+### Download Tracker PDF
+
+As a user, I want to generate and download a PDF summary of my tracker with all entries and reflection so that I can save or share my progress.
+
+## Jackier Method Workbook Integration
+
+### Complete Initial Assessment
+
+As a new user, I want to complete the Jackier Method Workbook so that I can receive a personalized diagnosis of my leadership challenges and get tailored worksheet recommendations.
+
+### Receive AI Diagnosis
+
+As a user, I want to receive an AI-generated diagnosis of my leadership pillars after completing the workbook so that I understand which areas to focus on for improvement.
+
+### Schedule Human Coaching
+
+As a user who has received an AI diagnosis, I want to be prompted to schedule a call with Eric so that I can discuss my results and get personalized human coaching.
+
+### Track Progress with Follow-ups
+
+As an ongoing user, I want to complete follow-up assessments so that I can track my progress and receive updated recommendations based on my development.
+
+### Receive Clarifying Questions
+
+As a user working through worksheets, I want the system to ask me clarifying questions when needed so that my coaching experience becomes more personalized and effective.
 
 ## Security & Compliance (Internal/Technical)
 
@@ -103,3 +147,7 @@ As the backend, I want to validate all incoming fields (types, lengths) so that 
 ### Rate-Limit API
 
 As the platform, I want to throttle submissions to one per second per user so that we mitigate accidental floods or abuse.
+
+### Email Integration
+
+As the system, I want to automatically send workbook responses and AI analysis to help@jackiercoaching.com so that the human coaching team has all necessary information before client calls.

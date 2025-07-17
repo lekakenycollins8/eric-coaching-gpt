@@ -1,7 +1,8 @@
 **Eric GPT Coaching Platform — Final Architecture & API Blueprint**
 
 
-**Date:** April 30, 2025
+**Date:** July 17, 2025
+**Status:** Implemented
 
 ---
 
@@ -11,7 +12,7 @@
 
 ```ts
 interface User {
-  id: string;                     // UUID
+  id: string;                     // MongoDB ObjectId
   email: string;
   name?: string;
   createdAt: Date;
@@ -38,7 +39,7 @@ interface User {
 
 ```ts
 interface Org {
-  id: string;                     // UUID
+  id: string;                     // MongoDB ObjectId
   ownerId: string;                // User.id
   memberIds: string[];            // User.id[] (max 5)
   stripeSubscriptionId: string;
@@ -69,7 +70,7 @@ interface Worksheet {
 
 ```ts
 interface Submission {
-  id: string;                     // UUID
+  id: string;                     // MongoDB ObjectId
   userId: string;
   orgId?: string;
   worksheetId: string;
@@ -87,34 +88,37 @@ interface Submission {
 ### 1.5 Trackers (5-Day Tools)
 
 ```ts
-interface Tracker {
-  id: string;                     // e.g. "pillar1_daily_mindset"
+interface ITracker {
+  id: string;                     // MongoDB ObjectId
+  userId: string;                 // User.id
   title: string;
-  promptFields: Field[];          // daily entry fields
-  reflectionFields: Field[];      // end-of-period fields
-  periodLength: number;           // 5 days
-}
-
-interface TrackerPeriod {
-  id: string;
-  trackerId: string;
-  userId: string;
+  description: string;
+  status: "active"|"completed"|"abandoned";
   startDate: Date;
-  status: "in_progress"|"complete";
+  endDate: Date;
+  submissionId?: string;          // Optional link to a worksheet submission
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface TrackerEntry {
-  id: string;
-  periodId: string;
-  date: Date;
-  answers: Record<string, string|boolean|string[]>;
+interface ITrackerEntry {
+  id: string;                     // MongoDB ObjectId
+  trackerId: string;              // Tracker.id
+  userId: string;                 // User.id
+  day: number;                    // 1-5 for the 5-day tracker
+  completed: boolean;
+  notes: string;                  // Optional daily notes
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface TrackerReflection {
-  id: string;
-  periodId: string;
-  answers: Record<string, string|boolean|string[]>;
-  submittedAt: Date;
+interface ITrackerReflection {
+  id: string;                     // MongoDB ObjectId
+  trackerId: string;              // Tracker.id
+  userId: string;                 // User.id
+  content: string;                // Reflection text
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
@@ -155,14 +159,16 @@ interface TrackerReflection {
 
 #### Trackers & Reflection
 
-| Method | Endpoint                                     | Auth     | Request             | Response                                    |
-| ------ | -------------------------------------------- | -------- | ------------------- | ------------------------------------------- |
-| GET    | `/api/trackers`                              | Required | —                   | `Tracker[]`                                 |
-| POST   | `/api/trackers/:trackerId/start`             | Required | —                   | `{ periodId, startDate }`                   |
-| GET    | `/api/trackers/periods/:periodId`            | Required | —                   | `{ TrackerPeriod, entries[], reflection? }` |
-| POST   | `/api/trackers/periods/:periodId/entries`    | Required | `{ date, answers }` | `{ entryId }`                               |
-| POST   | `/api/trackers/periods/:periodId/reflection` | Required | `{ answers }`       | `{ reflectionId }`                          |
-| GET    | `/api/trackers/periods/:periodId/export`     | Required | —                   | `application/pdf`                           |
+| Method | Endpoint                          | Auth     | Request                                | Response                                |
+| ------ | --------------------------------- | -------- | -------------------------------------- | --------------------------------------- |
+| GET    | `/api/trackers`                   | Required | Optional `status`, `submissionId`      | `Tracker[]`                             |
+| POST   | `/api/trackers`                   | Required | `{ title, description, startDate }`    | `{ tracker }`                           |
+| GET    | `/api/trackers/:id`               | Required | —                                      | `{ tracker, entries[], reflection? }`   |
+| PUT    | `/api/trackers/:id`               | Required | `{ title, description, status }`       | `{ tracker }`                           |
+| DELETE | `/api/trackers/:id`               | Required | —                                      | `{ success: true }`                     |
+| POST   | `/api/trackers/:id/entries`       | Required | `{ day, completed, notes }`            | `{ entry }`                             |
+| POST   | `/api/trackers/:id/reflection`    | Required | `{ content }`                          | `{ reflection }`                        |
+| GET    | `/api/trackers/:id/pdf`           | Required | —                                      | `application/pdf`                       |
 
 #### Stripe Billing
 
@@ -200,9 +206,12 @@ interface TrackerReflection {
 
 #### Puppeteer (PDF)
 
-* Render hidden route `/pdf-template/:submissionId` with React+CSS
-* Launch Puppeteer in serverless mode to generate PDF buffer
-* Return PDF stream or buffer to user
+* Render hidden routes for PDF templates:
+  * `/pdf-template/submission/:id` for worksheet submissions
+  * `/pdf-template/tracker/:id` for tracker exports
+* Launch Puppeteer in serverless mode with @sparticuz/chromium-min for production
+* Regular Puppeteer for local development
+* Return PDF buffer with appropriate headers
 
 ---
 

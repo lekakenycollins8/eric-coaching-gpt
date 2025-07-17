@@ -24,11 +24,15 @@
 
 NextAuth.js handles email magic-links via Nodemailer.
 
-Session JWTs include user ID and subscription state.
+Session JWTs include user ID, with subscription state fetched from database.
 
 #### Subscription Middleware
 
-On each submission endpoint, middleware verifies plan quotas (10/40/).
+Implemented as a service that:
+- Verifies active subscription status before allowing premium features
+- Tracks submission usage against plan quotas (10/40/unlimited)
+- Enforces feature access based on subscription tier
+- Provides detailed debug logging for troubleshooting
 
 Stripe webhooks update user subscription records in MongoDB.
 
@@ -48,17 +52,22 @@ Parses response, persists feedback and tokensUsed.
 
 #### PDF Generation
 
-Dedicated hidden route renders React component for Puppeteer.
-
-On request, Puppeteer generates PDF stream with branding.
+Implemented with a dual approach for development and production:
+- Development: Uses regular Puppeteer
+- Production: Uses @sparticuz/chromium-min for serverless environments
+- Dedicated template routes for both submissions and trackers
+- Robust error handling with fallback options for PDF generation
+- Proxy pattern in web app forwards PDF requests to server with authentication
 
 #### Trackers Module
 
-Tracker definitions (5-day cycles) create periods.
-
-Daily entry saving (auto + manual) and final reflections.
-
-Consolidated PDF export via same Puppeteer flow.
+Implemented as a 5-day commitment tracker with:
+- User creates tracker with title, description, and start date
+- System automatically calculates end date (start date + 4 days)
+- Daily entries track completion status and optional notes
+- Final reflection captured as a single text field
+- PDF export generates a branded summary document
+- Subscription enforcement on all tracker operations
 
 #### Team Collaboration
 
@@ -86,3 +95,27 @@ Invite tokens allow secure onboarding into an Org.
 * Caching:
 	+ Cache worksheet metadata and prompt templates in-memory.
 	+ Consider Redis or Edge caching for usage stats if read-heavy.
+
+### 5. Environment Variables & Configuration
+
+#### Standardized Environment Variables
+
+* `NEXT_PUBLIC_APP_URL`: Web application URL (client-facing)
+* `NEXT_PUBLIC_API_URL`: API server URL (for server-to-server communication)
+* `OPENAI_API_KEY`: OpenAI API authentication
+* `OPENAI_ORG_ID`: OpenAI organization identifier
+* `MONGODB_URI`: Database connection string
+* `STRIPE_SECRET_KEY`: Stripe API authentication
+* `STRIPE_WEBHOOK_SECRET`: For verifying webhook signatures
+* `NEXTAUTH_SECRET`: For JWT encryption
+* `NEXTAUTH_URL`: Auth callback URL
+
+#### Configuration Management
+
+* Environment-specific variables managed through Vercel
+* Centralized configuration files for:
+  * OpenAI models and parameters (`/config/openai.ts`)
+  * Stripe plans and pricing (`/config/stripe.ts`)
+  * System prompts (`/config/prompts/`)
+  * Database collections (`/db/config.ts`)
+* Feature flags and subscription tier requirements managed through quota service

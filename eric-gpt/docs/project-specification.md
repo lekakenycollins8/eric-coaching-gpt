@@ -1,11 +1,132 @@
 **Eric GPT Coaching Platform — Comprehensive Specification Guide**
 
-**Prepared By:** \[Your Name]
-**Date:** April 30, 2025
+**Prepared By:** Eric GPT Development Team
+**Date:** July 17, 2025
+**Status:** Implementation Complete
 
 ---
 
 ## 1. Feature Specifications Guide
+
+### 1.0 Jackier Method Workbook Integration
+
+**Status: Planned**
+
+#### Overview
+The Jackier Method Workbook serves as a mandatory initial assessment for all users, providing AI diagnosis of leadership pillars and creating a bridge between AI coaching and human coaching with Eric Jackier.
+
+#### Key Components
+
+1. **Mandatory Workbook Assessment**
+   - All users must complete the comprehensive Jackier Method Workbook
+   - Assessment collects data on leadership challenges and strengths
+   - Workbook completion enforced before accessing other platform features
+
+2. **AI Diagnosis Engine**
+   - GPT-4 analysis of workbook responses
+   - Identification of primary leadership pillars requiring attention
+   - Personalized worksheet recommendations based on diagnosis
+
+3. **Dual-Delivery Feedback System**
+   - Results delivered to user's dashboard
+   - Complete workbook responses and AI analysis sent to help@jackiercoaching.com
+   - Email notification includes user contact information
+
+4. **Human Coaching Integration**
+   - Prompt to schedule call with Eric after assessment
+   - Calendar integration for booking sessions
+   - Seamless handoff between AI and human coaching
+
+5. **Follow-up Assessment System**
+   - Interactive follow-up worksheets based on progress
+   - Feedback loop to determine worksheet effectiveness
+   - Additional clarifying questions when needed
+   - Adaptive recommendation engine based on ongoing responses
+
+#### Technical Implementation
+
+1. **Data Models**
+   ```typescript
+   interface Workbook {
+     id: string;                     // MongoDB ObjectId
+     title: string;
+     description: string;
+     sections: WorkbookSection[];
+     isRequired: boolean;            // True for mandatory completion
+     createdAt: Date;
+     updatedAt: Date;
+   }
+
+   interface WorkbookSection {
+     title: string;
+     description?: string;
+     questions: WorkbookQuestion[];
+   }
+
+   interface WorkbookQuestion {
+     id: string;                     // Unique identifier
+     text: string;                   // Question text
+     type: "text" | "textarea" | "checkbox" | "multiselect" | "rating";
+     options?: string[];             // For checkbox/multiselect/rating
+     required: boolean;
+   }
+
+   interface WorkbookSubmission {
+     id: string;                     // MongoDB ObjectId
+     userId: string;                 // User.id
+     workbookId: string;             // Workbook.id
+     answers: Record<string, string | boolean | string[]>;
+     diagnosis: {
+       primaryPillars: string[];     // Top leadership pillars to focus on
+       recommendedWorksheets: string[];
+       summary: string;              // Text summary of diagnosis
+     };
+     emailSent: boolean;             // Whether email was sent to coaching team
+     schedulingPrompted: boolean;    // Whether user was prompted to schedule
+     createdAt: Date;
+   }
+
+   interface FollowupAssessment {
+     id: string;                     // MongoDB ObjectId
+     userId: string;                 // User.id
+     workbookSubmissionId: string;   // WorkbookSubmission.id
+     questions: {
+       text: string;
+       answer?: string;
+     }[];
+     recommendations: {
+       worksheetId: string;
+       reason: string;
+     }[];
+     createdAt: Date;
+   }
+   ```
+
+2. **API Endpoints**
+
+   | Method | Endpoint                         | Auth     | Description                                  |
+   | ------ | -------------------------------- | -------- | -------------------------------------------- |
+   | GET    | `/api/workbook`                  | Required | Get Jackier Method Workbook questions        |
+   | POST   | `/api/workbook/submit`           | Required | Submit workbook answers and get diagnosis    |
+   | GET    | `/api/workbook/diagnosis`        | Required | Get personalized diagnosis results          |
+   | GET    | `/api/workbook/followup`         | Required | Get follow-up assessment questions          |
+   | POST   | `/api/workbook/followup/submit`  | Required | Submit follow-up assessment answers         |
+   | POST   | `/api/workbook/schedule`         | Required | Initiate scheduling with Eric               |
+
+3. **Email Integration**
+   - Automated email to help@jackiercoaching.com upon workbook submission
+   - Rich HTML format with workbook responses and AI analysis
+   - Calendar scheduling links included
+
+4. **User Flow**
+   - New user signs up → Directed to complete workbook
+   - Submits workbook → AI generates diagnosis
+   - User receives diagnosis and worksheet recommendations
+   - Email sent to coaching team
+   - User prompted to schedule call with Eric
+   - User works through recommended worksheets
+   - Follow-up assessment determines next steps
+   - Cycle continues with adaptive recommendations
 
 ### 1.1 Worksheet Selection
 
@@ -20,7 +141,7 @@
 * **Submit Action:** On form submit, collect `answers` JSON and `worksheetId`, send `POST /api/submissions`.
 * **Quota Check:** Middleware verifies user’s `submissionsThisPeriod` vs plan limits, returning 403 with upgrade message if exceeded.
 * **Prompt Assembly:** On server, load `systemPrompt` from `prompts.json` using `systemPromptKey`, format user answers, and build chat messages.
-* **OpenAI API Call:** Send `createChatCompletion` with model `gpt-4`, temperature `0.7`, max\_tokens `800`.
+* **OpenAI API Call:** Send `createChatCompletion` with model `gpt-4`, temperature `0.7`, max_tokens `800` using snake_case parameter naming.
 * **Response Handling:** Extract feedback text, record `usage` tokens, save Submission record.
 
 ### 1.3 Feedback Delivery
@@ -45,11 +166,11 @@
 
 ### 1.6 Trackers & Reflection Tools
 
-* **5-Day Period Tools:** Daily Mindset Reset, Self-Belief Tracker, etc.
-* **Start Period:** `POST /api/trackers/:id/start` returns `periodId`, `startDate`.
-* **Daily Entries:** UI renders 5 date rows with promptFields. Autosave on blur + manual Save button calls `POST /entries`.
-* **Final Reflection:** After 5 entries, show reflectionFields; submit `POST /reflection`.
-* **Export Report:** `GET /api/trackers/periods/:id/export` downloads compiled PDF.
+* **5-Day Commitment Tracker:** Allows users to track progress on commitments over 5 consecutive days
+* **Create Tracker:** `POST /api/trackers` with title, description, startDate (endDate auto-calculated)
+* **Daily Entries:** UI renders 5 date rows with completion status and notes fields. Save button calls `POST /api/trackers/[id]/entries`
+* **Final Reflection:** After 5 days, users can add a reflection via `POST /api/trackers/[id]/reflection`
+* **Export Report:** `GET /api/trackers/[id]/pdf` generates and downloads a branded PDF summary
 
 ---
 
@@ -60,7 +181,7 @@
 1. **New User Onboarding:** Landing → Sign Up (magic link) → Pricing → Subscribe → Dashboard.
 2. **Worksheet Completion:** Dashboard → Select Worksheet → Fill Form → Submit → View Feedback → Download PDF.
 3. **Team Setup (Pro):** Dashboard → Team Settings → Invite Teammate → Teammate Onboards → Shared Access.
-4. **Tracker Flow:** Dashboard → Select Tracker → Start 5-Day Period → Daily Entry → Final Reflection → Export.
+4. **Tracker Flow:** Dashboard → Create New Tracker → Fill Daily Entries → Submit Final Reflection → Export PDF.
 5. **Subscription Management:** Profile → View Plan & Usage → Manage Subscription (Stripe Portal).
 
 ### 2.2 Page Layouts & Navigation
@@ -97,8 +218,8 @@
    * **Billing Module:** Stripe checkout, webhooks.
    * **Worksheets Module:** Metadata endpoints.
    * **Submissions Module:** Quota enforcement, GPT integration, PDF generation.
-   * **Trackers Module:** Period lifecycle, entries, reflections, export.
-   * **Database Layer:** MongoDB models & CRUD.
+   * **Trackers Module:** CRUD operations, entries, reflections, PDF export with Puppeteer.
+   * **Database Layer:** MongoDB models with Mongoose schema validation.
 
 ### 3.2 Data Flow
 
