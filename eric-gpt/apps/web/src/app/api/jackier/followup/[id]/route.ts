@@ -37,11 +37,14 @@ export async function GET(
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     
-    // Add the user ID to the query parameters
+    // Add the user ID and worksheetId to the query parameters
     const userId = session.user.id;
-    const userQueryParam = queryString ? `&userId=${userId}` : `?userId=${userId}`;
+    // The server API expects worksheetId as a query parameter, not in the path
+    const worksheetIdParam = `worksheetId=${id}`;
+    const baseQueryString = queryString ? `${queryString}&${worksheetIdParam}` : worksheetIdParam;
+    const userQueryParam = `&userId=${userId}`;
     
-    const apiUrl = `${serverUrl}/api/followup/${id}${queryPart}${userQueryParam}`;
+    const apiUrl = `${serverUrl}/api/followup?${baseQueryString}${userQueryParam}`;
     console.log('Web app: Forwarding request to:', apiUrl);
     
     const response = await fetch(apiUrl, {

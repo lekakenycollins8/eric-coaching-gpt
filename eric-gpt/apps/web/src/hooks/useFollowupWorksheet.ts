@@ -28,7 +28,7 @@ interface FollowupSubmission {
   updatedAt: string;
 }
 
-export function useFollowupWorksheet(worksheetId: string) {
+export function useFollowupWorksheet(worksheetId: string, submissionId: string) {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
   
@@ -44,7 +44,7 @@ export function useFollowupWorksheet(worksheetId: string) {
         throw new Error('Authentication required');
       }
       
-      const response = await fetch(`/api/jackier/followup/${worksheetId}`);
+      const response = await fetch(`/api/jackier/followup/${worksheetId}?submissionId=${submissionId}`);
       
       if (!response.ok) {
         if (response.status === 401) {
@@ -76,7 +76,7 @@ export function useFollowupWorksheet(worksheetId: string) {
         throw new Error('Authentication required');
       }
       
-      const response = await fetch(`/api/jackier/followup/${worksheetId}/submission`);
+      const response = await fetch(`/api/jackier/followup/${worksheetId}/submission?submissionId=${submissionId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -109,7 +109,10 @@ export function useFollowupWorksheet(worksheetId: string) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ 
+          answers,
+          submissionId
+        }),
       });
       
       if (!response.ok) {
@@ -156,7 +159,10 @@ export function useFollowupWorksheet(worksheetId: string) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ 
+          answers,
+          submissionId
+        }),
       });
       
       if (!response.ok) {

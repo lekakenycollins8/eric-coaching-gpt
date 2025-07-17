@@ -96,7 +96,7 @@ export function useJackierWorkbook() {
   } = useQuery({
     queryKey: ['jackier', 'submission'],
     queryFn: async () => {
-      const response = await fetch('/api/jackier/submission');
+      const response = await fetch('/api/jackier/workbook');
       if (!response.ok) {
         if (response.status === 404) {
           // No submission found, return null
@@ -113,8 +113,8 @@ export function useJackierWorkbook() {
    * Save a draft of the workbook submission
    */
   const saveDraftMutation = useMutation({
-    mutationFn: async (answers: Record<string, any>) => {
-      const response = await fetch('/api/jackier/submission', {
+    mutationFn: async (answers: Record<string, unknown>) => {
+      const response = await fetch('/api/jackier/workbook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export function useJackierWorkbook() {
     }
   });
   
-  const saveDraft = async (answers: Record<string, any>) => {
+  const saveDraft = async (answers: Record<string, unknown>) => {
     try {
       setError(null);
       await saveDraftMutation.mutateAsync(answers);
@@ -154,8 +154,8 @@ export function useJackierWorkbook() {
    * Submit the workbook for diagnosis
    */
   const submitWorkbookMutation = useMutation({
-    mutationFn: async (answers: Record<string, any>) => {
-      const response = await fetch('/api/jackier/submission', {
+    mutationFn: async (answers: Record<string, unknown>) => {
+      const response = await fetch('/api/jackier/workbook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export function useJackierWorkbook() {
     }
   });
   
-  const submitWorkbook = async (answers: Record<string, any>) => {
+  const submitWorkbook = async (answers: Record<string, unknown>) => {
     try {
       setError(null);
       return await submitWorkbookMutation.mutateAsync(answers);
@@ -195,6 +195,8 @@ export function useJackierWorkbook() {
    */
   const markDiagnosisViewedMutation = useMutation({
     mutationFn: async (submissionId: string) => {
+      // The server API endpoint is /api/diagnosis with POST method
+      // Our proxy route is /api/jackier/diagnosis/view
       const response = await fetch(`/api/jackier/diagnosis/view`, {
         method: 'POST',
         headers: {

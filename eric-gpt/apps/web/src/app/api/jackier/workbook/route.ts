@@ -103,7 +103,14 @@ export async function POST(request: NextRequest) {
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const apiUrl = `${serverUrl}/api/workbook`;
+    
+    // Determine the correct endpoint based on the status parameter
+    // If status is 'submitted', use the submit endpoint, otherwise use the save endpoint
+    const status = body.status || 'draft';
+    const endpoint = status === 'submitted' ? 'submit' : 'save';
+    const apiUrl = `${serverUrl}/api/workbook/${endpoint}`;
+    
+    console.log(`Web app: Forwarding ${status} request to:`, apiUrl);
     
     const response = await fetch(apiUrl, {
       method: 'POST',

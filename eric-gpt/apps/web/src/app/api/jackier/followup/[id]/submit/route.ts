@@ -32,15 +32,20 @@ export async function POST(
     // Parse the request body
     const body = await request.json().catch(() => ({}));
     
-    // Add the user ID to the body
+    // Add the user ID and worksheetId to the body
     const bodyWithUser = {
       ...body,
-      userId: session.user.id
+      userId: session.user.id,
+      worksheetId: id,
+      // The server expects a submissionId for the original workbook submission
+      // This should be passed in the request body from the client
+      submissionId: body.submissionId
     };
 
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const apiUrl = `${serverUrl}/api/followup/${id}/submit`;
+    // The server API expects a POST to /api/followup
+    const apiUrl = `${serverUrl}/api/followup`;
     
     const response = await fetch(apiUrl, {
       method: 'POST',

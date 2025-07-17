@@ -5,12 +5,9 @@ import { authOptions } from '@/lib/auth';
 export const dynamic = 'force-dynamic';
 
 /**
- * Proxy endpoint to forward Jackier followup worksheet submission requests to the server API
+ * Proxy endpoint to mark a diagnosis as viewed
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
     // Get the authenticated user session
     const session = await getServerSession(authOptions);
@@ -21,38 +18,26 @@ export async function GET(
       );
     }
 
-    const { id } = params;
-    if (!id) {
-      return NextResponse.json(
-        { error: 'Worksheet ID is required' },
-        { status: 400 }
-      );
-    }
+    // Parse the request body
+    const body = await request.json().catch(() => ({}));
+    
+    // Add the user ID to the body
+    const bodyWithUser = {
+      ...body,
+      userId: session.user.id
+    };
 
-    // Get query parameters
-    const searchParams = request.nextUrl.searchParams;
-    const submissionId = searchParams.get('submissionId');
-    
-    if (!submissionId) {
-      return NextResponse.json(
-        { error: 'Submission ID is required' },
-        { status: 400 }
-      );
-    }
-    
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    
-    // Add the user ID and worksheetId to the query parameters
-    const userId = session.user.id;
-    // The server API expects a GET to /api/followup with submissionId and worksheetId
-    const apiUrl = `${serverUrl}/api/followup?submissionId=${submissionId}&worksheetId=${id}&userId=${userId}`;
+    // Based on server API structure, the correct endpoint is /api/diagnosis with POST method
+    const apiUrl = `${serverUrl}/api/diagnosis`;
     
     const response = await fetch(apiUrl, {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(bodyWithUser),
     });
 
     // Check if response is OK before trying to parse JSON
@@ -69,13 +54,7 @@ export async function GET(
         );
       }
       
-      // For 404, return null as it means no submission exists yet
-      if (response.status === 404) {
-        return NextResponse.json(null);
-      }
-      
       const errorData = await response.json().catch(() => ({ error: 'Could not parse error response' }));
-      console.error('Server returned an error:', response.status, errorData);
       return NextResponse.json(
         errorData,
         { status: response.status }
@@ -90,7 +69,7 @@ export async function GET(
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error in followup submission API route:', error);
+    console.error('Error in diagnosis view API route:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
