@@ -26,14 +26,19 @@ export function SubscriptionUI({
   formatDate,
   calculateProratedPrice
 }: SubscriptionUIProps) {
-
-  if (loading) {
+  // Use React.memo for expensive components
+  const LoadingSpinner = React.useMemo(() => {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center">
         <div className="w-16 h-16 border-t-4 border-green-500 border-solid rounded-full animate-spin"></div>
         <p className="mt-4 text-lg">Loading subscription details...</p>
       </div>
     );
+  }, []);
+
+  // Prevent flickering by using a stable loading state
+  if (loading && !subscription) {
+    return LoadingSpinner;
   }
 
   console.log('Subscription:', subscription);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -25,7 +25,8 @@ export default function DashboardLayout({
   const { data: session } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const navigation = [
+  // Memoize navigation items to prevent re-renders
+  const navigation = useMemo(() => [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
     { name: 'Profile', href: '/dashboard/profile', icon: UserIcon },
     { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
@@ -33,7 +34,55 @@ export default function DashboardLayout({
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
     { name: 'Jackier Workbook', href: '/dashboard/jackier', icon: DocumentTextIcon },
-  ];
+  ], []);
+  
+  // Memoize the navigation rendering to prevent re-renders
+  const renderNavigation = useCallback(() => {
+    return (
+      <nav className="flex flex-1 flex-col mt-5">
+        <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          <li>
+            <ul role="list" className="-mx-2 space-y-1">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold ${
+                        isActive
+                          ? 'bg-gray-50 text-green-600'
+                          : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <item.icon
+                        className={`h-6 w-6 shrink-0 ${
+                          isActive ? 'text-green-600' : 'text-gray-400 group-hover:text-green-600'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+          <li className="mt-auto">
+            <Link
+              href="/api/auth/signout"
+              className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-red-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400 group-hover:text-red-600">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+              </svg>
+              Sign out
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    );
+  }, [navigation, pathname]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -93,51 +142,4 @@ export default function DashboardLayout({
       </div>
     </div>
   );
-
-  function renderNavigation() {
-    return (
-      <nav className="flex flex-1 flex-col mt-5">
-        <ul role="list" className="flex flex-1 flex-col gap-y-7">
-          <li>
-            <ul role="list" className="-mx-2 space-y-1">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold ${
-                        isActive
-                          ? 'bg-gray-50 text-green-600'
-                          : 'text-gray-700 hover:text-green-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <item.icon
-                        className={`h-6 w-6 shrink-0 ${
-                          isActive ? 'text-green-600' : 'text-gray-400 group-hover:text-green-600'
-                        }`}
-                        aria-hidden="true"
-                      />
-                      {item.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </li>
-          <li className="mt-auto">
-            <Link
-              href="/api/auth/signout"
-              className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-red-600"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400 group-hover:text-red-600">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-              </svg>
-              Sign out
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    );
-  }
 }

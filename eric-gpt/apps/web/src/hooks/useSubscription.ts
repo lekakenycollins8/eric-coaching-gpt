@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { STRIPE_PLANS, formatPrice, type PlanId } from '../lib/stripe/plans';
@@ -31,6 +31,10 @@ export function useSubscription() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   
+  // Use refs to avoid unnecessary re-renders
+  const subscriptionRef = useRef<Subscription | null>(null);
+  const hasStripeCustomerIdRef = useRef(false);
+  
   // Check if the URL indicates a successful subscription
   const hasJustSubscribed = searchParams.get('success') === 'true' || searchParams.get('subscribed') === 'true';
 
@@ -42,14 +46,28 @@ export function useSubscription() {
         if (cachedSubscription) {
           const parsed = JSON.parse(cachedSubscription);
           console.log('Loaded cached subscription data:', parsed);
+          
+          // Update both ref and state
+          subscriptionRef.current = parsed;
           setSubscription(parsed);
-          // Still mark as loading until we get fresh data
+          
+          // Set loading to false briefly to prevent flickering
+          // This gives the UI a chance to render with cached data
+          setLoading(false);
+          
+          // Then set loading back to true after a short delay
+          // This indicates we're still fetching fresh data
+          setTimeout(() => {
+            if (authStatus === 'loading') {
+              setLoading(true);
+            }
+          }, 0);
         }
       } catch (e) {
         console.error('Error loading cached subscription:', e);
       }
     }
-  }, []);
+  }, [authStatus]);
 
   useEffect(() => {
     if (authStatus === 'authenticated' && session?.user?.id) {
@@ -88,7 +106,9 @@ export function useSubscription() {
       console.log('Subscription data:', data);
       
       // Check if the user has a Stripe customer ID
-      setHasStripeCustomerId(!!data.stripeCustomerId);
+      const hasStripeId = !!data.stripeCustomerId;
+      hasStripeCustomerIdRef.current = hasStripeId;
+      setHasStripeCustomerId(hasStripeId);
       
       // Only process subscription data if the user actually has a subscription
       // with valid data (has a status field at minimum AND status is valid)
@@ -97,7 +117,7 @@ export function useSubscription() {
       const validStatuses = ['active', 'past_due'];
       if (data.subscription && data.subscription.status && validStatuses.includes(data.subscription.status)) {
         // Convert date strings to Date objects and handle potential invalid dates
-        const subscription = {
+        const subscriptionData = {
           ...data.subscription,
           // Only use planId if it exists, don't add a default for new accounts
           planId: data.subscription.planId || '',
@@ -108,32 +128,33 @@ export function useSubscription() {
           currentPeriodEnd: data.subscription.currentPeriodEnd ? 
             new Date(data.subscription.currentPeriodEnd) : 
             new Date(),
-          // Ensure submissions count exists
           submissionsThisPeriod: data.subscription.submissionsThisPeriod || 0
         };
         
-        // Log the processed subscription for debugging
-        console.log('Processed subscription:', subscription);
+        // Update ref first to avoid unnecessary re-renders
+        subscriptionRef.current = subscriptionData;
         
-        // Cache the subscription data in localStorage
+        // Then update state (this will trigger a render)
+        setSubscription(subscriptionData);
+        
+        // Cache the subscription data in localStorage for faster initial loading
         if (typeof window !== 'undefined') {
           try {
-            localStorage.setItem('eric_subscription_cache', JSON.stringify(subscription));
-            console.log('Cached subscription data in localStorage');
+            localStorage.setItem('eric_subscription_cache', JSON.stringify(subscriptionData));
           } catch (e) {
-            console.error('Error caching subscription data:', e);
+            console.error('Error caching subscription:', e);
           }
         }
-        
-        setSubscription(subscription);
       } else {
-        // User doesn't have an active subscription
+        // If no valid subscription, set to null
+        subscriptionRef.current = null;
         setSubscription(null);
       }
-      
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching subscription:', error);
+      subscriptionRef.current = null;
+      setSubscription(null);
+    } finally {
       setLoading(false);
     }
   };
