@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
     '/api/workbook/status',
     '/api/workbook/save',
     '/api/workbook/submit',
+    '/api/workbook/submission',
     '/api/diagnosis',
     '/api/followup',
     // Add other known API routes here

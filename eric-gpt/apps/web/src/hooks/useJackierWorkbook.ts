@@ -112,14 +112,20 @@ export function useJackierWorkbook() {
           console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
           throw new Error(`Server error: ${response.status}`);
         }
-        
-        if (response.status === 404) {
-          // No submission found, return null
-          return null;
-        }
         throw new Error(`Failed to fetch submission: ${response.status}`);
       }
-      return response.json() as Promise<WorkbookSubmission>;
+      
+      // Parse the response
+      const responseData = await response.json();
+      
+      // Check if submission exists using the new format
+      if (!responseData.exists) {
+        // No submission found, return null
+        return null;
+      }
+      
+      // Return the actual submission data
+      return responseData.data as WorkbookSubmission;
     },
     enabled: !!session?.user,
   });

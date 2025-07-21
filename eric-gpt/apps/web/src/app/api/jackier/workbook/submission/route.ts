@@ -34,11 +34,6 @@ export async function GET() {
     }
     
     if (!response.ok) {
-      if (response.status === 404) {
-        // No submission found, return 404
-        return NextResponse.json(null, { status: 404 });
-      }
-      
       const errorData = await response.json();
       return NextResponse.json(
         { error: errorData.message || 'Failed to fetch submission' },
@@ -47,6 +42,8 @@ export async function GET() {
     }
     
     const data = await response.json();
+    // Pass through the response structure from the server API
+    // This maintains the exists flag and data structure for the UI
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error in jackier submission API route:', error);
