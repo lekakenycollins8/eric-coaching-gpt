@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface ISubmission extends Document {
   _id: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
-  orgId?: Schema.Types.ObjectId;
+  // orgId field removed as Organization feature isn't needed
   worksheetId: string;
   worksheetTitle?: string;
   answers: Record<string, any>;
@@ -19,7 +19,7 @@ export interface ISubmission extends Document {
 const SubmissionSchema: Schema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization" },
+    // orgId field removed as Organization feature isn't needed
     worksheetId: { type: String, required: true },
     worksheetTitle: { type: String },
     answers: { type: Schema.Types.Mixed, required: true },
@@ -35,7 +35,7 @@ const SubmissionSchema: Schema = new Schema(
 
 // Create index for faster queries
 SubmissionSchema.index({ userId: 1, createdAt: -1 });
-SubmissionSchema.index({ orgId: 1, createdAt: -1 });
+// Index for orgId removed as Organization feature isn't needed
 
 // Check if the model already exists to prevent overwriting during hot reloads
 import { Collections } from '@/db/config';

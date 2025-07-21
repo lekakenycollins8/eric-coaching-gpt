@@ -5,7 +5,7 @@ export interface IUser extends Document {
   email: string;
   image?: string;
   emailVerified?: Date;
-  orgId?: Schema.Types.ObjectId;
+  // orgId field removed as Organization feature isn't needed
   stripeCustomerId?: string;
   isActive: boolean;
   subscription?: {
@@ -23,7 +23,7 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true },
     image: String,
     emailVerified: Date,
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization" },
+    // orgId field removed as Organization feature isn't needed
     stripeCustomerId: { type: String },
     isActive: { type: Boolean, default: true },
     subscription: {

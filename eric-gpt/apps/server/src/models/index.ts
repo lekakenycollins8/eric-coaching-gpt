@@ -2,7 +2,7 @@ import { Collections } from '@/db/config';
 
 // Import models
 import User from './User';
-import Organization from './Organization';
+// Organization model removed as it's not needed
 import Worksheet from './Worksheet';
 import Submission from './Submission';
 import Subscription from './Subscription';
@@ -15,7 +15,7 @@ import TrackerReflection from './TrackerReflection';
 // Export collection names for reference
 export const ModelCollections = {
   User: Collections.USERS,
-  Organization: 'organizations',
+  // Organization collection removed as it's not needed
   Worksheet: Collections.WORKSHEETS,
   Submission: Collections.WORKSHEET_SUBMISSIONS,
   Subscription: Collections.SUBSCRIPTIONS,
@@ -28,7 +28,7 @@ export const ModelCollections = {
 // Export models
 export {
   User,
-  Organization,
+  // Organization removed as it's not needed
   Worksheet,
   Submission,
   Subscription,
