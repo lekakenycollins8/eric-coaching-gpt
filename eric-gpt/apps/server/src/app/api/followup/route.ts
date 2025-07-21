@@ -3,9 +3,12 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { User } from '@/models';
-import WorkbookSubmission, { IWorksheetSubmission } from '@/models/WorkbookSubmission';
-import mongoose from 'mongoose';
+import { IUser } from '@/models/User';
+import WorkbookSubmission, { IWorkbookSubmission, IWorksheetSubmission } from '@/models/WorkbookSubmission';
+import { FollowupAssessment, IFollowupAssessment } from '@/models/FollowupAssessment';
+import mongoose, { Document } from 'mongoose';
 import { loadWorksheet, validateFollowupAnswers, PILLAR_TYPES, FOLLOWUP_TYPES, PillarType, FollowupType, WorksheetType } from '@/utils/followupUtils';
+import { emailService } from '@/services/emailService';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,11 +128,11 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get the recommended follow-up worksheet ID
-    const { pillars = [], followup } = submission.diagnosis.followupWorksheets;
+    // Get the recommended pillar worksheets
+    const { pillars = [] } = submission.diagnosis.followupWorksheets;
     
     // Check if we have any worksheet recommendations
-    if (!followup && pillars.length === 0) {
+    if (pillars.length === 0) {
       return NextResponse.json(
         { error: 'No worksheets recommended' },
         { status: 404 }
@@ -155,9 +158,11 @@ export async function GET(request: Request) {
         );
       }
     } else {
-      // For follow-up worksheets, use the provided ID or the recommended follow-up
-      targetWorksheetId = worksheetId || followup;
+      // For follow-up worksheets, use the provided ID or check if we have implementation follow-ups
+      targetWorksheetId = worksheetId;
       
+      // If no specific worksheet ID was provided, we need to determine which follow-up to use
+      // This would typically come from the implementation-support-followup.json file
       if (!targetWorksheetId) {
         return NextResponse.json(
           { error: 'No follow-up worksheet recommended' },
@@ -198,8 +203,7 @@ export async function GET(request: Request) {
       existingAnswers,
       submittedAt,
       worksheetType,
-      recommendedPillars: pillars,
-      recommendedFollowup: followup
+      recommendedPillars: pillars
     });
   } catch (error) {
     console.error('Error retrieving follow-up worksheet:', error);
@@ -346,6 +350,18 @@ export async function POST(request: Request) {
       );
     }
     
+    // Create a new FollowupAssessment record for better tracking
+    const followupAssessment = new FollowupAssessment({
+      userId: user._id,
+      workbookSubmissionId: submission._id as unknown as mongoose.Types.ObjectId,
+      followupId: worksheetId,
+      status: 'completed',
+      answers,
+      completedAt: new Date()
+    });
+    
+    await followupAssessment.save();
+    
     if (isPillar) {
       // For pillar worksheets, store in the pillars array
       if (!submission.pillars) {
@@ -374,19 +390,64 @@ export async function POST(request: Request) {
       }
     } else {
       // For follow-up worksheets, use the followup field
-      submission.followup = {
+      // Create a new worksheet submission object
+      const followupSubmission: IWorksheetSubmission = {
         worksheetId,
         answers,
         submittedAt: new Date()
       };
+      
+      // Set it on the submission
+      submission.followup = followupSubmission;
+    }
+    
+    // Send email notification to coaching team
+    try {
+      // Cast to Document type to satisfy TypeScript
+      const userDoc = user as IUser & Document;
+      const followupDoc = followupAssessment as IFollowupAssessment & Document;
+      const submissionDoc = submission as IWorkbookSubmission & Document;
+      
+      await emailService.sendFollowupSubmissionNotification(userDoc, followupDoc, submissionDoc);
+    } catch (emailError) {
+      console.error('Error sending follow-up notification email:', emailError);
+      // Continue processing even if email fails
+    }
+    
+    // Check if we should prompt for coaching
+    // We'll prompt if this is the user's first follow-up submission
+    // or if they've completed multiple follow-ups
+    const followupCount = await FollowupAssessment.countDocuments({
+      userId: user._id,
+      status: 'completed'
+    });
+    
+    if (followupCount === 1 || followupCount % 3 === 0) {
+      // Update the submission to track that we've prompted for scheduling
+      submission.schedulingPrompted = true;
+      
+      // Send coaching prompt email
+      try {
+        // Cast to Document type to satisfy TypeScript
+        const userDoc = user as IUser & Document;
+        const submissionId = (submission._id as unknown as mongoose.Types.ObjectId).toString();
+        
+        await emailService.sendCoachingPrompt(userDoc, submissionId);
+      } catch (promptError) {
+        console.error('Error sending coaching prompt email:', promptError);
+        // Continue processing even if email fails
+      }
     }
     
     await submission.save();
 
+    // Return success response with coaching prompt information
     return NextResponse.json({
       success: true,
-      worksheetId,
-      worksheetType: isPillar ? 'pillar' : 'followup'
+      message: 'Follow-up worksheet submitted successfully',
+      id: followupAssessment._id,
+      shouldPromptCoaching: submission.schedulingPrompted || false,
+      worksheetTitle: worksheet?.title || 'Follow-up'
     });
   } catch (error) {
     console.error('Error submitting follow-up worksheet:', error);
