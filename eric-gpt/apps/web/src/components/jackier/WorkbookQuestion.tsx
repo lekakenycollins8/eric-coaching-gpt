@@ -38,8 +38,8 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           control={control}
           name={fieldName}
           render={({ field }) => (
-            <div className="mb-4">
-              <Label htmlFor={fieldName} className="block mb-2">
+            <div className="mb-8">
+              <Label htmlFor={fieldName} className="block mb-3 font-medium">
                 {question.text} {isRequired && <span className="text-red-500">*</span>}
               </Label>
               <Input
@@ -50,7 +50,7 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
                 aria-invalid={!!errors[fieldName]}
               />
               {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-1">{String(errors[fieldName]?.message)}</p>
+                <p className="text-sm text-red-500 mt-2">{String(errors[fieldName]?.message)}</p>
               )}
             </div>
           )}
@@ -64,19 +64,19 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           control={control}
           name={fieldName}
           render={({ field }) => (
-            <div className="mb-4">
-              <Label htmlFor={fieldName} className="block mb-2">
+            <div className="mb-8">
+              <Label htmlFor={fieldName} className="block mb-3 font-medium">
                 {question.text} {isRequired && <span className="text-red-500">*</span>}
               </Label>
               <Textarea
                 id={fieldName}
                 {...field}
                 value={field.value || ''}
-                className="w-full min-h-[100px]"
+                className="w-full min-h-[120px]"
                 aria-invalid={!!errors[fieldName]}
               />
               {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-1">{String(errors[fieldName]?.message)}</p>
+                <p className="text-sm text-red-500 mt-2">{String(errors[fieldName]?.message)}</p>
               )}
             </div>
           )}
@@ -91,11 +91,11 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           control={control}
           name={fieldName}
           render={({ field }) => (
-            <div className="mb-4">
-              <Label htmlFor={fieldName} className="block mb-2">
+            <div className="mb-8">
+              <Label htmlFor={fieldName} className="block mb-3 font-medium">
                 {question.text} {isRequired && <span className="text-red-500">*</span>}
               </Label>
-              <div className="py-4">
+              <div className="py-6 px-2">
                 <Slider
                   id={fieldName}
                   min={question.min || 1}
@@ -103,17 +103,18 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
                   step={1}
                   value={field.value ? [field.value] : [question.min || 1]}
                   onValueChange={(value) => field.onChange(value[0])}
+                  className="mb-4"
                 />
-                <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                <div className="flex justify-between mt-3 text-sm text-muted-foreground">
                   <span>{question.min || 1}</span>
                   <span>{question.max || 10}</span>
                 </div>
-                <div className="text-center mt-2">
+                <div className="text-center mt-4 font-medium">
                   Selected: <strong>{field.value || (question.min || 1)}</strong>
                 </div>
               </div>
               {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-1">{String(errors[fieldName]?.message)}</p>
+                <p className="text-sm text-red-500 mt-2">{String(errors[fieldName]?.message)}</p>
               )}
             </div>
           )}
@@ -127,24 +128,24 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           control={control}
           name={fieldName}
           render={({ field }) => (
-            <div className="mb-4">
-              <Label className="block mb-2">
+            <div className="mb-8">
+              <Label className="block mb-3 font-medium">
                 {question.text} {isRequired && <span className="text-red-500">*</span>}
               </Label>
               <RadioGroup
                 value={field.value || ''}
                 onValueChange={field.onChange}
-                className="space-y-2"
+                className="space-y-3 mt-2 pl-1"
               >
                 {question.options?.map((option: string, i: number) => (
-                  <div key={i} className="flex items-center space-x-2">
+                  <div key={i} className="flex items-center space-x-3">
                     <RadioGroupItem value={option} id={`${fieldName}-${i}`} />
-                    <Label htmlFor={`${fieldName}-${i}`}>{option}</Label>
+                    <Label htmlFor={`${fieldName}-${i}`} className="text-base">{option}</Label>
                   </div>
                 ))}
               </RadioGroup>
               {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-1">{String(errors[fieldName]?.message)}</p>
+                <p className="text-sm text-red-500 mt-3">{String(errors[fieldName]?.message)}</p>
               )}
             </div>
           )}
@@ -158,13 +159,13 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           control={control}
           name={fieldName}
           render={({ field }) => (
-            <div className="mb-4">
-              <Label className="block mb-2">
+            <div className="mb-8">
+              <Label className="block mb-3 font-medium">
                 {question.text} {isRequired && <span className="text-red-500">*</span>}
               </Label>
-              <div className="space-y-2">
+              <div className="space-y-3 mt-2 pl-1">
                 {question.options?.map((option: string, i: number) => (
-                  <div key={i} className="flex items-center space-x-2">
+                  <div key={i} className="flex items-center space-x-3">
                     <Checkbox
                       id={`${fieldName}-${i}`}
                       checked={(field.value || []).includes(option)}
@@ -175,13 +176,14 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
                           : currentValue.filter((val: string) => val !== option);
                         field.onChange(newValue);
                       }}
+                      className="h-5 w-5"
                     />
-                    <Label htmlFor={`${fieldName}-${i}`}>{option}</Label>
+                    <Label htmlFor={`${fieldName}-${i}`} className="text-base">{option}</Label>
                   </div>
                 ))}
               </div>
               {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-1">{String(errors[fieldName]?.message)}</p>
+                <p className="text-sm text-red-500 mt-3">{String(errors[fieldName]?.message)}</p>
               )}
             </div>
           )}
@@ -190,8 +192,8 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
       
     case 'info':
       return (
-        <div key={fieldName} className="mb-4 p-4 bg-muted rounded-md">
-          <p>{question.text}</p>
+        <div key={fieldName} className="mb-8 p-6 bg-muted rounded-md">
+          <p className="text-base">{question.text}</p>
         </div>
       );
       

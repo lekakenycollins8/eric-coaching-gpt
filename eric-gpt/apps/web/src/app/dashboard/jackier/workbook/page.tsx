@@ -222,8 +222,9 @@ export default function WorkbookPage() {
   }
   
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-4 flex justify-between items-center">
+    <div className="container mx-auto py-6 px-4 sm:px-6 max-w-5xl">
+      {/* Header with navigation and save button */}
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <Link href="/dashboard/jackier">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -231,7 +232,7 @@ export default function WorkbookPage() {
           </Button>
         </Link>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <AutoSaveStatus status={autoSaveStatus} />
           
           <Button 
@@ -239,39 +240,46 @@ export default function WorkbookPage() {
             size="sm" 
             onClick={handleSave} 
             disabled={isSaving || !isDirty}
+            className="ml-auto sm:ml-0"
           >
-            <Save className="h-4 w-4 mr-1" />
+            <Save className="h-4 w-4 mr-2" />
             Save Progress
           </Button>
         </div>
       </div>
       
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">{workbook.title}</h1>
-        <p className="text-muted-foreground mb-4">{workbook.description}</p>
+      {/* Workbook title and progress */}
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-3">{workbook.title}</h1>
+        <p className="text-muted-foreground mb-5">{workbook.description}</p>
         
-        <div className="mb-6">
+        <div>
           <WorkbookProgress progress={progress} />
         </div>
       </div>
       
+      {/* Form with tabs */}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-              {workbook.sections.map((section, index) => (
-                <TabsTrigger 
-                  key={index} 
-                  value={`section-${index}`}
-                  className="text-xs md:text-sm"
-                >
-                  Section {index + 1}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            {/* Tab navigation - scrollable on mobile */}
+            <div className="overflow-x-auto pb-2">
+              <TabsList className="inline-flex min-w-full sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                {workbook.sections.map((section, index) => (
+                  <TabsTrigger 
+                    key={index} 
+                    value={`section-${index}`}
+                    className="text-xs sm:text-sm whitespace-nowrap"
+                  >
+                    Section {index + 1}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
             
+            {/* Tab content */}
             {workbook.sections.map((section, sectionIndex) => (
-              <TabsContent key={sectionIndex} value={`section-${sectionIndex}`}>
+              <TabsContent key={sectionIndex} value={`section-${sectionIndex}`} className="pt-2">
                 <WorkbookSection
                   section={section}
                   isFirstSection={sectionIndex === 0}

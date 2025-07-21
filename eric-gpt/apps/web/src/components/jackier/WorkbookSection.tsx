@@ -34,22 +34,23 @@ export function WorkbookSection({
 }: WorkbookSectionProps) {
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{section.title}</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl">{section.title}</CardTitle>
         {section.description && (
-          <CardDescription>{section.description}</CardDescription>
+          <CardDescription className="mt-2">{section.description}</CardDescription>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6 pt-2">
         {children}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex flex-col sm:flex-row justify-between gap-4 pt-6">
         <Button
           type="button"
           variant="outline"
           onClick={onPrevious}
           disabled={isFirstSection}
+          className="w-full sm:w-auto order-2 sm:order-1"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous Section
@@ -59,6 +60,7 @@ export function WorkbookSection({
           <Button
             type="button"
             onClick={onNext}
+            className="w-full sm:w-auto order-1 sm:order-2"
           >
             Next Section
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -67,6 +69,7 @@ export function WorkbookSection({
           <Button
             type="submit"
             disabled={isSubmitting || hasErrors}
+            className="w-full sm:w-auto order-1 sm:order-2"
           >
             {isSubmitting ? (
               <>
