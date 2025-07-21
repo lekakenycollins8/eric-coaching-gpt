@@ -22,11 +22,14 @@ This document outlines the integration of the Jackier Method Workbook with the E
    - Email notification to help@jackiercoaching.com with user responses and AI analysis
    - Seamless handoff between AI and human coaching
 
-4. **Follow-up System**
-   - Interactive follow-up worksheets based on progress
+4. **Enhanced Follow-up System**
+   - Contextual follow-up worksheets based on specific user challenges
+   - Intelligent timing for follow-up recommendations (1-2 weeks after completion)
+   - Progress tracking visualization of the user's leadership journey
+   - Reflection features that reference previous worksheet answers
+   - Coaching integration at strategic points in the user journey
+   - Adaptive content that tailors questions based on previous responses
    - Feedback loop to determine if current worksheets are effective
-   - Additional clarifying questions when needed
-   - Adaptive recommendation engine based on ongoing user responses
 
 ## User Flow
 
@@ -46,7 +49,10 @@ This document outlines the integration of the Jackier Method Workbook with the E
    - If current worksheets are effective
    - If additional clarification is needed
    - What next steps would be most beneficial
-9. Cycle continues with adaptive recommendations
+9. User sees their progress on their leadership journey visualization
+10. At strategic points, user is offered coaching integration with Eric
+11. Follow-up worksheets adapt based on user's previous responses
+12. Cycle continues with increasingly personalized recommendations
 
 ## Technical Requirements
 
@@ -55,6 +61,9 @@ This document outlines the integration of the Jackier Method Workbook with the E
    - `WorkbookSubmission` model with comprehensive response data
    - `DiagnosisResult` model linking workbook to recommendations
    - `FollowupAssessment` model for tracking progress
+   - `WorksheetRelationship` model to track connections between pillar and follow-up worksheets
+   - `UserProgress` model for visualizing the leadership development journey
+   - `CoachingTouchpoint` model to track coaching integration opportunities
 
 2. **API Endpoints**
    - `/api/workbook` - Get workbook questions
@@ -62,6 +71,9 @@ This document outlines the integration of the Jackier Method Workbook with the E
    - `/api/diagnosis` - Get personalized diagnosis results
    - `/api/followup` - Get/submit follow-up assessments
    - `/api/schedule` - Initiate scheduling with Eric
+   - `/api/progress` - Get user's leadership journey progress
+   - `/api/related-submissions` - Get related worksheet submissions
+   - `/api/coaching-touchpoints` - Get/submit coaching integration requests
 
 3. **Email Integration**
    - Automated email to help@jackiercoaching.com
@@ -112,11 +124,14 @@ This document outlines the integration of the Jackier Method Workbook with the E
 - Add contact page link integration
 - Test email delivery to help@jackiercoaching.com
 
-### Phase 5: Follow-up System & Final Integration
-- Implement follow-up assessment system
-- Create notification mechanism for follow-up worksheets
-- Build follow-up assessment UI
-- Integrate with existing worksheet system
+### Phase 5: Enhanced Follow-up System & Final Integration
+- Implement contextual follow-up assessment system
+- Create intelligent notification mechanism with optimal timing for follow-up worksheets
+- Build adaptive follow-up assessment UI that references previous worksheet answers
+- Implement progress tracking visualization for user's leadership journey
+- Develop reflection features that connect pillar and follow-up worksheets
+- Add coaching integration touchpoints at strategic moments in the user journey
+- Create adaptive content system that tailors questions based on previous responses
 - Perform comprehensive testing and bug fixes
 
 ## Technical Integration Notes
@@ -145,3 +160,41 @@ This document outlines the integration of the Jackier Method Workbook with the E
 - Implement secure data handling for sensitive coaching information
 - Develop seamless transition between AI and human coaching interactions
 - Build adaptive system that improves recommendations over time
+
+## Enhanced Follow-up System Implementation
+
+### Contextual Recommendations
+- Analyze user submissions to identify specific challenges
+- Map challenges to appropriate follow-up worksheets
+- Generate personalized explanations for each recommendation
+- Store recommendation context for future reference
+
+### Progress Tracking Visualization
+- Design leadership journey map UI component
+- Create data structure for tracking completed worksheets
+- Implement visual connections between related worksheets
+- Add progress indicators and achievement markers
+
+### Intelligent Follow-up Timing
+- Implement notification scheduling system
+- Create algorithm to determine optimal follow-up timing
+- Design reminder emails with context from previous work
+- Add user preferences for notification frequency
+
+### Reflection and Integration Features
+- Build UI components to display previous worksheet insights
+- Create reflection prompts based on previous answers
+- Implement progress self-assessment features
+- Store and retrieve key insights for contextual display
+
+### Enhanced Coaching Integration
+- Add coaching request fields to follow-up worksheets
+- Create system to package worksheet responses for coaching context
+- Implement "Request Coaching Session" workflow
+- Design coach dashboard for viewing user progress
+
+### Adaptive Content System
+- Build logic to filter and prioritize questions based on previous answers
+- Create dynamic worksheet generation system
+- Implement difficulty adjustment based on user mastery
+- Design adaptive prompts that reference specific user challenges
