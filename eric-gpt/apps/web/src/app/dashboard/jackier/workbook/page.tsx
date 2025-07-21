@@ -147,9 +147,16 @@ export default function WorkbookPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirty, workbook, saveDraft]);
   
-  // Load initial data from user submission if available
+  // Check if the workbook is already submitted and redirect to diagnosis
   useEffect(() => {
-    // Only proceed if we have a valid submission with answers
+    // If we have a submission with status 'submitted', redirect to diagnosis page
+    if (userSubmission?.status === 'submitted') {
+      console.log('Workbook already submitted, redirecting to diagnosis page');
+      router.push('/dashboard/jackier/diagnosis');
+      return;
+    }
+    
+    // Only proceed if we have a valid submission with answers (draft)
     if (userSubmission?.answers && Object.keys(userSubmission.answers).length > 0) {
       console.log('Resetting form with saved answers:', userSubmission.answers);
       
@@ -161,7 +168,7 @@ export default function WorkbookPage() {
     } else {
       console.log('No saved answers found or empty answers object');
     }
-  }, [userSubmission, reset]);
+  }, [userSubmission, reset, router]);
   
   // Handle manual save
   const handleSave = async () => {

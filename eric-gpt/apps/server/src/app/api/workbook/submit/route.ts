@@ -5,6 +5,7 @@ import { connectToDatabase } from '@/db/connection';
 import { User } from '@/models';
 import WorkbookSubmission from '@/models/WorkbookSubmission';
 import mongoose from 'mongoose';
+import { generateAIDiagnosis, FormattedQA } from '@/utils/diagnosisUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -190,18 +191,78 @@ export async function POST(request: Request) {
     // Save the submission
     await submission.save();
 
-    // In a real implementation, you would trigger the AI diagnosis process here
-    // For now, we'll just mark that it's scheduled
-    const diagnosisScheduled = true;
-
-    // TODO: Schedule AI diagnosis process
-    // This would typically be done via a background job or queue
-    // For example: await scheduleDiagnosis(submission._id);
+    // Generate the AI diagnosis based on the submitted answers
+    try {
+      console.log('Generating AI diagnosis for submission:', submission._id);
+      
+      // Format the answers for the diagnosis generation
+      const formattedAnswers: FormattedQA[] = [];
+      
+      // Get the user's name or use a default
+      const userName = user.name || 'Client';
+      
+      // Format each answer as a question-answer pair
+      // In a real implementation, you would have a mapping of question IDs to actual question text
+      Object.entries(submission.answers).forEach(([key, value]) => {
+        // Skip empty answers
+        if (value === null || value === undefined || value === '') return;
+        
+        // Format the question based on the key
+        // This is a simplified example - in a real app, you'd have proper question text
+        const question = key
+          .replace(/_/g, ' ')
+          .replace(/^(\w)/, (match) => match.toUpperCase())
+          .replace(/section\d+/i, '');
+        
+        formattedAnswers.push({
+          question,
+          answer: String(value)
+        });
+      });
+      
+      // Generate the diagnosis
+      const diagnosisResponse = await generateAIDiagnosis(formattedAnswers, userName);
+      
+      // Update the submission with the diagnosis
+      // Add createdAt field required by IDiagnosisResult interface
+      // Ensure followupWorksheets.followup is a string or undefined (not null) to match schema
+      const diagnosis = {
+        summary: diagnosisResponse.summary,
+        strengths: diagnosisResponse.strengths,
+        challenges: diagnosisResponse.challenges,
+        recommendations: diagnosisResponse.recommendations,
+        createdAt: new Date(),
+        followupWorksheets: {
+          pillars: Array.isArray(diagnosisResponse.followupWorksheets.pillars) 
+            ? diagnosisResponse.followupWorksheets.pillars 
+            : []
+        }
+      };
+      
+      console.log('Prepared diagnosis object:', JSON.stringify(diagnosis, null, 2));
+      
+      submission.diagnosis = diagnosis;
+      submission.diagnosisGeneratedAt = new Date();
+      
+      // Save the updated submission
+      await submission.save();
+      
+      console.log('AI diagnosis generated successfully for submission:', submission._id);
+    } catch (diagnosisError) {
+      console.error('Error generating diagnosis:', diagnosisError);
+      // Log more details about the error
+      if (diagnosisError instanceof Error) {
+        console.error('Error details:', diagnosisError.message);
+        console.error('Error stack:', diagnosisError.stack);
+      }
+      // We'll continue even if diagnosis generation fails
+      // The user can still submit the workbook, and we can generate the diagnosis later
+    }
 
     return NextResponse.json({
       success: true,
       submissionId: submission._id,
-      diagnosisScheduled
+      diagnosisGenerated: !!submission.diagnosisGeneratedAt
     }, { status: 200 });
   } catch (error) {
     console.error('Error submitting workbook:', error);

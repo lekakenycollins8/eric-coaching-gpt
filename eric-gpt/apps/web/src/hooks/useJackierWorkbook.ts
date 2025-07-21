@@ -122,10 +122,20 @@ export function useJackierWorkbook() {
       // Parse the response
       const responseData = await response.json();
       
+      console.log('Jackier workbook submission API response:', responseData);
+      
       // Check if submission exists using the new format
       if (!responseData.exists) {
+        console.log('No submission found in API response');
         // No submission found, return null
         return null;
+      }
+      
+      // Log the diagnosis data specifically
+      if (responseData.data && responseData.data.diagnosis) {
+        console.log('Diagnosis found in submission:', responseData.data.diagnosis);
+      } else {
+        console.log('No diagnosis found in submission data');
       }
       
       // Return the actual submission data

@@ -6,7 +6,6 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
  */
 export interface IFollowupWorksheets {
   pillars: string[];              // Recommended pillar worksheet IDs
-  followup?: string;             // Recommended follow-up worksheet ID (optional)
 }
 
 /**
@@ -57,11 +56,13 @@ export interface IWorkbookSubmission extends Document {
 const FollowupWorksheetsSchema = new Schema({
   pillars: {
     type: [String],
-    required: true
+    required: true,
+    default: []
   },
   followup: {
     type: String,
-    required: true
+    required: false,
+    default: undefined
   }
 });
 
@@ -85,7 +86,13 @@ const DiagnosisResultSchema = new Schema({
     required: true
   },
   followupWorksheets: {
-    type: FollowupWorksheetsSchema,
+    type: new Schema({
+      pillars: {
+        type: [String],
+        required: true,
+        default: []
+      }
+    }, { _id: false }),
     required: true
   },
   createdAt: {

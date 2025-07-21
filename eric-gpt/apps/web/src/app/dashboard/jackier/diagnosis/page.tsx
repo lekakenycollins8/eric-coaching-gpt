@@ -32,7 +32,11 @@ export default function DiagnosisPage() {
   
   // Mark diagnosis as viewed when the page loads
   useEffect(() => {
+    // Debug the userSubmission data
+    console.log('Diagnosis page - userSubmission:', userSubmission);
+    
     if (userSubmission?.diagnosis && !userSubmission.diagnosisViewedAt) {
+      console.log('Marking diagnosis as viewed');
       markDiagnosisViewed();
     }
   }, [userSubmission, markDiagnosisViewed]);

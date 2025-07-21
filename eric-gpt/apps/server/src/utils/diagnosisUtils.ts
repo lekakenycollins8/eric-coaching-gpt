@@ -21,7 +21,6 @@ export interface DiagnosisResponse {
   recommendations: string[];
   followupWorksheets: {
     pillars: PillarType[];
-    followup: FollowupType | null;
   };
 }
 
@@ -85,7 +84,6 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
   const challenges: string[] = [];
   const recommendations: string[] = [];
   const pillars: PillarType[] = [];
-  let followup: FollowupType | null = null;
   
   sections.forEach(section => {
     if (section.toLowerCase().includes('summary') || section.toLowerCase().includes('situation')) {
@@ -102,9 +100,6 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
     } else if (section.toLowerCase().includes('follow-up worksheet') || section.toLowerCase().includes('pillar')) {
       // Extract pillar IDs
       extractPillarIds(section, pillars);
-      
-      // Extract follow-up worksheet ID
-      followup = extractFollowupId(section);
     }
   });
   
@@ -114,8 +109,7 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
     challenges,
     recommendations,
     followupWorksheets: {
-      pillars,
-      followup
+      pillars
     }
   };
 }
@@ -203,11 +197,10 @@ function extractFollowupId(text: string): FollowupType | null {
 /**
  * Determines the most appropriate follow-up worksheets based on the diagnosis
  * @param diagnosis Structured diagnosis object
- * @returns Object containing recommended pillar and follow-up worksheets
+ * @returns Object containing recommended pillar worksheets
  */
 export function determineFollowupWorksheets(diagnosis: DiagnosisResponse): {
   pillars: PillarType[];
-  followup: FollowupType;
 } {
   // Start with any explicitly identified pillars from the AI response
   let pillars = [...(diagnosis.followupWorksheets.pillars || [])];
@@ -232,12 +225,8 @@ export function determineFollowupWorksheets(diagnosis: DiagnosisResponse): {
   // Prioritize pillars based on the diagnosis content
   pillars = prioritizePillars(pillars, diagnosis);
   
-  // Determine the most appropriate follow-up worksheet
-  const followup = diagnosis.followupWorksheets.followup || determineDefaultFollowup(diagnosis);
-  
   return {
-    pillars: pillars.slice(0, 3), // Limit to 3 pillars max
-    followup
+    pillars: pillars.slice(0, 3) // Limit to 3 pillars max
   };
 }
 
