@@ -30,6 +30,10 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
   const fieldName = question.id;
   const isRequired = question.required;
   
+  // Memoize default values to prevent re-renders
+  const defaultMin = React.useMemo(() => question.min || 1, [question.min]);
+  const defaultMax = React.useMemo(() => question.max || 10, [question.max]);
+  
   switch (question.type) {
     case 'text':
       return (
@@ -90,34 +94,51 @@ export function WorkbookQuestion({ question, sectionIndex, questionIndex, isLast
           key={fieldName}
           control={control}
           name={fieldName}
-          render={({ field }) => (
-            <div className="mb-8">
-              <Label htmlFor={fieldName} className="block mb-3 font-medium">
-                {question.text} {isRequired && <span className="text-red-500">*</span>}
-              </Label>
-              <div className="py-6 px-2">
-                <Slider
-                  id={fieldName}
-                  min={question.min || 1}
-                  max={question.max || 10}
-                  step={1}
-                  value={field.value ? [field.value] : [question.min || 1]}
-                  onValueChange={(value) => field.onChange(value[0])}
-                  className="mb-4"
-                />
-                <div className="flex justify-between mt-3 text-sm text-muted-foreground">
-                  <span>{question.min || 1}</span>
-                  <span>{question.max || 10}</span>
+          render={({ field }) => {
+            // Memoize the slider component to prevent re-renders
+            const SliderComponent = React.useMemo(() => {
+              // Default to min value if undefined
+              const currentValue = field.value !== undefined ? field.value : defaultMin;
+              
+              // Create a stable onChange handler
+              const handleValueChange = (value: number[]) => {
+                field.onChange(value[0]);
+              };
+              
+              return (
+                <div className="py-6 px-2">
+                  <Slider
+                    id={fieldName}
+                    min={defaultMin}
+                    max={defaultMax}
+                    step={1}
+                    value={[currentValue]}
+                    onValueChange={handleValueChange}
+                    className="mb-4"
+                  />
+                  <div className="flex justify-between mt-3 text-sm text-muted-foreground">
+                    <span>{defaultMin}</span>
+                    <span>{defaultMax}</span>
+                  </div>
+                  <div className="text-center mt-4 font-medium">
+                    Selected: <strong>{currentValue}</strong>
+                  </div>
                 </div>
-                <div className="text-center mt-4 font-medium">
-                  Selected: <strong>{field.value || (question.min || 1)}</strong>
-                </div>
+              );
+            }, [field.value, defaultMin, defaultMax, fieldName]);
+            
+            return (
+              <div className="mb-8">
+                <Label htmlFor={fieldName} className="block mb-3 font-medium">
+                  {question.text} {isRequired && <span className="text-red-500">*</span>}
+                </Label>
+                {SliderComponent}
+                {errors[fieldName] && (
+                  <p className="text-sm text-red-500 mt-2">{String(errors[fieldName]?.message)}</p>
+                )}
               </div>
-              {errors[fieldName] && (
-                <p className="text-sm text-red-500 mt-2">{String(errors[fieldName]?.message)}</p>
-              )}
-            </div>
-          )}
+            );
+          }}
         />
       );
       

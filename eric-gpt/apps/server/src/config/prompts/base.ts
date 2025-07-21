@@ -13,4 +13,4 @@ When analyzing their responses:
 4. Use a supportive, empowering tone
 5. Reference relevant leadership frameworks when appropriate
 
-Keep your feedback concise (250-400 words) and focused on helping them take their leadership to the next level.`;
+Keep your feedback concise (250-400 words) and focused on helping them take their leadership to the next level and urge them to track their commitment in Tracker feature of the application to ensure they are making progress.`;

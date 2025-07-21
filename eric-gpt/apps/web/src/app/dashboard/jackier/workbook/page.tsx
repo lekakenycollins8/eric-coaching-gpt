@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -38,7 +38,6 @@ export default function WorkbookPage() {
   const [activeTab, setActiveTab] = useState('section-0');
   const [progress, setProgress] = useState(0);
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
   
   // Create form schema using our extracted utility
   // Only create the schema when workbook is loaded to prevent errors
@@ -54,51 +53,74 @@ export default function WorkbookPage() {
   const { handleSubmit, formState, watch, reset } = methods;
   const { errors, isDirty } = formState;
   
-  // Watch form values for auto-save
+  // Use refs to track form values and prevent re-renders
+  const formValuesRef = useRef<Record<string, unknown>>({});
+  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Watch form values without causing re-renders
   const formValues = watch();
   
-  // Calculate progress
+  // Update the ref whenever form values change
   useEffect(() => {
-    // Make sure workbook is loaded and has sections before calculating progress
-    if (!workbook || !Array.isArray(workbook.sections)) return;
+    formValuesRef.current = formValues;
     
-    try {
-      const totalQuestions = workbook.sections.reduce((acc, section) => {
-        return acc + section.questions.filter(q => q.type !== 'info').length;
-      }, 0);
-      
-      const answeredQuestions = Object.keys(formValues).filter(key => {
-        const value = formValues[key] as unknown;
-        if (Array.isArray(value)) return value.length > 0;
-        if (typeof value === 'number') return true;
-        return !!value;
-      }).length;
-      
-      const newProgress = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
-      setProgress(newProgress);
-    } catch (err) {
-      console.error('Error calculating progress:', err);
-      setProgress(0);
+    // Clear any existing progress timer
+    if (progressTimerRef.current) {
+      clearTimeout(progressTimerRef.current);
     }
-  }, [formValues, workbook]);
+    
+    // Debounce progress calculation to prevent excessive updates
+    progressTimerRef.current = setTimeout(() => {
+      // Only calculate progress if workbook is loaded
+      if (!workbook || !Array.isArray(workbook.sections)) return;
+      
+      try {
+        const totalQuestions = workbook.sections.reduce((acc, section) => {
+          return acc + section.questions.filter(q => q.type !== 'info').length;
+        }, 0);
+        
+        const answeredQuestions = Object.keys(formValues).filter(key => {
+          const value = formValues[key] as unknown;
+          if (Array.isArray(value)) return value.length > 0;
+          if (typeof value === 'number') return true;
+          return !!value;
+        }).length;
+        
+        const newProgress = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
+        setProgress(newProgress);
+      } catch (err) {
+        console.error('Error calculating progress:', err);
+        setProgress(0);
+      }
+    }, 300);
+    
+    return () => {
+      if (progressTimerRef.current) {
+        clearTimeout(progressTimerRef.current);
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workbook, JSON.stringify(formValues)]);
   
-  // Auto-save functionality
+  // Auto-save functionality using refs to prevent re-renders
   useEffect(() => {
     // Make sure workbook is loaded and form is dirty before attempting to auto-save
     if (!isDirty || !workbook || !Array.isArray(workbook.sections)) return;
     
     // Clear any existing timer
-    if (autoSaveTimer) {
-      clearTimeout(autoSaveTimer);
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
     }
     
     // Set a new timer for auto-save
-    const timer = setTimeout(async () => {
+    autoSaveTimerRef.current = setTimeout(async () => {
       setAutoSaveStatus('saving');
       try {
-        const success = await saveDraft(formValues as Record<string, unknown>);
+        const success = await saveDraft(formValuesRef.current as Record<string, unknown>);
         if (success) {
           setAutoSaveStatus('saved');
+          // Reset status after 2 seconds
           setTimeout(() => setAutoSaveStatus('idle'), 2000);
         } else {
           setAutoSaveStatus('error');
@@ -109,13 +131,14 @@ export default function WorkbookPage() {
       }
     }, 3000); // Auto-save after 3 seconds of inactivity
     
-    setAutoSaveTimer(timer);
-    
     // Cleanup function
     return () => {
-      if (timer) clearTimeout(timer);
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
     };
-  }, [formValues, isDirty, workbook, saveDraft]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDirty, workbook, saveDraft]);
   
   // Load initial data from user submission if available
   useEffect(() => {
