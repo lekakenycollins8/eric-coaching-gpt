@@ -169,8 +169,15 @@ const WorkbookSubmissionSchema = new Schema({
 // Compound index for faster queries
 WorkbookSubmissionSchema.index({ userId: 1, workbookId: 1, status: 1 });
 
-// Create model only if it doesn't exist (prevents overwriting during hot reloads)
-export const WorkbookSubmission = mongoose.models.WorkbookSubmission || 
-  mongoose.model<IWorkbookSubmission>('WorkbookSubmission', WorkbookSubmissionSchema);
+// Use a more robust pattern to prevent model overwrite errors
+let WorkbookSubmissionModel: mongoose.Model<IWorkbookSubmission>;
+try {
+  // Try to get existing model first
+  WorkbookSubmissionModel = mongoose.model<IWorkbookSubmission>('WorkbookSubmission');
+} catch (error) {
+  // Model doesn't exist yet, create it
+  WorkbookSubmissionModel = mongoose.model<IWorkbookSubmission>('WorkbookSubmission', WorkbookSubmissionSchema);
+}
 
-export default WorkbookSubmission;
+export default WorkbookSubmissionModel;
+export { WorkbookSubmissionModel as WorkbookSubmission };

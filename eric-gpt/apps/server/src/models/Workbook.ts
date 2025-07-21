@@ -110,7 +110,15 @@ const WorkbookSchema = new Schema({
 // Add index for faster queries
 WorkbookSchema.index({ title: 1, createdAt: -1 });
 
-// Create model only if it doesn't exist (prevents overwriting during hot reloads)
-export const Workbook = mongoose.models.Workbook || mongoose.model<IWorkbook>('Workbook', WorkbookSchema);
+// Use a more robust pattern to prevent model overwrite errors
+let WorkbookModel: mongoose.Model<IWorkbook>;
+try {
+  // Try to get existing model first
+  WorkbookModel = mongoose.model<IWorkbook>('Workbook');
+} catch (error) {
+  // Model doesn't exist yet, create it
+  WorkbookModel = mongoose.model<IWorkbook>('Workbook', WorkbookSchema);
+}
 
-export default Workbook;
+export default WorkbookModel;
+export { WorkbookModel as Workbook };

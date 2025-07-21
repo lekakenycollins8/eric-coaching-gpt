@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
+// Check if the model already exists to prevent overwriting during hot reloads
+import { Collections } from '@/db/config';
 
 export interface IField {
   name: string;
@@ -39,9 +41,14 @@ const WorksheetSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Check if the model already exists to prevent overwriting during hot reloads
-import { Collections } from '@/db/config';
+// Use the configured collection name and prevent model overwrites
+let WorksheetModel: mongoose.Model<IWorksheet>;
+try {
+  // Try to get existing model first
+  WorksheetModel = mongoose.model<IWorksheet>(Collections.WORKSHEETS);
+} catch (error) {
+  // Model doesn't exist yet, create it
+  WorksheetModel = mongoose.model<IWorksheet>(Collections.WORKSHEETS, WorksheetSchema);
+}
 
-// Use the configured collection name
-export default mongoose.models.Worksheet || 
-  mongoose.model<IWorksheet>(Collections.WORKSHEETS, WorksheetSchema);
+export default WorksheetModel;

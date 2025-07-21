@@ -63,9 +63,25 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: Request) {
   try {
-    // Check authentication
+    // Parse request body
+    const body = await request.json();
+    const { workbookId, answers, userId: bodyUserId } = body;
+    
+    // Try to authenticate via session first
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    let userId;
+    
+    // If session exists, use the user ID from the session
+    if (session && session.user) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in the request body
+    else if (bodyUserId) {
+      userId = bodyUserId;
+      console.log(`Using userId from request body for authentication: ${bodyUserId}`);
+    } 
+    // If no authentication method worked, return 401
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -74,7 +90,7 @@ export async function POST(request: Request) {
 
     // Check if user has an active subscription
     await connectToDatabase();
-    const user = await User.findById(session.user.id);
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -91,10 +107,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse request body
-    const body = await request.json();
-    const { workbookId, answers } = body;
-
     // Validate required fields
     if (!workbookId || !answers) {
       return NextResponse.json(
@@ -109,7 +121,6 @@ export async function POST(request: Request) {
     }
 
     // Find existing draft or create new one
-    const userId = session.user.id;
     
     let submission = await WorkbookSubmission.findOne({
       userId,

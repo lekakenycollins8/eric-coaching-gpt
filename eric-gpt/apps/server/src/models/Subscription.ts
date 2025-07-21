@@ -45,5 +45,14 @@ SubscriptionSchema.index({ stripeSubscriptionId: 1 }, { unique: true });
 SubscriptionSchema.index({ status: 1 });
 SubscriptionSchema.index({ currentPeriodEnd: 1 });
 
-export default mongoose.models.Subscription ||
-  mongoose.model<ISubscription>(Collections.SUBSCRIPTIONS, SubscriptionSchema);
+// Use the configured collection name and prevent model overwrites
+let SubscriptionModel: mongoose.Model<ISubscription>;
+try {
+  // Try to get existing model first
+  SubscriptionModel = mongoose.model<ISubscription>(Collections.SUBSCRIPTIONS);
+} catch (error) {
+  // Model doesn't exist yet, create it
+  SubscriptionModel = mongoose.model<ISubscription>(Collections.SUBSCRIPTIONS, SubscriptionSchema);
+}
+
+export default SubscriptionModel;

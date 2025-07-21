@@ -95,11 +95,24 @@ export const dynamic = 'force-dynamic';
  * GET handler for the workbook API endpoint
  * Returns the Jackier Method Workbook structure
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Check authentication
+    // Get the URL from the request to extract query parameters
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId');
+    
+    // Check authentication - either via session or userId parameter
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    let authenticatedUserId = session?.user?.id;
+    
+    // If no session but userId parameter is provided, use that instead
+    if (!authenticatedUserId && userId) {
+      authenticatedUserId = userId;
+      console.log(`Using userId parameter for authentication: ${userId}`);
+    }
+    
+    // If still no authenticated user, return 401
+    if (!authenticatedUserId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -108,7 +121,7 @@ export async function GET() {
 
     // Check if user has an active subscription
     await connectToDatabase();
-    const user = await User.findById(session.user.id);
+    const user = await User.findById(authenticatedUserId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },

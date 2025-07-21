@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
+// Check if the model already exists to prevent overwriting during hot reloads
+import { Collections } from '@/db/config';
 
 export interface IUser extends Document {
   name: string;
@@ -46,11 +48,17 @@ const UserSchema: Schema = new Schema(
 UserSchema.index({ stripeCustomerId: 1 });
 UserSchema.index({ isActive: 1 });
 
-// Check if the model already exists to prevent overwriting during hot reloads
-import { Collections } from '@/db/config';
 
-// Use the configured collection name
-// Make sure we don't try to recompile the model if it already exists
+
+// Use the configured collection name and prevent model overwrites
 const modelName = Collections.USERS;
-const User = mongoose.models[modelName] as mongoose.Model<IUser> || mongoose.model<IUser>(modelName, UserSchema);
-export default User;
+let UserModel: mongoose.Model<IUser>;
+try {
+  // Try to get existing model first
+  UserModel = mongoose.model<IUser>(modelName);
+} catch (error) {
+  // Model doesn't exist yet, create it
+  UserModel = mongoose.model<IUser>(modelName, UserSchema);
+}
+
+export default UserModel;
