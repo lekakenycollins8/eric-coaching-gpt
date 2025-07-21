@@ -39,9 +39,14 @@ export default function JackierWorkbookPage() {
     router.push('/dashboard/jackier/diagnosis');
   };
 
-  // Handle starting follow-up worksheet
-  const handleStartFollowup = (worksheetId: string) => {
-    router.push(`/dashboard/jackier/followup/${worksheetId}`);
+  // Handle starting a worksheet - route to correct path based on worksheet type
+  const handleStartWorksheet = (worksheetId: string, variant: 'pillar' | 'followup') => {
+    // Route pillar worksheets to the pillar path, follow-up worksheets to the follow-up path
+    if (variant === 'pillar') {
+      router.push(`/dashboard/worksheets/${worksheetId}`);
+    } else {
+      router.push(`/dashboard/jackier/followup/${worksheetId}`);
+    }
   };
 
   // Combine errors from both hooks
@@ -232,58 +237,77 @@ export default function JackierWorkbookPage() {
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-4">Recommended Follow-up Worksheets</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {userSubmission?.diagnosis?.followupWorksheets?.pillars && 
-                 userSubmission?.diagnosis?.followupWorksheets?.pillars.map((pillarId) => (
-                  <Card key={pillarId} className="border-blue-400">
-                    <CardHeader>
-                      <CardTitle>Pillar Worksheet</CardTitle>
-                      <CardDescription>
-                        {pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        This worksheet will help you develop specific leadership skills related to this pillar.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button 
-                        onClick={() => handleStartFollowup(pillarId)} 
-                        variant="outline" 
-                        className="w-full"
-                      >
-                        Start Worksheet
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-                
-                {userSubmission?.diagnosis?.followupWorksheets?.followup && (
-                  <Card className="border-purple-400">
-                    <CardHeader>
-                      <CardTitle>Follow-up Worksheet</CardTitle>
-                      <CardDescription>
-                        {userSubmission?.diagnosis?.followupWorksheets?.followup.replace(/_/g, ' ')}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        This follow-up worksheet will help you integrate insights from your diagnosis.
-                      </p>
-                    </CardContent>
-                    <CardFooter>
-                      <Button 
-                        onClick={() => handleStartFollowup(userSubmission?.diagnosis?.followupWorksheets?.followup || '')} 
-                        variant="outline" 
-                        className="w-full"
-                      >
-                        Start Worksheet
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                )}
+              <div className="mb-6">
+                <p className="text-muted-foreground">
+                  Based on your diagnosis, we've identified specific areas where you can develop your leadership skills.
+                </p>
               </div>
+              
+              {userSubmission?.diagnosis?.followupWorksheets?.pillars?.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-semibold mb-3">Core Leadership Pillars</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {userSubmission?.diagnosis?.followupWorksheets?.pillars.map((pillarId) => (
+                      <Card key={pillarId} className="border-blue-400 overflow-hidden">
+                        <div className="bg-blue-50 px-6 py-2">
+                          <p className="text-xs uppercase font-semibold tracking-wide">Core Leadership Pillar</p>
+                        </div>
+                        <CardHeader>
+                          <CardTitle>{pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}</CardTitle>
+                          <CardDescription>
+                            Build your leadership foundation with this core pillar worksheet
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            This worksheet will help you develop specific leadership skills related to this pillar.
+                          </p>
+                        </CardContent>
+                        <CardFooter>
+                          <Button 
+                            onClick={() => handleStartWorksheet(pillarId, 'pillar')} 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            Start Worksheet
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {userSubmission?.diagnosis?.followupWorksheets?.followup && (
+                <div>
+                  <h3 className="text-xl font-semibold mb-3">Implementation Support</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="border-purple-400 overflow-hidden">
+                      <div className="bg-purple-50 px-6 py-2">
+                        <p className="text-xs uppercase font-semibold tracking-wide">Implementation Support</p>
+                      </div>
+                      <CardHeader>
+                        <CardTitle>{userSubmission?.diagnosis?.followupWorksheets?.followup.replace(/_/g, ' ')}</CardTitle>
+                        <CardDescription>
+                          Deepen your learning with this targeted follow-up worksheet
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          This follow-up worksheet will help you integrate insights from your diagnosis.
+                        </p>
+                      </CardContent>
+                      <CardFooter>
+                        <Button 
+                          onClick={() => handleStartWorksheet(userSubmission?.diagnosis?.followupWorksheets?.followup || '', 'followup')} 
+                          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                        >
+                          Start Worksheet
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>

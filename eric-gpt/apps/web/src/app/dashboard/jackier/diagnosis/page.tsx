@@ -41,9 +41,14 @@ export default function DiagnosisPage() {
     }
   }, [userSubmission, markDiagnosisViewed]);
   
-  // Handle starting a follow-up worksheet
-  const handleStartFollowup = (worksheetId: string) => {
-    router.push(`/dashboard/jackier/followup/${worksheetId}`);
+  // Handle starting a worksheet - route to correct path based on worksheet type
+  const handleStartWorksheet = (worksheetId: string, variant: 'pillar' | 'followup') => {
+    // Route pillar worksheets to the pillar path, follow-up worksheets to the follow-up path
+    if (variant === 'pillar') {
+      router.push(`/dashboard/worksheets/${worksheetId}`);
+    } else {
+      router.push(`/dashboard/jackier/followup/${worksheetId}`);
+    }
   };
   
   if (isLoading) {
@@ -123,34 +128,64 @@ export default function DiagnosisPage() {
       </Tabs>
       
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Recommended Follow-up Worksheets</h2>
-        <p className="text-muted-foreground mb-6">
-          Based on your diagnosis, we recommend the following worksheets to help you develop your leadership skills.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {diagnosis.followupWorksheets.pillars && 
-           diagnosis.followupWorksheets.pillars.map((pillarId) => (
-            <FollowupWorksheetCard
-              key={pillarId}
-              id={pillarId}
-              title="Pillar Worksheet"
-              description={pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
-              onStart={handleStartFollowup}
-              variant="pillar"
-            />
-          ))}
-          
-          {diagnosis.followupWorksheets.followup && (
-            <FollowupWorksheetCard
-              id={diagnosis.followupWorksheets.followup}
-              title="Follow-up Worksheet"
-              description={diagnosis.followupWorksheets.followup.replace(/_/g, ' ')}
-              onStart={handleStartFollowup}
-              variant="followup"
-            />
-          )}
+        <h2 className="text-2xl font-bold mb-4">Your Leadership Development Path</h2>
+        <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-6">
+          <div className="flex items-start">
+            <AlertCircle className="h-5 w-5 text-amber-600 mr-2 mt-0.5" />
+            <div>
+              <p className="font-medium text-amber-800">Need personalized coaching?</p>
+              <p className="text-sm text-amber-700">If you're facing complex leadership challenges, Eric offers personalized coaching to help you implement these insights effectively.</p>
+              <Button variant="outline" className="mt-2 text-amber-800 border-amber-300 hover:bg-amber-100" size="sm">
+                Learn about coaching options
+              </Button>
+            </div>
+          </div>
         </div>
+        
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            Based on your diagnosis, we've identified specific areas where you can develop your leadership skills.
+            {diagnosis.followupWorksheets.pillars?.length > 0 && (
+              <span> We recommend starting with the core pillar worksheets below to build your foundation.</span>
+            )}
+            {diagnosis.followupWorksheets.followup && (
+              <span> For targeted improvement, we also suggest a specific follow-up worksheet.</span>
+            )}
+          </p>
+        </div>
+        
+        {diagnosis.followupWorksheets.pillars?.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-3">Core Leadership Pillars</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {diagnosis.followupWorksheets.pillars.map((pillarId) => (
+                <FollowupWorksheetCard
+                  key={pillarId}
+                  id={pillarId}
+                  title={pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
+                  description="Build your leadership foundation with this core pillar worksheet"
+                  onStart={(id) => handleStartWorksheet(id, 'pillar')}
+                  variant="pillar"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {diagnosis.followupWorksheets.followup && (
+          <div>
+            <h3 className="text-xl font-semibold mb-3">Implementation Support</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FollowupWorksheetCard
+                id={diagnosis.followupWorksheets.followup}
+                title={diagnosis.followupWorksheets.followup.replace(/_/g, ' ')}
+                description="Deepen your learning with this targeted follow-up worksheet"
+                onStart={(id) => handleStartWorksheet(id, 'followup')}
+                variant="followup"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

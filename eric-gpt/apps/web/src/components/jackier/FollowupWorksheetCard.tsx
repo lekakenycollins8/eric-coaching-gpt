@@ -17,10 +17,20 @@ export function FollowupWorksheetCard({
   onStart,
   variant = 'pillar'
 }: FollowupWorksheetCardProps) {
+  // Different styling for pillar vs followup worksheets
   const borderClass = variant === 'pillar' ? 'border-blue-400' : 'border-purple-400';
+  const bgClass = variant === 'pillar' ? 'bg-blue-50' : 'bg-purple-50';
+  const buttonClass = variant === 'pillar' 
+    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+    : 'bg-purple-600 hover:bg-purple-700 text-white';
   
   return (
-    <Card className={borderClass}>
+    <Card className={`${borderClass} overflow-hidden`}>
+      <div className={`${bgClass} px-6 py-2`}>
+        <p className="text-xs uppercase font-semibold tracking-wide">
+          {variant === 'pillar' ? 'Core Leadership Pillar' : 'Implementation Support'}
+        </p>
+      </div>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
@@ -38,8 +48,7 @@ export function FollowupWorksheetCard({
       <CardFooter>
         <Button 
           onClick={() => onStart(id)} 
-          variant="outline" 
-          className="w-full"
+          className={`w-full ${buttonClass}`}
         >
           Start Worksheet
         </Button>
