@@ -41,7 +41,8 @@ export default function WorkbookPage() {
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
   
   // Create form schema using our extracted utility
-  const formSchema = createWorkbookFormSchema(workbook);
+  // Only create the schema when workbook is loaded to prevent errors
+  const formSchema = workbook ? createWorkbookFormSchema(workbook) : createWorkbookFormSchema(null);
   
   // Set up the form with react-hook-form and zod validation
   const methods = useForm({
@@ -58,26 +59,33 @@ export default function WorkbookPage() {
   
   // Calculate progress
   useEffect(() => {
-    if (!workbook) return;
+    // Make sure workbook is loaded and has sections before calculating progress
+    if (!workbook || !Array.isArray(workbook.sections)) return;
     
-    const totalQuestions = workbook.sections.reduce((acc, section) => {
-      return acc + section.questions.filter(q => q.type !== 'info').length;
-    }, 0);
-    
-    const answeredQuestions = Object.keys(formValues).filter(key => {
-      const value = formValues[key] as unknown;
-      if (Array.isArray(value)) return value.length > 0;
-      if (typeof value === 'number') return true;
-      return !!value;
-    }).length;
-    
-    const newProgress = Math.round((answeredQuestions / totalQuestions) * 100);
-    setProgress(newProgress);
+    try {
+      const totalQuestions = workbook.sections.reduce((acc, section) => {
+        return acc + section.questions.filter(q => q.type !== 'info').length;
+      }, 0);
+      
+      const answeredQuestions = Object.keys(formValues).filter(key => {
+        const value = formValues[key] as unknown;
+        if (Array.isArray(value)) return value.length > 0;
+        if (typeof value === 'number') return true;
+        return !!value;
+      }).length;
+      
+      const newProgress = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
+      setProgress(newProgress);
+    } catch (err) {
+      console.error('Error calculating progress:', err);
+      setProgress(0);
+    }
   }, [formValues, workbook]);
   
   // Auto-save functionality
   useEffect(() => {
-    if (!isDirty || !workbook) return;
+    // Make sure workbook is loaded and form is dirty before attempting to auto-save
+    if (!isDirty || !workbook || !Array.isArray(workbook.sections)) return;
     
     // Clear any existing timer
     if (autoSaveTimer) {

@@ -75,7 +75,8 @@ export function useJackierWorkbook() {
   const { 
     data: workbook,
     isLoading: isWorkbookLoading,
-    error: workbookError 
+    error: workbookError,
+    isSuccess: isWorkbookSuccess
   } = useQuery({
     queryKey: ['jackier', 'workbook'],
     queryFn: async () => {
@@ -90,7 +91,9 @@ export function useJackierWorkbook() {
         }
         throw new Error(`Failed to fetch workbook: ${response.status}`);
       }
-      return response.json() as Promise<JackierWorkbook>;
+      const data = await response.json();
+      // Extract the workbook from the response, which comes as { workbook: {...} }
+      return data.workbook as JackierWorkbook;
     },
     enabled: !!session?.user,
   });
@@ -99,7 +102,8 @@ export function useJackierWorkbook() {
   const {
     data: userSubmission,
     isLoading: isSubmissionLoading,
-    error: submissionError
+    error: submissionError,
+    isSuccess: isSubmissionSuccess
   } = useQuery({
     queryKey: ['jackier', 'submission'],
     queryFn: async () => {
@@ -282,6 +286,10 @@ export function useJackierWorkbook() {
     workbook,
     userSubmission,
     isLoading: isWorkbookLoading || isSubmissionLoading,
+    isWorkbookLoading,
+    isSubmissionLoading,
+    isWorkbookSuccess,
+    isSubmissionSuccess,
     error: combinedError ? String(combinedError) : null,
     saveDraft,
     submitWorkbook,
