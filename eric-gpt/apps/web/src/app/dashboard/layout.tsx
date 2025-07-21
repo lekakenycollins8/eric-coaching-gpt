@@ -13,7 +13,9 @@ import {
   Cog6ToothIcon,
   Bars3Icon,
   XMarkIcon,
-  ArrowTrendingUpIcon
+  ArrowTrendingUpIcon,
+  CalendarIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 
 export default function DashboardLayout({
@@ -33,6 +35,8 @@ export default function DashboardLayout({
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
+    { name: 'Coaching', href: '/dashboard/coaching', icon: ChatBubbleLeftRightIcon },
+    { name: 'Schedule Session', href: '/dashboard/coaching/schedule', icon: CalendarIcon },
     { name: 'Jackier Workbook', href: '/dashboard/jackier', icon: DocumentTextIcon },
   ], []);
   

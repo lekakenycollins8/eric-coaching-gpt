@@ -6,33 +6,66 @@ This document outlines the step-by-step implementation plan for enhancing the fo
 
 ## Current Status
 
-We have completed up to Phase 3 of the Jackier Method Workbook Integration:
+We have completed up to Phase 3 of the Jackier Method Workbook Integration and made significant progress on Phase 4:
 - Data models and core backend are in place
 - Workbook UI and progress saving functionality are implemented
 - AI diagnosis engine is operational
 - Basic routing for worksheets has been fixed (pillar vs. follow-up paths)
+- Follow-up worksheet submission page has been implemented
+- Coaching integration components have been created
 
 ## Implementation Milestones
 
-### Milestone 1: Research & Analysis (Current)
+### Milestone 1: Research & Analysis (COMPLETED)
 **Goal:** Gain comprehensive understanding of the existing codebase to ensure proper integration
 
 #### Tasks:
-- [ ] Analyze server-side data models and API endpoints
-- [ ] Review client-side hooks and components for worksheet handling
-- [ ] Examine existing AI integration for diagnosis generation
-- [ ] Document data flow between pillar worksheets and follow-up worksheets
-- [ ] Identify potential integration points for new features
+- [x] Analyze server-side data models and API endpoints
+- [x] Review client-side hooks and components for worksheet handling
+- [x] Examine existing AI integration for diagnosis generation
+- [x] Document data flow between pillar worksheets and follow-up worksheets
+- [x] Identify potential integration points for new features
 
-#### Expected Outcome:
+#### Outcome:
 - Detailed documentation of current system architecture
+- Identified architectural pattern of separating web and server components
+- Discovered the proxy pattern used for API requests from web to server
+- Noted React Query usage for data fetching
+- Identified Swagger documentation requirements for server API routes
 - Identification of code patterns to follow
 - List of potential risks and mitigation strategies
 - Clear understanding of existing AI integration points
 
 ---
 
-### Milestone 2: Email & Human Coaching Integration (Phase 4)
+### Milestone 2: Architectural Corrections (COMPLETED)
+**Goal:** Fix architectural inconsistencies in the current implementation
+
+#### Tasks:
+- [x] Move API routes from web to server app
+  - [x] Move `/api/coaching/schedule` to server app with Swagger documentation
+  - [x] Move `/api/coaching/dismiss-prompt` to server app with Swagger documentation
+- [x] Create proxy routes in web app
+  - [x] Create proxy for coaching schedule API
+  - [x] Create proxy for coaching prompt dismissal API
+- [x] Update React hooks to use React Query
+  - [x] Refactor `useCoachingSchedule` to use React Query
+  - [x] Refactor `useCoachingPrompt` to use React Query
+- [x] Ensure proper error handling for API responses
+  - [x] Add content-type checking before JSON parsing
+  - [x] Implement consistent error response format
+
+#### Outcome:
+- Properly structured API architecture following project standards
+- Improved data fetching with React Query for caching and state management
+- Consistent error handling across all API interactions with non-JSON response handling
+- Documented API endpoints with Swagger annotations
+- Separation of concerns with business logic in server and proxy pattern in web
+- Better TypeScript typing with proper error handling
+
+---
+
+### Milestone 3: Email & Human Coaching Integration (Phase 4)
 **Goal:** Complete the email notification system and coaching integration touchpoints
 
 #### Tasks:

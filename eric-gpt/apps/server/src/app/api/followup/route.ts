@@ -447,7 +447,7 @@ export async function POST(request: Request) {
       message: 'Follow-up worksheet submitted successfully',
       id: followupAssessment._id,
       shouldPromptCoaching: submission.schedulingPrompted || false,
-      worksheetTitle: worksheet?.title || 'Follow-up'
+      worksheetTitle: worksheetId?.title || 'Follow-up'
     });
   } catch (error) {
     console.error('Error submitting follow-up worksheet:', error);

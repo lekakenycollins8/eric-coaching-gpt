@@ -27,6 +27,7 @@ interface WorksheetFormProps {
   initialData?: Record<string, any>;
   onSaveDraft?: (data: Record<string, any>) => void;
   disabled?: boolean;
+  isFollowup?: boolean;
 }
 
 const WorksheetForm: React.FC<WorksheetFormProps> = ({
@@ -36,6 +37,7 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
   initialData = {},
   onSaveDraft,
   disabled = false,
+  isFollowup = false,
 }) => {
   const { toast } = useToast();
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -234,6 +236,8 @@ const WorksheetForm: React.FC<WorksheetFormProps> = ({
             'Subscription Required'
           ) : disabled ? (
             'Quota Exceeded'
+          ) : isFollowup ? (
+            'Submit Follow-up'
           ) : (
             'Submit for Feedback'
           )}

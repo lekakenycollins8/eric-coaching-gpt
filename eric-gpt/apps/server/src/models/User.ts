@@ -62,3 +62,17 @@ try {
 }
 
 export default UserModel;
+
+/**
+ * Gets a user by their email address
+ * @param email - The email address to search for
+ * @returns The user document or null if not found
+ */
+export async function getUserByEmail(email: string): Promise<IUser | null> {
+  try {
+    return await UserModel.findOne({ email });
+  } catch (error) {
+    console.error('Error finding user by email:', error);
+    return null;
+  }
+}
