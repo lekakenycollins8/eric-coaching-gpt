@@ -1,0 +1,222 @@
+[
+  {
+    "id": "jackier-step1-followup",
+    "title": "Step 1 – Ask the Right Questions Follow-Up",
+    "description": "For leaders who have completed the Jackier Method but are struggling to fully implement Step 1.",
+    "sections": [
+      {
+        "title": "Self-Assessment Checklist",
+        "questions": [
+          {
+            "id": "step1-check-1",
+            "text": "I clearly identified the leadership challenge I was facing.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step1-check-2",
+            "text": "I asked questions that dug beneath the surface of the problem.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step1-check-3",
+            "text": "I challenged my assumptions or blind spots.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "step1-reflection",
+            "text": "Where might your questions have been too shallow, biased, or reactive? How could you ask differently?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "step1-next-steps",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jackier-step2-followup",
+    "title": "Step 2 – Identify the Real Issues Follow-Up",
+    "description": "For leaders who have completed the Jackier Method but are struggling to fully implement Step 2.",
+    "sections": [
+      {
+        "title": "Self-Assessment Checklist",
+        "questions": [
+          {
+            "id": "step2-check-1",
+            "text": "I distinguished symptoms from root causes.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step2-check-2",
+            "text": "I looked at both internal and external contributing factors.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step2-check-3",
+            "text": "I sought feedback or multiple perspectives when needed.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "step2-reflection",
+            "text": "What issues might you have overlooked or misdiagnosed? What feedback did you ignore or avoid?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "step2-next-steps",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jackier-step3-followup",
+    "title": "Step 3 – Find the Best Solution Follow-Up",
+    "description": "For leaders who have completed the Jackier Method but are struggling to fully implement Step 3.",
+    "sections": [
+      {
+        "title": "Self-Assessment Checklist",
+        "questions": [
+          {
+            "id": "step3-check-1",
+            "text": "I evaluated more than one possible course of action.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step3-check-2",
+            "text": "I considered how each option aligns with my values and long-term vision.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step3-check-3",
+            "text": "I chose a solution that balanced impact and feasibility.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "step3-reflection",
+            "text": "Are you stuck trying to find the 'perfect' solution? Have you ignored an obvious or simple one?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "step3-next-steps",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jackier-step4-followup",
+    "title": "Step 4 – Execute and Succeed Follow-Up",
+    "description": "For leaders who have completed the Jackier Method but are struggling to fully implement Step 4.",
+    "sections": [
+      {
+        "title": "Self-Assessment Checklist",
+        "questions": [
+          {
+            "id": "step4-check-1",
+            "text": "I created a clear plan and took immediate action.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step4-check-2",
+            "text": "I tracked progress and adjusted as needed.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          },
+          {
+            "id": "step4-check-3",
+            "text": "I stayed committed even when results didn't come instantly.",
+            "type": "checkbox",
+            "options": ["Yes", "Somewhat", "No"],
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "step4-reflection",
+            "text": "Where did your execution fall off? Was it motivation, structure, support, or something else?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "step4-next-steps",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+]

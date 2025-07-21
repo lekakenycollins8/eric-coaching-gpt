@@ -1,0 +1,698 @@
+[
+  {
+    "id": "pillar1-followup",
+    "title": "Self-Awareness Follow-Up",
+    "description": "For leaders who have completed Pillar 1 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p1",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p1",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p1",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p1",
+            "text": "What has shifted in your self-perception? Are you noticing blind spots again?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p1",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar2-followup",
+    "title": "Goal Setting Follow-Up",
+    "description": "For leaders who have completed Pillar 2 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p2",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p2",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p2",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p2",
+            "text": "Where are your goals unclear or misaligned with your current responsibilities?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p2",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar3-followup",
+    "title": "Communication Mastery Follow-Up",
+    "description": "For leaders who have completed Pillar 3 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p3",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p3",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p3",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p3",
+            "text": "Where are miscommunications creeping back in—team, stakeholders, or self-talk?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p3",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar4-followup",
+    "title": "Time Mastery Follow-Up",
+    "description": "For leaders who have completed Pillar 4 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p4",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p4",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p4",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p4",
+            "text": "What keeps pulling you off your priorities? Are you back in reaction mode?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p4",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar5-followup",
+    "title": "Decision Making Follow-Up",
+    "description": "For leaders who have completed Pillar 5 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p5",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p5",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p5",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p5",
+            "text": "Have you been hesitating or overthinking? What's one key decision you're avoiding?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p5",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar6-followup",
+    "title": "Conflict Navigation Follow-Up",
+    "description": "For leaders who have completed Pillar 6 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p6",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p6",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p6",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p6",
+            "text": "Which recent conflict did you ignore, mishandle, or avoid entirely?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p6",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar7-followup",
+    "title": "Delegation & Trust Follow-Up",
+    "description": "For leaders who have completed Pillar 7 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p7",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p7",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p7",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p7",
+            "text": "What tasks are you still holding on to that someone else could do?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p7",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar8-followup",
+    "title": "Strategic Thinking Follow-Up",
+    "description": "For leaders who have completed Pillar 8 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p8",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p8",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p8",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p8",
+            "text": "Where are you getting lost in the weeds instead of focusing on big picture?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p8",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar9-followup",
+    "title": "Influence & Impact Follow-Up",
+    "description": "For leaders who have completed Pillar 9 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p9",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p9",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p9",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p9",
+            "text": "What actions are not reflecting the influence you want to create?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p9",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar10-followup",
+    "title": "Feedback & Growth Follow-Up",
+    "description": "For leaders who have completed Pillar 10 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p10",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p10",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p10",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p10",
+            "text": "Are you seeking feedback consistently—or avoiding it again?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p10",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar11-followup",
+    "title": "Culture Building Follow-Up",
+    "description": "For leaders who have completed Pillar 11 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p11",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p11",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p11",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p11",
+            "text": "What recent moment did you miss to reinforce your team's values or norms?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p11",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pillar12-followup",
+    "title": "Execution & Follow Through Follow-Up",
+    "description": "For leaders who have completed Pillar 12 but are experiencing difficulty sustaining or applying what they've learned.",
+    "sections": [
+      {
+        "title": "Self-Assessment",
+        "questions": [
+          {
+            "id": "self-assessment-p12",
+            "text": "Rate your consistency in applying this pillar:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "results-assessment-p12",
+            "text": "Rate the positive results you've seen in this area of leadership:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          },
+          {
+            "id": "modeling-assessment-p12",
+            "text": "Rate how well you've modeled this behavior for others:",
+            "type": "rating",
+            "min": 1,
+            "max": 5,
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Reflect & Reset",
+        "questions": [
+          {
+            "id": "reflection-p12",
+            "text": "Where are plans falling apart—poor clarity, weak commitment, or unclear next steps?",
+            "type": "textarea",
+            "required": true
+          }
+        ]
+      },
+      {
+        "title": "Next Steps",
+        "questions": [
+          {
+            "id": "next-steps-p12",
+            "text": "Would you like to discuss your challenges with Eric? If yes, please provide your email.",
+            "type": "text",
+            "required": false
+          }
+        ]
+      }
+    ]
+  }
+]
