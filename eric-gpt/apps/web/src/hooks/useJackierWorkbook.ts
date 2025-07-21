@@ -146,6 +146,7 @@ export function useJackierWorkbook() {
         },
         body: JSON.stringify({
           status: 'draft',
+          workbookId: 'jackier-method-workbook', // Add the required workbookId field
           answers,
         }),
       });
@@ -194,6 +195,7 @@ export function useJackierWorkbook() {
         },
         body: JSON.stringify({
           status: 'submitted',
+          workbookId: 'jackier-method-workbook', // Add the required workbookId field
           answers,
         }),
       });

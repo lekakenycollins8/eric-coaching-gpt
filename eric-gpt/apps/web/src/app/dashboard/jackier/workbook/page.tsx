@@ -46,15 +46,20 @@ export default function WorkbookPage() {
   // Set up the form with react-hook-form and zod validation
   const methods = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: userSubmission?.answers || {},
+    defaultValues: {}, // Start with empty defaults, we'll set them properly in useEffect
     mode: 'onChange'
   });
   
   const { handleSubmit, formState, watch, reset } = methods;
   const { errors, isDirty } = formState;
   
+  // Define type for form values to fix TypeScript errors
+  interface FormValues {
+    [key: string]: unknown;
+  }
+  
   // Use refs to track form values and prevent re-renders
-  const formValuesRef = useRef<Record<string, unknown>>({});
+  const formValuesRef = useRef<FormValues>({});
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -81,7 +86,9 @@ export default function WorkbookPage() {
         }, 0);
         
         const answeredQuestions = Object.keys(formValues).filter(key => {
-          const value = formValues[key] as unknown;
+          // Cast formValues to FormValues type to fix TypeScript error
+          const typedFormValues = formValues as FormValues;
+          const value = typedFormValues[key];
           if (Array.isArray(value)) return value.length > 0;
           if (typeof value === 'number') return true;
           return !!value;
@@ -142,8 +149,17 @@ export default function WorkbookPage() {
   
   // Load initial data from user submission if available
   useEffect(() => {
+    // Only proceed if we have a valid submission with answers
     if (userSubmission?.answers && Object.keys(userSubmission.answers).length > 0) {
+      console.log('Resetting form with saved answers:', userSubmission.answers);
+      
+      // Reset the form with the saved answers
       reset(userSubmission.answers);
+      
+      // Also update the formValuesRef to ensure auto-save has the latest data
+      formValuesRef.current = userSubmission.answers;
+    } else {
+      console.log('No saved answers found or empty answers object');
     }
   }, [userSubmission, reset]);
   
