@@ -205,24 +205,128 @@ The implementation maintains the project's architectural principles:
 
 ---
 
-### Milestone 4: Worksheet Relationship Model
-**Goal:** Establish connections between pillar worksheets and follow-up worksheets
+### Milestone 4: Worksheet Authentication Fix (COMPLETED)
+**Goal:** Resolve persistent 401 Unauthorized errors in the worksheet recommendations API
 
 #### Tasks:
-- [ ] Design `WorksheetRelationship` data model
-- [ ] Update MongoDB schema to include relationship tracking
-- [ ] Create API endpoints for retrieving related worksheets
-- [ ] Implement server-side logic to map relationships
-- [ ] Add client-side hooks to fetch related worksheets
+- [x] Fix authentication token forwarding in web app proxy routes
+- [x] Update server API routes to accept authentication via headers
+- [x] Improve error handling and logging for authentication failures
+- [x] Ensure consistent session handling across all worksheet API routes
+- [x] Fix TypeScript errors in API routes
+
+#### Implementation Details:
+
+##### 1. Server-Side Authentication Enhancement
+
+**API Routes Authentication:**
+- Updated server-side worksheet recommendations and relationships routes to accept authentication via multiple methods:
+  - Primary: NextAuth's `getServerSession()` for direct server access
+  - Secondary: Custom header authentication (`Authorization`, `x-user-id`, `x-user-email`) for proxy requests
+- Added detailed logging for authentication failures to aid debugging
+- Fixed TypeScript errors related to null handling in user email validation
+- Ensured consistent error response format across all API routes
+
+##### 2. Web App Proxy Routes
+
+**Proxy Authentication Forwarding:**
+- Enhanced proxy routes to correctly forward authentication information:
+  - Added `Authorization` header with Bearer token from session
+  - Included `x-user-id` and `x-user-email` headers for direct user identification
+  - Set `cache: 'no-store'` to prevent stale data issues
+  - Added `export const dynamic = 'force-dynamic';` to ensure dynamic rendering
+
+##### 3. Client-Side React Query Hooks
+
+**Authentication-Aware Data Fetching:**
+- Improved React Query hooks to properly handle authentication state
+- Added explicit session checks before making API calls
+- Enhanced error handling for 401/403 responses
+- Added support for non-JSON error responses
+
+#### Current Status:
+- Authentication now works correctly across all worksheet API routes
+- Proper error handling and logging in place for debugging
+- TypeScript errors fixed in all related files
+- Consistent authentication pattern established for future API routes
 
 #### Expected Outcome:
-- Database structure for tracking worksheet relationships
-- Functional API for retrieving related worksheets
-- Client-side capability to understand worksheet connections
+- ✅ Elimination of 401 Unauthorized errors in worksheet recommendations
+- ✅ Proper authentication token forwarding between web and server apps
+- ✅ Improved error handling and debugging capabilities
+- ✅ Type-safe implementation with proper TypeScript support
 
 ---
 
-### Milestone 5: Contextual Recommendations
+### Milestone 5: Worksheet Relationship Model (COMPLETED)
+**Goal:** Establish connections between pillar worksheets and follow-up worksheets
+
+#### Tasks:
+- [x] Design `WorksheetRelationship` data model
+- [x] Update MongoDB schema to include relationship tracking
+- [x] Create API endpoints for retrieving related worksheets
+- [x] Implement server-side logic to map relationships
+- [x] Add client-side hooks to fetch related worksheets
+
+#### Implementation Details:
+
+##### 1. Data Model
+
+**WorksheetRelationship Model (`/apps/server/src/models/WorksheetRelationship.ts`):**
+- Created a comprehensive model with the following key features:
+  - Relationship types (follow-up, prerequisite, recommended, related, jackier-method)
+  - Trigger conditions (completion, score-threshold, time-elapsed, specific-answer, ai-recommendation)
+  - Relevance scoring system (1-100) to prioritize recommendations
+  - Context descriptions to explain relationships to users
+  - Display ordering for UI presentation
+
+##### 2. Server-Side Implementation
+
+**WorksheetRelationshipService (`/apps/server/src/services/worksheetRelationshipService.ts`):**
+- Implemented CRUD operations for worksheet relationships
+- Created methods for retrieving relationships by source or target worksheet
+- Added specialized methods for getting recommended follow-ups based on user data
+- Integrated with the existing worksheet loader system
+
+**API Endpoints:**
+- `/api/worksheets/relationships` - For managing and retrieving worksheet relationships
+- `/api/worksheets/recommendations` - For getting personalized worksheet recommendations
+
+##### 3. Client-Side Integration
+
+**React Query Hooks (`/apps/web/src/hooks/useWorksheetRelationships.ts`):**
+- Created `useWorksheetRelationships` hook for fetching relationship data
+- Implemented `useWorksheetRecommendations` hook for personalized recommendations
+- Added proper TypeScript interfaces and error handling
+
+**UI Components:**
+- Created `WorksheetRecommendations` component to display personalized recommendations
+- Added visual indicators for relationship types (follow-up, prerequisite, etc.)
+- Implemented responsive card layout for recommendation display
+
+##### 4. Data Seeding
+
+**Seed Script (`/apps/server/src/scripts/seedWorksheetRelationships.ts`):**
+- Created a script to establish initial relationships between:
+  - Pillar worksheets and their follow-ups
+  - Jackier Method steps and implementation support follow-ups
+  - Jackier Method steps and relevant pillar worksheets
+- Added contextual descriptions for each relationship
+
+#### Current Status:
+- Complete data model for worksheet relationships
+- Functional APIs for managing and retrieving relationships
+- Client-side hooks and components for displaying recommendations
+- Ready for integration with the user journey
+
+#### Expected Outcome:
+- ✅ Database structure for tracking worksheet relationships
+- ✅ Functional API for retrieving related worksheets
+- ✅ Client-side capability to understand worksheet connections
+
+---
+
+### Milestone 6: Contextual Recommendations
 **Goal:** Enhance the recommendation system to provide context-aware follow-up suggestions
 
 #### Tasks:
@@ -239,7 +343,7 @@ The implementation maintains the project's architectural principles:
 
 ---
 
-### Milestone 6: Progress Tracking Visualization
+### Milestone 7: Progress Tracking Visualization
 **Goal:** Create a visual representation of the user's leadership journey
 
 #### Tasks:

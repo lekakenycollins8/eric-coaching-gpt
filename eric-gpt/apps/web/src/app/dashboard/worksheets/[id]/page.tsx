@@ -7,6 +7,7 @@ import { useWorksheetSubmission } from '@/hooks/useWorksheetSubmission';
 import { useSubscription } from '@/hooks/useSubscription';
 import WorksheetForm from '@/components/worksheets/WorksheetForm';
 import FeedbackPanel from '@/components/worksheets/FeedbackPanel';
+import { WorksheetRecommendations } from '@/components/worksheets/WorksheetRecommendations';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuotaExceededAlert } from '@/components/usage/QuotaExceededAlert';
 import { AlertCircle, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
@@ -15,6 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 import { hasFeatureAccess, debugSubscription } from '@/lib/subscription-utils';
+import { Separator } from '@/components/ui/separator';
 
 export default function WorksheetPage() {
   const params = useParams();
@@ -242,6 +244,18 @@ export default function WorksheetPage() {
         submissionId={submissionId}
         worksheetTitle={worksheet.title}
       />
+
+      {/* Show worksheet recommendations if feedback exists */}
+      {feedback && (
+        <div className="mt-12">
+          <Separator className="mb-8" />
+          <WorksheetRecommendations 
+            worksheetId={worksheetId} 
+            limit={3} 
+            showTitle={true}
+          />
+        </div>
+      )}
     </div>
   );
 }

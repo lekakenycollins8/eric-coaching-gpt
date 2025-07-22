@@ -12,6 +12,8 @@ export async function middleware(request: NextRequest) {
     '/',
     '/api',  // Root API route
     '/api/worksheets',
+    '/api/worksheets/recommendations',
+    '/api/worksheets/relationships',
     '/api/submissions',
     '/api/stripe/create-checkout-session',
     '/api/stripe/webhook',
