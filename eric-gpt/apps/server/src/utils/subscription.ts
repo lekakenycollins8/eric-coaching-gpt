@@ -26,8 +26,8 @@ export async function hasFeatureAccess(user: IUser, feature: string): Promise<bo
     
     // Define feature access by tier
     const featureAccess: Record<string, string[]> = {
-      'FOUNDATION': ['worksheets', 'basic_diagnosis'],
-      'PROFESSIONAL': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up'],
+      'FOUNDATION': ['worksheets', 'basic_diagnosis', 'coaching'], // Added coaching to FOUNDATION tier
+      'PROFESSIONAL': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'], // Added coaching to PROFESSIONAL tier
       'EXECUTIVE': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
       'LEGACY': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
     };

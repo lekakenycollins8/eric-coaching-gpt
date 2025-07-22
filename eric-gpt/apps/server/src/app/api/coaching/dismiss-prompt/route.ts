@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserByEmail } from '@/models/User';
 import { emailService } from '@/services/emailService';
+import { connectToDatabase } from '@/db/connection';
 
 /**
  * @swagger
@@ -60,11 +61,18 @@ export async function POST(request: Request) {
     // Get the user from the database if userEmail is provided
     let user = null;
     if (userEmail) {
-      user = await getUserByEmail(userEmail);
-      if (!user) {
-        console.warn('User not found for email:', userEmail);
-        // Continue processing even if user is not found
+      try {
+        await connectToDatabase();
+        console.log('Connected to database before user lookup in dismiss-prompt');
+        user = await getUserByEmail(userEmail);
+      } catch (dbError) {
+        console.error('Failed to connect to database in dismiss-prompt:', dbError);
+        // Continue without user, but log the error
       }
+    }
+    if (!user) {
+      console.warn('User not found for email:', userEmail);
+      // Continue processing even if user is not found
     }
 
     // In a real implementation, we would update the database to track that the user

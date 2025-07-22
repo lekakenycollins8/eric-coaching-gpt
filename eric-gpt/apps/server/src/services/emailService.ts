@@ -12,15 +12,23 @@ export class EmailService {
   
   constructor() {
     // Initialize the nodemailer transporter
-    this.transporter = nodemailer.createTransport({
+    // Use the exact same configuration pattern as the working auth implementation
+    const server = {
       host: process.env.EMAIL_SERVER_HOST,
-      port: parseInt(process.env.EMAIL_SERVER_PORT || '465'),
-      secure: process.env.EMAIL_SERVER_SECURE === 'true',
+      port: Number(process.env.EMAIL_SERVER_PORT),
       auth: {
         user: process.env.EMAIL_SERVER_USER,
         pass: process.env.EMAIL_SERVER_PASSWORD,
       },
+    };
+    
+    console.log('Email service initializing with config:', {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: process.env.EMAIL_SERVER_PORT,
+      user: process.env.EMAIL_SERVER_USER ? '***provided***' : '***missing***'
     });
+    
+    this.transporter = nodemailer.createTransport(server);
   }
   
   /**
@@ -100,47 +108,102 @@ export class EmailService {
   }
   
   /**
-   * Send a coaching session scheduling prompt to the user
-   * @param user The user to send the prompt to
-   * @param submissionId The ID of the relevant submission
+   * Send coaching session confirmation emails
+   * @param user The user who scheduled the session
+   * @param schedulingDetails The details of the scheduled coaching session
+   * @param submissionId Optional submission ID related to this coaching session
    */
-  async sendCoachingPrompt(user: IUser & Document, submissionId: string) {
-    const mailOptions = {
+  async sendCoachingPrompt(user: IUser & Document, submissionId?: string, schedulingDetails?: { date: string; time: string; notes?: string }) {
+    // Verify required environment variables
+    if (!process.env.EMAIL_FROM) {
+      console.error('EMAIL_FROM environment variable is not set');
+      return false;
+    }
+    
+    const coachingEmail = process.env.COACHING_EMAIL || 'coaching@ericjackier.com';
+    const formattedDate = schedulingDetails?.date ? new Date(schedulingDetails.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not specified';
+    const formattedTime = schedulingDetails?.time || 'Not specified';
+    const userNotes = schedulingDetails?.notes || 'No additional notes provided';
+    
+    // Email to the user confirming their scheduled session
+    const userMailOptions = {
       from: process.env.EMAIL_FROM,
       to: user.email,
-      subject: 'Schedule Your Leadership Coaching Session',
+      subject: 'Your Leadership Coaching Session Confirmation',
       html: `
-        <h2>Ready for Your Coaching Session?</h2>
+        <h2>Your Coaching Session is Confirmed!</h2>
         <p>Hello ${user.name || 'there'},</p>
         
-        <p>Based on your recent worksheet submissions, we believe you would benefit from a personalized coaching session with Eric Jackier.</p>
+        <p>Thank you for scheduling your leadership coaching session with Eric Jackier. Here are the details of your upcoming session:</p>
         
-        <p>During this session, Eric will:</p>
-        <ul>
-          <li>Review your leadership assessment results</li>
-          <li>Provide targeted guidance for your specific challenges</li>
-          <li>Help you develop an action plan for continued growth</li>
-        </ul>
+        <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p><strong>Date:</strong> ${formattedDate}</p>
+          <p><strong>Time:</strong> ${formattedTime}</p>
+          <p><strong>Format:</strong> Virtual meeting (Zoom link will be sent before the session)</p>
+          ${submissionId ? `<p><strong>Related to submission:</strong> ${submissionId}</p>` : ''}
+          <p><strong>Your notes:</strong> ${userNotes}</p>
+        </div>
         
-        <p><strong>Click below to schedule your session:</strong></p>
-        <p style="text-align: center;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard/coaching/schedule?submission=${submissionId}" 
-             style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
-            Schedule My Coaching Session
-          </a>
-        </p>
+        <p>Please add this appointment to your calendar. You'll receive a Zoom meeting link via email before your scheduled session.</p>
         
-        <p>We look forward to supporting your leadership journey!</p>
+        <p>If you need to reschedule or have any questions, please reply to this email or contact us at ${coachingEmail}.</p>
         
-        <p>Best regards,<br>The Eric Jackier Leadership Team</p>
+        <p>We look forward to working with you!</p>
+        
+        <p>Best regards,<br>The Eric GPT Coaching Team</p>
       `,
     };
     
     try {
-      await this.transporter.sendMail(mailOptions);
+      // Add verification step before sending
+      await this.transporter.verify();
+      console.log('SMTP connection verified successfully');
+      
+      // Send confirmation email to the user
+      const userResult = await this.transporter.sendMail(userMailOptions);
+      console.log('User confirmation email sent result:', userResult);
+      
+      // Only send notification to coaching team if we have scheduling details
+      let coachingTeamResult = { rejected: [], pending: [] };
+      if (schedulingDetails && coachingEmail) {
+        // Email to the coaching team with the scheduling details
+        const coachingTeamMailOptions = {
+          from: process.env.EMAIL_FROM,
+          to: coachingEmail,
+          subject: `New Coaching Session Scheduled: ${user.name || user.email}`,
+          html: `
+            <h2>New Coaching Session Scheduled</h2>
+            <p>A new leadership coaching session has been scheduled.</p>
+            
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>User:</strong> ${user.name || 'Not provided'} (${user.email})</p>
+              <p><strong>Date:</strong> ${formattedDate}</p>
+              <p><strong>Time:</strong> ${formattedTime}</p>
+              ${submissionId ? `<p><strong>Related to submission:</strong> ${submissionId}</p>` : ''}
+              <p><strong>User notes:</strong> ${userNotes}</p>
+            </div>
+            
+            <p>Please prepare for this session and ensure you're available at the scheduled time.</p>
+          `,
+        };
+        
+        coachingTeamResult = await this.transporter.sendMail(coachingTeamMailOptions);
+        console.log('Coaching team notification email sent result:', coachingTeamResult);
+      }
+      
+      // Check for rejected or pending emails
+      const failed = [...(userResult.rejected || []), ...(coachingTeamResult.rejected || [])]
+        .concat([...(userResult.pending || []), ...(coachingTeamResult.pending || [])])
+        .filter(Boolean);
+        
+      if (failed.length) {
+        console.error(`Email(s) (${failed.join(", ")}) could not be sent`);
+        return false;
+      }
+      
       return true;
     } catch (error) {
-      console.error('Error sending coaching prompt:', error);
+      console.error('Error sending coaching emails:', error);
       return false;
     }
   }
