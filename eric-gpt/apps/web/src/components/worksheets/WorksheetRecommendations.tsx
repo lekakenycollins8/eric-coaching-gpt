@@ -116,7 +116,25 @@ export function WorksheetRecommendations({
               </CardDescription>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
-              <p className="line-clamp-3">{recommendation.contextDescription}</p>
+              {recommendation.aiGeneratedContext ? (
+                <>
+                  <p className="line-clamp-3 mb-2">{recommendation.aiGeneratedContext}</p>
+                  {recommendation.challengeAreas && recommendation.challengeAreas.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium mb-1">Focus Areas:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {recommendation.challengeAreas.map((area, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {area}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p className="line-clamp-3">{recommendation.contextDescription}</p>
+              )}
             </CardContent>
             <CardFooter>
               <Link 

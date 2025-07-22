@@ -158,16 +158,25 @@ export default function DiagnosisPage() {
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-3">Core Leadership Pillars</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {diagnosis.followupWorksheets.pillars.map((pillarId) => (
-                <FollowupWorksheetCard
-                  key={pillarId}
-                  id={pillarId}
-                  title={pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
-                  description="Build your leadership foundation with this core pillar worksheet"
-                  onStart={(id) => handleStartWorksheet(id, 'pillar')}
-                  variant="pillar"
-                />
-              ))}
+              {diagnosis.followupWorksheets.pillars.map((pillarId) => {
+                // Find if we have AI-generated context for this worksheet
+                const worksheetRecommendation = userSubmission.worksheetRecommendations?.find(
+                  (rec) => rec.worksheetId === pillarId
+                );
+                
+                return (
+                  <FollowupWorksheetCard
+                    key={pillarId}
+                    id={pillarId}
+                    title={pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
+                    description="Build your leadership foundation with this core pillar worksheet"
+                    onStart={(id) => handleStartWorksheet(id, 'pillar')}
+                    variant="pillar"
+                    aiGeneratedContext={worksheetRecommendation?.aiGeneratedContext}
+                    challengeAreas={worksheetRecommendation?.challengeAreas}
+                  />
+                );
+              })}
             </div>
           </div>
         )}
@@ -176,13 +185,25 @@ export default function DiagnosisPage() {
           <div>
             <h3 className="text-xl font-semibold mb-3">Implementation Support</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FollowupWorksheetCard
-                id={diagnosis.followupWorksheets.followup}
-                title={diagnosis.followupWorksheets.followup.replace(/_/g, ' ')}
-                description="Deepen your learning with this targeted follow-up worksheet"
-                onStart={(id) => handleStartWorksheet(id, 'followup')}
-                variant="followup"
-              />
+              {(() => {
+                // Find if we have AI-generated context for this worksheet
+                const followupId = diagnosis.followupWorksheets.followup;
+                const worksheetRecommendation = userSubmission.worksheetRecommendations?.find(
+                  (rec) => rec.worksheetId === followupId
+                );
+                
+                return (
+                  <FollowupWorksheetCard
+                    id={followupId}
+                    title={followupId.replace(/_/g, ' ')}
+                    description="Deepen your learning with this targeted follow-up worksheet"
+                    onStart={(id) => handleStartWorksheet(id, 'followup')}
+                    variant="followup"
+                    aiGeneratedContext={worksheetRecommendation?.aiGeneratedContext}
+                    challengeAreas={worksheetRecommendation?.challengeAreas}
+                  />
+                );
+              })()}
             </div>
           </div>
         )}
