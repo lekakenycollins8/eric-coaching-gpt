@@ -25,7 +25,6 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
-import { WorksheetRecommendations } from '@/components/worksheets/WorksheetRecommendations';
 import { Separator } from '@/components/ui/separator';
 
 export default function WorksheetsPage() {
@@ -53,13 +52,6 @@ export default function WorksheetsPage() {
           Complete these worksheets to receive personalized coaching feedback from Eric GPT.
         </p>
       </div>
-      
-      {/* Personalized Worksheet Recommendations */}
-      <div className="mb-10">
-        <WorksheetRecommendations limit={3} showTitle={true} />
-        <Separator className="my-8" />  
-      </div>
-
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
