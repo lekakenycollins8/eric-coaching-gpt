@@ -24,6 +24,9 @@ export async function analyzeUserChallenges(
   user?: IUser
 ): Promise<AIAnalysisResponse> {
   try {
+    console.log(`[DEBUG] analyzeUserChallenges called for worksheet: ${worksheet?.id || 'unknown'}`);
+    console.log(`[DEBUG] User answers received:`, Object.keys(userAnswers).length);
+    
     // Default response in case AI analysis fails
     const defaultResponse: AIAnalysisResponse = {
       challenges: ['leadership', 'communication', 'goal-setting'],
@@ -57,7 +60,15 @@ export async function analyzeUserChallenges(
         
         return `Question: ${questionText}\nAnswer: ${formattedValue}`;
       })
+      .filter(qa => qa && qa.includes('Answer:') && !qa.includes('Answer: undefined') && !qa.includes('Answer: null'))
       .join('\n\n');
+      
+    console.log(`[DEBUG] Formatted ${formattedAnswers.split('\n\n').length} answers for AI analysis`);
+    
+    if (!formattedAnswers || formattedAnswers.trim() === '') {
+      console.log(`[DEBUG] No valid answers found for analysis`);
+      return { challenges: [], analysis: 'No answers provided for analysis.' };
+    }
 
     // Create the prompt for the AI
     const prompt = `

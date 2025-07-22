@@ -159,11 +159,6 @@ export default function DiagnosisPage() {
             <h3 className="text-xl font-semibold mb-3">Core Leadership Pillars</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {diagnosis.followupWorksheets.pillars.map((pillarId) => {
-                // Find if we have AI-generated context for this worksheet
-                const worksheetRecommendation = userSubmission.worksheetRecommendations?.find(
-                  (rec) => rec.worksheetId === pillarId
-                );
-                
                 return (
                   <FollowupWorksheetCard
                     key={pillarId}
@@ -172,8 +167,6 @@ export default function DiagnosisPage() {
                     description="Build your leadership foundation with this core pillar worksheet"
                     onStart={(id) => handleStartWorksheet(id, 'pillar')}
                     variant="pillar"
-                    aiGeneratedContext={worksheetRecommendation?.aiGeneratedContext}
-                    challengeAreas={worksheetRecommendation?.challengeAreas}
                   />
                 );
               })}
@@ -186,11 +179,7 @@ export default function DiagnosisPage() {
             <h3 className="text-xl font-semibold mb-3">Implementation Support</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {(() => {
-                // Find if we have AI-generated context for this worksheet
                 const followupId = diagnosis.followupWorksheets.followup;
-                const worksheetRecommendation = userSubmission.worksheetRecommendations?.find(
-                  (rec) => rec.worksheetId === followupId
-                );
                 
                 return (
                   <FollowupWorksheetCard
@@ -199,8 +188,6 @@ export default function DiagnosisPage() {
                     description="Deepen your learning with this targeted follow-up worksheet"
                     onStart={(id) => handleStartWorksheet(id, 'followup')}
                     variant="followup"
-                    aiGeneratedContext={worksheetRecommendation?.aiGeneratedContext}
-                    challengeAreas={worksheetRecommendation?.challengeAreas}
                   />
                 );
               })()}

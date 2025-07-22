@@ -8,8 +8,6 @@ interface FollowupWorksheetCardProps {
   description: string;
   onStart: (id: string) => void;
   variant?: 'pillar' | 'followup';
-  aiGeneratedContext?: string;
-  challengeAreas?: string[];
 }
 
 export function FollowupWorksheetCard({ 
@@ -17,9 +15,7 @@ export function FollowupWorksheetCard({
   title, 
   description, 
   onStart,
-  variant = 'pillar',
-  aiGeneratedContext,
-  challengeAreas
+  variant = 'pillar'
 }: FollowupWorksheetCardProps) {
   // Different styling for pillar vs followup worksheets
   const borderClass = variant === 'pillar' ? 'border-blue-400' : 'border-purple-400';
@@ -43,27 +39,10 @@ export function FollowupWorksheetCard({
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          {aiGeneratedContext ? (
-            aiGeneratedContext
-          ) : (
-            variant === 'pillar' 
-              ? 'This worksheet will help you develop specific leadership skills related to this pillar.'
-              : 'This follow-up worksheet will help you integrate insights from your diagnosis.'
-          )}
+          {variant === 'pillar' 
+            ? 'This worksheet will help you develop specific leadership skills related to this pillar.'
+            : 'This follow-up worksheet will help you integrate insights from your diagnosis.'}
         </p>
-        
-        {challengeAreas && challengeAreas.length > 0 && (
-          <div className="mt-3">
-            <p className="text-xs font-medium mb-1">Focus Areas:</p>
-            <div className="flex flex-wrap gap-1">
-              {challengeAreas.map((area, index) => (
-                <span key={index} className={`text-xs px-2 py-0.5 rounded-full ${variant === 'pillar' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
-                  {area}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </CardContent>
       <CardFooter>
         <Button 

@@ -57,16 +57,7 @@ export interface WorkbookSubmission {
     answers: Record<string, any>;
     submittedAt: string;
   }>;
-  worksheetRecommendations?: Array<{
-    worksheetId: string;
-    title: string;
-    description: string;
-    relevanceScore: number;
-    contextDescription: string;
-    relationshipType: string;
-    aiGeneratedContext?: string;
-    challengeAreas?: string[];
-  }>;
+
   createdAt: string;
   updatedAt: string;
   diagnosisGeneratedAt?: string;

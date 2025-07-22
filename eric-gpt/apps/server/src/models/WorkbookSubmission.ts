@@ -41,16 +41,7 @@ export interface IWorksheetSubmission {
  * Interface for worksheet recommendation
  * @interface IWorksheetRecommendation
  */
-export interface IWorksheetRecommendation {
-  worksheetId: string;
-  title: string;
-  description: string;
-  relevanceScore: number;
-  contextDescription: string;
-  relationshipType: string;
-  aiGeneratedContext?: string;
-  challengeAreas?: string[];
-}
+// Worksheet recommendation interface removed as per requirements
 
 export interface IWorkbookSubmission extends Document {
   userId: Types.ObjectId;          // Reference to the user
@@ -60,7 +51,6 @@ export interface IWorkbookSubmission extends Document {
   diagnosis?: IDiagnosisResult;    // Diagnosis results (if submitted)
   followup?: IWorksheetSubmission; // Follow-up worksheet submission
   pillars?: IWorksheetSubmission[]; // Pillar worksheet submissions
-  worksheetRecommendations?: IWorksheetRecommendation[]; // AI-generated worksheet recommendations
   emailSent: boolean;              // Whether email notification was sent
   schedulingPrompted: boolean;     // Whether scheduling was prompted
   createdAt: Date;                 // Creation timestamp
@@ -134,41 +124,7 @@ const WorksheetSubmissionSchema = new Schema({
   }
 });
 
-// Schema for worksheet recommendation
-const WorksheetRecommendationSchema = new Schema({
-  worksheetId: {
-    type: String,
-    required: true
-  },
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  relevanceScore: {
-    type: Number,
-    required: true
-  },
-  contextDescription: {
-    type: String,
-    required: true
-  },
-  relationshipType: {
-    type: String,
-    required: true
-  },
-  aiGeneratedContext: {
-    type: String,
-    required: false
-  },
-  challengeAreas: {
-    type: [String],
-    required: false
-  }
-}, { _id: false });
+// Worksheet recommendation schema removed as per requirements
 
 // Schema for workbook submission
 const WorkbookSubmissionSchema = new Schema({
@@ -205,10 +161,7 @@ const WorkbookSubmissionSchema = new Schema({
     type: [WorksheetSubmissionSchema],
     default: undefined
   },
-  worksheetRecommendations: {
-    type: [WorksheetRecommendationSchema],
-    default: undefined
-  },
+  // Worksheet recommendations feature removed as per requirements
   diagnosisGeneratedAt: {
     type: Date,
     default: undefined

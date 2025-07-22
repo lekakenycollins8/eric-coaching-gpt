@@ -6,7 +6,6 @@ import WorkbookSubmission, { IWorkbookSubmission } from '@/models/WorkbookSubmis
 import mongoose from 'mongoose';
 import { generateAIDiagnosis, FormattedQA } from '@/utils/diagnosisUtils';
 import { hasActiveSubscription } from '@/services/quotaManager';
-import worksheetRelationshipService from '@/services/worksheetRelationshipService';
 import { connectToDatabase } from '@/db/connection';
 
 export const dynamic = 'force-dynamic';
@@ -250,36 +249,6 @@ export async function POST(request: Request) {
       await submission.save();
       
       console.log('AI diagnosis generated successfully for submission:', submission._id);
-      
-      // Generate worksheet recommendations with AI context
-      try {
-        console.log('Generating worksheet recommendations with AI context...');
-        
-        // Get recommended worksheets based on the diagnosis
-        const recommendedWorksheets = await worksheetRelationshipService.getRecommendedFollowUps(
-          'jackier_method', // Source worksheet ID for Jackier Method
-          formattedAnswers,
-          diagnosis.challenges
-        );
-        
-        console.log(`Generated ${recommendedWorksheets.length} worksheet recommendations with AI context`);
-        
-        // Store the recommendations in the submission document
-        // First check if the schema supports worksheetRecommendations
-        if (!submission.worksheetRecommendations) {
-          // Add worksheetRecommendations as a custom property if not in schema
-          (submission as any).worksheetRecommendations = recommendedWorksheets;
-        } else {
-          submission.worksheetRecommendations = recommendedWorksheets;
-        }
-        
-        await submission.save();
-        
-        console.log('Worksheet recommendations stored in submission document');
-      } catch (recommendationsError) {
-        console.error('Error generating worksheet recommendations:', recommendationsError);
-        // Continue even if recommendations generation fails
-      }
     } catch (diagnosisError) {
       console.error('Error generating diagnosis:', diagnosisError);
       // Log more details about the error
