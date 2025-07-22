@@ -184,7 +184,8 @@ export async function POST(request: Request) {
         strengths: diagnosis.strengths,
         challenges: diagnosis.challenges,
         recommendations: diagnosis.recommendations,
-        followupWorksheets
+        followupWorksheets,
+        createdAt: new Date() // Add the required createdAt field
       };
       submission.diagnosisGeneratedAt = new Date();
       await submission.save();

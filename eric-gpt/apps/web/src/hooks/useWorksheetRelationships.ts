@@ -33,6 +33,8 @@ export interface WorksheetRecommendation {
   relevanceScore: number;
   contextDescription: string;
   relationshipType: RelationshipType;
+  aiGeneratedContext?: string;
+  challengeAreas?: string[];
 }
 
 /**

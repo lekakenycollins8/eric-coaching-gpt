@@ -18,6 +18,7 @@ import { PILLAR9_PROMPT } from './conflict-resolution';
 import { PILLAR10_PROMPT } from './high-performance';
 import { PILLAR11_PROMPT } from './decision-making';
 import { PILLAR12_PROMPT } from './execution-results';
+import { CHALLENGE_ANALYSIS_PROMPT, RECOMMENDATION_CONTEXT_PROMPT } from './challenge-analysis';
 
 // Re-export all prompts for external use
 export {
@@ -33,7 +34,9 @@ export {
   PILLAR9_PROMPT,
   PILLAR10_PROMPT,
   PILLAR11_PROMPT,
-  PILLAR12_PROMPT
+  PILLAR12_PROMPT,
+  CHALLENGE_ANALYSIS_PROMPT,
+  RECOMMENDATION_CONTEXT_PROMPT
 };
 
 /**
@@ -41,6 +44,8 @@ export {
  */
 export const SYSTEM_PROMPTS = {
   // General worksheet categories
+  challenge_analysis: CHALLENGE_ANALYSIS_PROMPT,
+  recommendation_context: RECOMMENDATION_CONTEXT_PROMPT,
   
   // Specific pillar prompts
   pillar1_prompt: PILLAR1_PROMPT,

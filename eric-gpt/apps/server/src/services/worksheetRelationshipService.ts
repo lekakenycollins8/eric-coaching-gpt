@@ -5,6 +5,8 @@ import WorksheetRelationshipModel, {
   TriggerCondition 
 } from '../models/WorksheetRelationship';
 import { loadWorksheetById } from '../utils/worksheetLoader';
+import { analyzeUserChallenges } from '@/utils/aiAnalysis'
+import { IUser } from '../models/User';
 
 /**
  * Service for managing worksheet relationships
@@ -72,6 +74,8 @@ export class WorksheetRelationshipService {
     relevanceScore: number;
     contextDescription: string;
     relationshipType: RelationshipType;
+    aiGeneratedContext?: string;
+    challengeAreas?: string[];
   }[]> {
     await connectToDatabase();
     
@@ -80,11 +84,35 @@ export class WorksheetRelationshipService {
     
     // Filter relationships based on trigger conditions
     const validRelationships = relationships.filter(relationship => {
-      // For now, we'll consider all relationships valid
-      // In the future, we can implement more complex filtering based on
-      // trigger conditions, user answers, and user profile
+      // Check if the relationship has AI_RECOMMENDATION trigger condition
+      const hasAiTrigger = relationship.triggerConditions.some(
+        condition => condition.type === TriggerCondition.AI_RECOMMENDATION
+      );
+      
+      // If it has AI trigger, we'll validate it later with AI analysis
+      // For other trigger types, consider them valid for now
       return true;
     });
+    
+    // Get user challenges if we have user answers
+    let userChallenges: { challenges: string[], analysis: string } | null = null;
+    if (userAnswers && Object.keys(userAnswers).length > 0) {
+      try {
+        // Get the source worksheet to provide context for AI analysis
+        const sourceWorksheet = await loadWorksheetById(worksheetId);
+        if (sourceWorksheet) {
+          // Analyze user challenges based on their answers
+          userChallenges = await analyzeUserChallenges(
+            sourceWorksheet,
+            userAnswers,
+            userProfile?.user as IUser
+          );
+        }
+      } catch (error) {
+        console.error('Error analyzing user challenges:', error);
+        // Continue without AI analysis if it fails
+      }
+    }
     
     // Load the target worksheets for valid relationships
     const recommendations = await Promise.all(
@@ -95,18 +123,48 @@ export class WorksheetRelationshipService {
           return null;
         }
         
+        // Check if this relationship has AI recommendation trigger
+        const hasAiTrigger = relationship.triggerConditions.some(
+          condition => condition.type === TriggerCondition.AI_RECOMMENDATION
+        );
+        
+        // Adjust relevance score and provide AI-generated context if we have user challenges
+        let aiGeneratedContext: string | undefined;
+        let challengeAreas: string[] | undefined;
+        let adjustedRelevanceScore = relationship.relevanceScore;
+        
+        if (hasAiTrigger && userChallenges) {
+          // Check if this worksheet addresses any of the user's challenges
+          const matchingChallenges = userChallenges.challenges.filter(challenge => 
+            targetWorksheet.tags?.some((tag: string | null | undefined) => 
+              tag !== null && tag !== undefined && tag.toLowerCase().includes(challenge.toLowerCase())
+            )
+          );
+          
+          if (matchingChallenges.length > 0) {
+            // Boost relevance score for worksheets that match user challenges
+            adjustedRelevanceScore = Math.min(100, relationship.relevanceScore + (matchingChallenges.length * 10));
+            
+            // Generate contextual explanation
+            aiGeneratedContext = `This worksheet addresses your challenges with ${matchingChallenges.join(', ')} identified in your previous responses.`;
+            challengeAreas = matchingChallenges;
+          }
+        }
+        
         return {
           worksheetId: targetWorksheet.id,
           title: targetWorksheet.title,
           description: targetWorksheet.description,
-          relevanceScore: relationship.relevanceScore,
+          relevanceScore: adjustedRelevanceScore,
           contextDescription: relationship.contextDescription,
-          relationshipType: relationship.relationshipType
+          relationshipType: relationship.relationshipType,
+          aiGeneratedContext,
+          challengeAreas
         };
       })
     );
     
-    // Define the return type to avoid null values
+    // Define the return type for recommendations
     type RecommendationType = {
       worksheetId: string;
       title: string;
@@ -114,12 +172,17 @@ export class WorksheetRelationshipService {
       relevanceScore: number;
       contextDescription: string;
       relationshipType: RelationshipType;
+      aiGeneratedContext?: string;
+      challengeAreas?: string[];
     };
     
     // Filter out null values and sort by relevance score
-    return recommendations
-      .filter((rec): rec is RecommendationType => rec !== null)
-      .sort((a, b) => b.relevanceScore - a.relevanceScore);
+    const filteredRecommendations = recommendations
+      .filter((rec): rec is NonNullable<typeof rec> => rec !== null)
+      .sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+      
+    // Cast to the expected return type
+    return filteredRecommendations as RecommendationType[];
   }
   
   /**

@@ -6,6 +6,7 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
  */
 export interface IFollowupWorksheets {
   pillars: string[];              // Recommended pillar worksheet IDs
+  followup?: string;             // Recommended follow-up worksheet ID
 }
 
 /**
