@@ -24,12 +24,12 @@ export async function hasFeatureAccess(user: IUser, feature: string): Promise<bo
     // Get the user's subscription tier
     const tier = await getUserSubscriptionTier(userId);
     
-    // Define feature access by tier
+    // Define feature access by tier - must match the tiers in QUOTA_LIMITS from config/openai.ts
     const featureAccess: Record<string, string[]> = {
-      'FOUNDATION': ['worksheets', 'basic_diagnosis', 'coaching'], // Added coaching to FOUNDATION tier
-      'PROFESSIONAL': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'], // Added coaching to PROFESSIONAL tier
-      'EXECUTIVE': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
+      'FOUNDATION': ['worksheets', 'basic_diagnosis', 'coaching'],
+      'MOMENTUM': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
       'LEGACY': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
+      'EXECUTIVE': ['worksheets', 'basic_diagnosis', 'advanced_diagnosis', 'follow_up', 'coaching'],
     };
     
     // Check if the user's tier has access to the requested feature

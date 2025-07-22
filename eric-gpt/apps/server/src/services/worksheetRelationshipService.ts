@@ -145,8 +145,29 @@ export class WorksheetRelationshipService {
             // Boost relevance score for worksheets that match user challenges
             adjustedRelevanceScore = Math.min(100, relationship.relevanceScore + (matchingChallenges.length * 10));
             
-            // Generate contextual explanation
-            aiGeneratedContext = `This worksheet addresses your challenges with ${matchingChallenges.join(', ')} identified in your previous responses.`;
+            // Get source worksheet for context generation
+            const sourceWorksheet = await loadWorksheetById(worksheetId);
+            
+            try {
+              // Generate personalized context using AI
+              if (sourceWorksheet) {
+                // Import the generateRecommendationContext function
+                const { generateRecommendationContext } = await import('../utils/aiAnalysis');
+                
+                // Generate personalized context
+                aiGeneratedContext = await generateRecommendationContext(
+                  sourceWorksheet,
+                  targetWorksheet,
+                  matchingChallenges
+                );
+              }
+            } catch (error) {
+              console.error('Error generating recommendation context:', error);
+              // Fallback to simple context if AI generation fails
+              aiGeneratedContext = `This worksheet addresses your challenges with ${matchingChallenges.join(', ')} identified in your previous responses.`;
+            }
+            
+            // Set challenge areas for display in UI
             challengeAreas = matchingChallenges;
           }
         }

@@ -37,6 +37,21 @@ export interface IWorksheetSubmission {
  * @interface IWorkbookSubmission
  * @extends Document
  */
+/**
+ * Interface for worksheet recommendation
+ * @interface IWorksheetRecommendation
+ */
+export interface IWorksheetRecommendation {
+  worksheetId: string;
+  title: string;
+  description: string;
+  relevanceScore: number;
+  contextDescription: string;
+  relationshipType: string;
+  aiGeneratedContext?: string;
+  challengeAreas?: string[];
+}
+
 export interface IWorkbookSubmission extends Document {
   userId: Types.ObjectId;          // Reference to the user
   workbookId: string;              // Reference to the workbook
@@ -45,6 +60,7 @@ export interface IWorkbookSubmission extends Document {
   diagnosis?: IDiagnosisResult;    // Diagnosis results (if submitted)
   followup?: IWorksheetSubmission; // Follow-up worksheet submission
   pillars?: IWorksheetSubmission[]; // Pillar worksheet submissions
+  worksheetRecommendations?: IWorksheetRecommendation[]; // AI-generated worksheet recommendations
   emailSent: boolean;              // Whether email notification was sent
   schedulingPrompted: boolean;     // Whether scheduling was prompted
   createdAt: Date;                 // Creation timestamp
@@ -118,6 +134,42 @@ const WorksheetSubmissionSchema = new Schema({
   }
 });
 
+// Schema for worksheet recommendation
+const WorksheetRecommendationSchema = new Schema({
+  worksheetId: {
+    type: String,
+    required: true
+  },
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  relevanceScore: {
+    type: Number,
+    required: true
+  },
+  contextDescription: {
+    type: String,
+    required: true
+  },
+  relationshipType: {
+    type: String,
+    required: true
+  },
+  aiGeneratedContext: {
+    type: String,
+    required: false
+  },
+  challengeAreas: {
+    type: [String],
+    required: false
+  }
+}, { _id: false });
+
 // Schema for workbook submission
 const WorkbookSubmissionSchema = new Schema({
   userId: {
@@ -151,6 +203,10 @@ const WorkbookSubmissionSchema = new Schema({
   },
   pillars: {
     type: [WorksheetSubmissionSchema],
+    default: undefined
+  },
+  worksheetRecommendations: {
+    type: [WorksheetRecommendationSchema],
     default: undefined
   },
   diagnosisGeneratedAt: {
