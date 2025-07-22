@@ -65,7 +65,7 @@ We have completed up to Phase 3 of the Jackier Method Workbook Integration and m
 
 ---
 
-### Milestone 3: Email & Human Coaching Integration (Phase 4) (COMPLETED)
+### Milestone 3: Email & Human Coaching Integration (Phase 4) (PARTIALLY COMPLETED)
 **Goal:** Complete the email notification system and coaching integration touchpoints
 
 #### Tasks:
@@ -90,17 +90,36 @@ We have completed up to Phase 3 of the Jackier Method Workbook Integration and m
 ##### 1. Server-Side API Routes
 
 **Schedule Route (`/apps/server/src/app/api/coaching/schedule/route.ts`):**
-- Integrated `emailService.sendCoachingPrompt()` to send confirmation emails when a coaching session is scheduled
-- Added email status tracking with a new `emailSent` boolean variable
-- Included email status in the API response to inform the client about email delivery
-- Implemented proper error handling to ensure the scheduling process continues even if email sending fails
+- Implemented POST handler for scheduling coaching sessions
+- Added user authentication and subscription access checks
+- Integrated with EmailService to send confirmation emails to users
+- Added second email notification to coaching team with session details
+- Included detailed scheduling information in emails (date, time, notes)
+- Added proper error handling for database and email operations
 
-**Dismiss-Prompt Route (`/apps/server/src/app/api/coaching/dismiss-prompt/route.ts`):**
-- Added user retrieval from the database using the provided email
-- Integrated `emailService.sendCoachingPrompt()` to send notifications when a coaching prompt is dismissed
-- Added email status tracking with a new `emailSent` boolean variable
-- Included email status in the API response
-- Implemented proper error handling to ensure the dismissal process continues even if email sending fails
+**Dismiss Prompt Route (`/apps/server/src/app/api/coaching/dismiss-prompt/route.ts`):**
+- Implemented POST handler for tracking when users dismiss coaching prompts
+- Added optional email notifications for dismissed prompts
+- Prepared structure for future database integration
+
+##### 2. Email Service Integration
+
+**EmailService (`/apps/server/src/services/emailService.ts`):**
+- Enhanced the sendCoachingPrompt method to handle both scheduling confirmations and dismissals
+- Created professional email templates with proper formatting and styling
+- Added dual-recipient functionality to notify both users and coaching team
+- Implemented proper error handling and logging for email delivery issues
+- Fixed SMTP configuration to match working auth email implementation
+
+##### 3. Database Integration (Deferred)
+
+**Note:** Due to timeline constraints and prioritization of other features, the database integration for coaching sessions has been deferred to a future milestone. The current implementation successfully handles email notifications to both users and the coaching team, which satisfies the immediate requirements.
+
+**Future Tasks (Deferred):**
+- Create MongoDB models for coaching sessions and prompt dismissals
+- Implement database operations in API routes to store session details
+- Add tracking for prompt dismissals to analyze user engagement
+- Create admin dashboard for coaching team to view scheduled sessions
 
 ##### 2. Web App Proxy Routes
 
@@ -123,6 +142,12 @@ We have completed up to Phase 3 of the Jackier Method Workbook Integration and m
 - Exposed the `emailSent` state in the hook's return value for UI components
 
 ##### 4. Integration Flow
+
+**Current Implementation:**
+- When a user schedules a coaching session, confirmation emails are sent to both the user and coaching team
+- Emails include all relevant session details (date, time, notes, submission context)
+- The system handles errors gracefully, allowing the scheduling process to continue even if email sending fails
+- Both API routes properly connect to the database before attempting to retrieve user information
 
 **Coaching Session Scheduling:**
 - User submits a form to schedule a coaching session
