@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUserByEmail } from '@/models/User';
 import { hasFeatureAccess } from '@/utils/subscription';
+import { emailService } from '@/services/emailService';
 
 /**
  * @swagger
@@ -93,20 +94,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Subscription required for coaching sessions' }, { status: 403 });
     }
 
-    // In a real implementation, we would:
     // 1. Save the scheduling request to the database
-    // 2. Send an email to the coaching team
-    // 3. Send a confirmation email to the user
-    // 4. Create a calendar invitation
-    
-    // For now, we'll simulate a successful scheduling
+    // For now, we'll simulate a successful scheduling with a generated ID
     const schedulingId = `sched_${Date.now()}`;
+    
+    // 2. Send a confirmation email to the user
+    // This uses the EmailService to send a coaching prompt email
+    let emailSent = false;
+    try {
+      emailSent = await emailService.sendCoachingPrompt(user, submissionId || '');
+      console.log('Coaching confirmation email sent successfully:', emailSent);
+    } catch (emailError) {
+      console.error('Failed to send coaching confirmation email:', emailError);
+      // We continue with the scheduling process even if email fails
+      // but we log the error for monitoring
+    }
+    
+    // 3. In a production environment, we would also:
+    //    - Send an email to the coaching team
+    //    - Create a calendar invitation
     
     // Return a success response with the scheduling details
     return NextResponse.json({
       success: true,
       message: 'Coaching session scheduled successfully',
       schedulingId,
+      emailSent, // Include email status in the response
       details: {
         date,
         time,

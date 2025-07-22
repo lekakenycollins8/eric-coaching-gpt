@@ -2,6 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface DismissPromptParams {
   submissionId: string;
@@ -10,6 +11,7 @@ interface DismissPromptParams {
 interface DismissPromptResponse {
   success: boolean;
   message: string;
+  emailSent?: boolean;
 }
 
 /**
@@ -48,6 +50,8 @@ async function dismissCoachingPrompt(submissionId: string): Promise<DismissPromp
  * Handles dismissing prompts and tracking user interactions
  */
 export function useCoachingPrompt() {
+  const [emailSent, setEmailSent] = useState<boolean>(false);
+  
   const mutation = useMutation<
     DismissPromptResponse, 
     Error, 
@@ -55,8 +59,9 @@ export function useCoachingPrompt() {
     unknown
   >({
     mutationFn: dismissCoachingPrompt,
-    onSuccess: () => {
-      // Optional: You can add additional success handling here
+    onSuccess: (data) => {
+      // Track if an email was sent as part of the dismissal process
+      setEmailSent(data.emailSent || false);
     },
     onError: (error) => {
       console.error('Error dismissing coaching prompt:', error);
@@ -76,6 +81,7 @@ export function useCoachingPrompt() {
     dismissPrompt,
     isDismissing: mutation.isPending,
     isDismissed: mutation.isSuccess,
+    emailSent,
     error: mutation.error ? mutation.error.message : null
   };
 }

@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     // Add user information to the request body
     const requestBody = {
       userId: session.user.id,
+      userEmail: session.user.email,
       submissionId
     };
     

@@ -15,6 +15,7 @@ interface ScheduleCoachingResponse {
   success: boolean;
   message: string;
   schedulingId?: string;
+  emailSent?: boolean;
   details?: {
     date: string;
     time: string;
@@ -66,6 +67,7 @@ export function useCoachingSchedule() {
   // We still need some local state for UI management
   const [schedulingDetails, setSchedulingDetails] = useState<ScheduleCoachingResponse['details'] | null>(null);
   const [schedulingId, setSchedulingId] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState<boolean>(false);
   
   const { toast } = useToast();
   const { data: session } = useSession();
@@ -81,10 +83,13 @@ export function useCoachingSchedule() {
     onSuccess: (data) => {
       setSchedulingDetails(data.details || null);
       setSchedulingId(data.schedulingId || null);
+      setEmailSent(data.emailSent || false);
       
       toast({
         title: 'Coaching Session Scheduled',
-        description: 'Your coaching session has been scheduled successfully.',
+        description: data.emailSent 
+          ? 'Your coaching session has been scheduled successfully and a confirmation email has been sent.'
+          : 'Your coaching session has been scheduled successfully.',
       });
     },
     onError: (error) => {
@@ -144,5 +149,6 @@ export function useCoachingSchedule() {
     error: mutation.error ? mutation.error.message : null,
     schedulingDetails,
     schedulingId,
+    emailSent,
   };
 }

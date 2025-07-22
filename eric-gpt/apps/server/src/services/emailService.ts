@@ -13,12 +13,12 @@ export class EmailService {
   constructor() {
     // Initialize the nodemailer transporter
     this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.example.com',
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: process.env.EMAIL_SECURE === 'true',
+      host: process.env.EMAIL_SERVER_HOST,
+      port: parseInt(process.env.EMAIL_SERVER_PORT || '465'),
+      secure: process.env.EMAIL_SERVER_SECURE === 'true',
       auth: {
-        user: process.env.EMAIL_USER || '',
-        pass: process.env.EMAIL_PASSWORD || '',
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD,
       },
     });
   }
@@ -32,25 +32,22 @@ export class EmailService {
     const coachingEmail = process.env.COACHING_EMAIL || 'coaching@ericjackier.com';
     
     // Extract key information from the diagnosis
-    const strengths = submission.diagnosis?.strengths?.join(', ') || 'None identified';
-    const challenges = submission.diagnosis?.challenges?.join(', ') || 'None identified';
+    const strengths = submission.diagnosis?.strengths?.join(', ');
+    const challenges = submission.diagnosis?.challenges?.join(', ');
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'notifications@ericjackier.com',
+      from: process.env.EMAIL_FROM,
       to: coachingEmail,
       subject: `New Workbook Submission: ${user.name || user.email}`,
       html: `
         <h2>New Workbook Submission</h2>
-        <p><strong>User:</strong> ${user.name || 'Not provided'} (${user.email})</p>
+        <p><strong>User:</strong> ${user.name} (${user.email})</p>
         <p><strong>Submission Date:</strong> ${new Date(submission.createdAt).toLocaleString()}</p>
         <p><strong>Diagnosis Generated:</strong> ${submission.diagnosisGeneratedAt ? 'Yes' : 'No'}</p>
         
         <h3>Key Insights</h3>
         <p><strong>Strengths:</strong> ${strengths}</p>
         <p><strong>Challenges:</strong> ${challenges}</p>
-        
-        <p>View the full submission in the coaching dashboard.</p>
-        <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/submissions/${submission._id}">View Submission Details</a></p>
       `,
     };
     
@@ -74,14 +71,14 @@ export class EmailService {
     followupAssessment: IFollowupAssessment & Document,
     workbookSubmission: IWorkbookSubmission & Document
   ) {
-    const coachingEmail = process.env.COACHING_EMAIL || 'coaching@ericjackier.com';
+    const coachingEmail = process.env.COACHING_EMAIL;
     
     // Determine the worksheet type (pillar or follow-up)
     const isPillar = followupAssessment.followupId.includes('pillar');
     const worksheetType = isPillar ? 'Pillar' : 'Implementation';
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'notifications@ericjackier.com',
+      from: process.env.EMAIL_FROM,
       to: coachingEmail,
       subject: `New ${worksheetType} Follow-up Submission: ${user.name || user.email}`,
       html: `
@@ -90,10 +87,6 @@ export class EmailService {
         <p><strong>Submission Date:</strong> ${new Date(followupAssessment.createdAt).toLocaleString()}</p>
         <p><strong>Worksheet Type:</strong> ${worksheetType}</p>
         <p><strong>Worksheet ID:</strong> ${followupAssessment.followupId}</p>
-        
-        <p>The user has completed a follow-up worksheet and may benefit from coaching support.</p>
-        <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/followups/${followupAssessment._id}">View Follow-up Details</a></p>
-        <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/submissions/${workbookSubmission._id}">View Original Submission</a></p>
       `,
     };
     
@@ -113,7 +106,7 @@ export class EmailService {
    */
   async sendCoachingPrompt(user: IUser & Document, submissionId: string) {
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'coaching@ericjackier.com',
+      from: process.env.EMAIL_FROM,
       to: user.email,
       subject: 'Schedule Your Leadership Coaching Session',
       html: `
