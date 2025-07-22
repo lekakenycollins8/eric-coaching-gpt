@@ -245,7 +245,13 @@ export function useJackierWorkbook() {
   const submitWorkbook = async (answers: Record<string, unknown>) => {
     try {
       setError(null);
-      return await submitWorkbookMutation.mutateAsync(answers);
+      const result = await submitWorkbookMutation.mutateAsync(answers);
+      
+      // Force invalidation and refetch to ensure fresh data
+      await queryClient.invalidateQueries({ queryKey: ['jackier', 'submission'] });
+      await queryClient.refetchQueries({ queryKey: ['jackier', 'submission'] });
+      
+      return result;
     } catch (err) {
       throw err;
     }
