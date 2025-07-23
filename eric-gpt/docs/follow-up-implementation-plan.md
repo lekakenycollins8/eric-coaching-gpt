@@ -48,6 +48,43 @@ We have successfully implemented the core functionality of the platform:
 - [x] Enhance the analysis of leadership pillars with more specific recommendations
 - [x] Improve the presentation of diagnosis results in the UI
 - [x] Add more detailed explanations for why each pillar was identified
+
+### Milestone 6: AI Diagnosis Display and Data Integration
+**Goal:** Ensure enhanced diagnosis fields are correctly parsed, saved, and displayed
+
+#### Tasks:
+- [x] Update MongoDB schema to include all enhanced diagnosis fields
+- [x] Create migration scripts to update existing diagnosis data
+- [x] Implement email notification system for diagnosis generation
+- [x] Verify frontend UI components correctly display enhanced fields
+
+#### Implementation Details:
+
+1. **Database Schema Updates**
+   - Updated `DiagnosisResultSchema` in `WorkbookSubmission.ts` to include all enhanced fields:
+     - `situationAnalysis`
+     - `strengthsAnalysis`
+     - `growthAreasAnalysis`
+     - `actionableRecommendations`
+     - `pillarRecommendations`
+     - `followupRecommendation`
+   - Added corresponding sub-schemas for structured data storage
+
+2. **Data Migration**
+   - Created migration scripts (`migrateDiagnosisFields.ts` and JS ES module version)
+   - Implemented proper environment variable handling and database connection
+   - Added error handling and logging for migration process
+
+3. **Email Notification System**
+   - Added `sendDiagnosisNotification` method to `emailService.ts`
+   - Implemented detailed email template with enhanced diagnosis information
+   - Updated workbook submission route to send notifications when diagnosis is generated
+   - Added proper tracking of email notification status
+
+4. **Frontend Integration**
+   - Verified that all UI components correctly handle enhanced diagnosis fields
+   - Confirmed conditional rendering for optional enhanced fields
+   - Ensured proper display of detailed diagnosis information in the UI
 - [x] Implement better error handling for AI response processing
 
 #### Expected Outcome:
@@ -81,12 +118,9 @@ We have successfully implemented the core functionality of the platform:
 
 #### Tasks:
 - [ ] Improve email notifications with more detailed worksheet insights
-- [ ] Create a coaching dashboard for reviewing client submissions
 - [ ] Implement a feedback loop between coaching sessions and follow-up worksheets
-- [x] Add scheduling integration for coaching sessions
 - [ ] Enhance data sharing between the AI system and human coaches
 - [ ] Create reminder mechanism (in-app and/or email)
-- [ ] Add user preferences for notification frequency
 
 #### Expected Outcome:
 - Seamless transition from AI diagnosis to human coaching
