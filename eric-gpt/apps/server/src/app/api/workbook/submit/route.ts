@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import User, { IUser } from '@/models/User';
 import WorkbookSubmission, { IWorkbookSubmission } from '@/models/WorkbookSubmission';
 import mongoose from 'mongoose';
-import { generateAIDiagnosis, FormattedQA } from '@/utils/diagnosisUtils';
+import { generateAIDiagnosis } from '@/utils/diagnosis/generator';
 import { hasActiveSubscription } from '@/services/quotaManager';
 import { connectToDatabase } from '@/db/connection';
 
@@ -197,13 +197,13 @@ export async function POST(request: Request) {
       console.log('Generating AI diagnosis for submission:', submission._id);
       
       // Format the answers for the diagnosis generation
-      const formattedAnswers: FormattedQA[] = [];
-      
       // Get the user's name or use a default
       const userName = user.name || 'Client';
       
       // Format each answer as a question-answer pair
       // In a real implementation, you would have a mapping of question IDs to actual question text
+      let formattedAnswersText = '';
+      
       Object.entries(submission.answers).forEach(([key, value]) => {
         // Skip empty answers
         if (value === null || value === undefined || value === '') return;
@@ -215,18 +215,23 @@ export async function POST(request: Request) {
           .replace(/^(\w)/, (match) => match.toUpperCase())
           .replace(/section\d+/i, '');
         
-        formattedAnswers.push({
-          question,
-          answer: String(value)
-        });
+        // Add formatted Q&A to the text
+        formattedAnswersText += `Question: ${question}\nAnswer: ${String(value)}\n\n`;
       });
       
+      console.log('Formatted answers text sample:', formattedAnswersText.substring(0, 200) + '...');
+      
       // Generate the diagnosis
-      const diagnosisResponse = await generateAIDiagnosis(formattedAnswers, userName);
+      const rawDiagnosisResponse = await generateAIDiagnosis(formattedAnswersText, userName);
+      
+      // Log the raw diagnosis response for debugging
+      console.log('Raw AI diagnosis response:', JSON.stringify(rawDiagnosisResponse, null, 2));
+      
+      const diagnosisResponse = rawDiagnosisResponse;
       
       // Update the submission with the diagnosis
       // Add createdAt field required by IDiagnosisResult interface
-      // Ensure followupWorksheets.followup is a string or undefined (not null) to match schema
+      // Include all enhanced fields from the parser
       const diagnosis = {
         summary: diagnosisResponse.summary,
         strengths: diagnosisResponse.strengths,
@@ -236,8 +241,16 @@ export async function POST(request: Request) {
         followupWorksheets: {
           pillars: Array.isArray(diagnosisResponse.followupWorksheets.pillars) 
             ? diagnosisResponse.followupWorksheets.pillars 
-            : []
-        }
+            : [],
+          followup: diagnosisResponse.followupWorksheets.followup || undefined
+        },
+        // Add enhanced analysis fields
+        situationAnalysis: diagnosisResponse.situationAnalysis,
+        strengthsAnalysis: diagnosisResponse.strengthsAnalysis,
+        growthAreasAnalysis: diagnosisResponse.growthAreasAnalysis,
+        actionableRecommendations: diagnosisResponse.actionableRecommendations,
+        pillarRecommendations: diagnosisResponse.pillarRecommendations,
+        followupRecommendation: diagnosisResponse.followupRecommendation
       };
       
       console.log('Prepared diagnosis object:', JSON.stringify(diagnosis, null, 2));

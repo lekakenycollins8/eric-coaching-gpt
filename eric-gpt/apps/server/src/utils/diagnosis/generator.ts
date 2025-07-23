@@ -1,94 +1,71 @@
-import { openai } from '@/services/openai';
-import { openaiConfig } from '@/config/openai';
 import { DIAGNOSIS_PROMPT, DIAGNOSIS_SYSTEM_MESSAGE } from '@/config/prompts/diagnosis';
-import { WorksheetType } from '../followupUtils';
-import { DiagnosisResponse, FormattedQA } from './interfaces';
+import { DiagnosisResponse, IDiagnosisResult } from './interfaces';
 import { parseDiagnosisResponse } from './parser';
+import { WorksheetType } from '../followupUtils';
+import { openai } from '@/services/openai';
+import { DEFAULT_MODEL } from '@/config/openai';
 
 /**
- * Generates an AI diagnosis based on workbook answers
- * @param formattedAnswers Array of question-answer pairs
- * @param clientName Name of the client
- * @param previousSubmissions Optional previous submissions for context
- * @returns Structured diagnosis object
+ * Generate an AI diagnosis based on formatted workbook answers
+ * @param formattedAnswers Formatted Q&A from the workbook
+ * @param userName User's name
+ * @param previousDiagnosis Optional previous diagnosis for context
+ * @returns Structured diagnosis response
  */
 export async function generateAIDiagnosis(
-  formattedAnswers: FormattedQA[],
-  clientName: string,
-  previousSubmissions?: {
-    worksheetId: WorksheetType;
-    submissionDate: Date;
-    summary: string;
-    answers?: FormattedQA[];
-    diagnosis?: DiagnosisResponse;
-  }[]
+  formattedAnswers: string,
+  userName: string,
+  previousDiagnosis?: IDiagnosisResult
 ): Promise<DiagnosisResponse> {
-  // Generate the prompt using the template from config
-  let prompt = DIAGNOSIS_PROMPT
-    .replace('{{clientName}}', clientName)
-    .replace('{{formattedAnswers}}', 
-      formattedAnswers.map(qa => `Question: ${qa.question}\nAnswer: ${qa.answer}\n`).join('\n')
-    );
-
-  // Add previous context if available
-  let previousContext = '';
-  if (previousSubmissions && previousSubmissions.length > 0) {
-    // Sort by submission date (newest first)
-    const sortedSubmissions = [...previousSubmissions].sort(
-      (a, b) => b.submissionDate.getTime() - a.submissionDate.getTime()
-    );
-    
-    // Take up to 2 most recent submissions
-    const recentSubmissions = sortedSubmissions.slice(0, 2);
-    
-    // Format previous context
-    previousContext = recentSubmissions.map(sub => {
-      const worksheetName = getWorksheetNameById(sub.worksheetId);
-      const submissionDate = sub.submissionDate.toLocaleDateString();
-      
-      // Include key Q&A if available (up to 3)
-      let keyQA = '';
-      if (sub.answers && sub.answers.length > 0) {
-        keyQA = '\n\nKey responses:\n' + sub.answers.slice(0, 3).map(
-          qa => `Q: ${qa.question}\nA: ${qa.answer}`
-        ).join('\n\n');
-      }
-      
-      // Include previous diagnosis summary
-      const diagnosisSummary = sub.diagnosis ? 
-        `\n\nPrevious diagnosis: ${sub.diagnosis.summary}` : 
-        `\n\nSummary: ${sub.summary}`;
-      
-      return `## Previous Worksheet: ${worksheetName} (${submissionDate})${keyQA}${diagnosisSummary}`;
-    }).join('\n\n');
-  }
-  
-  // Replace the previous context placeholder
-  prompt = prompt.replace('{{previousContext}}', previousContext || 'No previous context available.');
-  
   try {
-    console.log('Generating diagnosis for client:', clientName);
+    // Prepare previous context if available
+    let previousContext = '';
+    if (previousDiagnosis) {
+      previousContext = `Previous diagnosis summary: ${previousDiagnosis.summary}`;
+    }
     
-    // Call OpenAI with enhanced context
-    const completion = await openai.chat.completions.create({
-      model: openaiConfig.defaultModel,
+    // Prepare the prompt with variables
+    const prompt = DIAGNOSIS_PROMPT
+      .replace('{{clientName}}', userName)
+      .replace('{{formattedAnswers}}', formattedAnswers)
+      .replace('{{previousContext}}', previousContext);
+    
+    // Log formatted answers sample for debugging
+    console.log(`Formatted answers text sample: ${formattedAnswers.substring(0, 150)}...`);
+    
+    // Prepare the enhanced system message with formatting instructions
+    const enhancedSystemMessage = `${DIAGNOSIS_SYSTEM_MESSAGE}
+
+Formatting instructions:
+1. Use markdown headings (##) for each section
+2. Format lists as bullet points with dashes (-)
+3. Keep the exact section headings as specified
+4. Include specific pillar IDs in the recommendations
+5. Always include the exact pillar IDs as specified in the prompt`;
+    
+    console.log(`Generating diagnosis using model: ${DEFAULT_MODEL}`);
+    
+    const response = await openai.chat.completions.create({
+      model: DEFAULT_MODEL,
       messages: [
-        { role: 'system', content: DIAGNOSIS_SYSTEM_MESSAGE },
+        { role: 'system', content: enhancedSystemMessage },
         { role: 'user', content: prompt }
       ],
-      max_tokens: 2000, // Increased token limit to accommodate more detailed response
-      temperature: 0.7,
+      temperature: 0.5,
+      max_tokens: 4000,
     });
-
-    console.log(`Diagnosis generated successfully. Model: ${completion.model}, Tokens used: ${completion.usage?.total_tokens || 0}`);
     
-    const diagnosisText = completion.choices[0]?.message?.content || '';
+    // Extract the generated text
+    const generatedText = response.choices[0].message.content || '';
     
-    // Parse the AI response into structured diagnosis
-    return parseDiagnosisResponse(diagnosisText);
-  } catch (error: any) {
+    console.log(`Generated diagnosis text (${response.usage?.total_tokens} tokens)`);
+    console.log('Generated text sample:', generatedText.substring(0, 200) + '...');
+    
+    // Parse the response into structured format
+    return parseDiagnosisResponse(generatedText);
+  } catch (error) {
     console.error('Error generating diagnosis:', error);
-    throw new Error(`Failed to generate diagnosis: ${error.message}`);
+    throw error;
   }
 }
 
@@ -102,7 +79,7 @@ export function getWorksheetNameById(worksheetId: WorksheetType): string {
   if (worksheetId.startsWith('pillar')) {
     return worksheetId
       .replace('pillar', 'Leadership Pillar: ')
-      .replace(/^\\d+_/, '')
+      .replace(/^\d+_/, '')
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');

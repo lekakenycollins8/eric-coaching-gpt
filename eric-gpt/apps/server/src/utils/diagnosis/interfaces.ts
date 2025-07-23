@@ -71,6 +71,7 @@ export interface DiagnosisResponse {
   recommendations: string[];
   followupWorksheets: {
     pillars: PillarType[];
+    followup?: FollowupType;
   };
   
   // Enhanced fields for more detailed analysis
@@ -86,4 +87,12 @@ export interface DiagnosisResponse {
   actionableRecommendations?: ActionableRecommendation[];
   pillarRecommendations?: PillarRecommendation[];
   followupRecommendation?: FollowupRecommendation;
+}
+
+/**
+ * Interface for the diagnosis result stored in the database
+ * Extends DiagnosisResponse with additional metadata
+ */
+export interface IDiagnosisResult extends DiagnosisResponse {
+  createdAt: Date;
 }

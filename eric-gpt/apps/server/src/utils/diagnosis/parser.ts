@@ -14,18 +14,23 @@ import { FollowupType, PillarType } from '../followupUtils';
  * @returns Structured diagnosis object
  */
 export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse {
-  // Extract sections by markdown headings
+  // Log the raw diagnosis text for debugging
+  console.log('Parsing diagnosis text of length:', diagnosisText.length);
+  console.log('First 200 characters:', diagnosisText.substring(0, 200));
+  
+  // Extract sections by markdown headings (both ## and # are supported)
   const sections: Record<string, string> = {};
   let currentSection = '';
   let currentContent: string[] = [];
   
+  // First pass: extract all sections with their exact headings
   diagnosisText.split('\n').forEach(line => {
-    if (line.startsWith('## ')) {
+    if (line.startsWith('## ') || line.startsWith('# ')) {
       if (currentSection) {
         sections[currentSection] = currentContent.join('\n').trim();
         currentContent = [];
       }
-      currentSection = line.replace('## ', '').trim();
+      currentSection = line.replace(/^#+\s+/, '').trim();
     } else if (currentSection) {
       currentContent.push(line);
     }
@@ -36,11 +41,44 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
     sections[currentSection] = currentContent.join('\n').trim();
   }
   
+  // Log all section headings found
+  console.log('Sections found:', Object.keys(sections));
+  
+  // Map of possible section headings to standardized names
+  const sectionMappings: Record<string, string[]> = {
+    'Summary': ['summary', 'overview', 'executive summary'],
+    'Leadership Situation Analysis': ['leadership situation analysis', 'situation analysis', 'context', 'current situation'],
+    'Strengths': ['key strengths', 'strengths', 'leadership strengths'],
+    'Growth Areas': ['growth areas', 'challenges', 'areas for improvement', 'development areas', 'weaknesses'],
+    'Actionable Recommendations': ['actionable recommendations', 'recommendations', 'action items', 'action steps', 'next steps'],
+    'Recommended Leadership Pillars': ['recommended leadership pillars', 'leadership pillars', 'pillar recommendations', 'pillars'],
+    'Implementation Support': ['implementation support', 'follow-up', 'follow up', 'followup', 'implementation']
+  };
+  
+  // Second pass: normalize section names
+  const normalizedSections: Record<string, string> = {};
+  for (const [standardName, variations] of Object.entries(sectionMappings)) {
+    for (const [sectionName, content] of Object.entries(sections)) {
+      if (variations.includes(sectionName.toLowerCase())) {
+        normalizedSections[standardName] = content;
+        break;
+      }
+    }
+  }
+  
+  // Log normalized sections
+  console.log('Normalized sections:', Object.keys(normalizedSections));
+  
   // Extract basic information for backward compatibility
-  const summary = sections['Summary'] || sections['Leadership Situation Analysis'] || 'No summary provided.';
-  const strengths = extractListItems(sections['Strengths'] || '');
-  const challenges = extractListItems(sections['Growth Areas'] || sections['Challenges'] || '');
-  const recommendations = extractListItems(sections['Recommendations'] || sections['Actionable Recommendations'] || '');
+  const summary = normalizedSections['Summary'] || normalizedSections['Leadership Situation Analysis'] || 'No summary provided.';
+  const strengths = extractListItems(normalizedSections['Strengths'] || '');
+  const challenges = extractListItems(normalizedSections['Growth Areas'] || '');
+  const recommendations = extractListItems(normalizedSections['Actionable Recommendations'] || '');
+  
+  // Log extracted lists
+  console.log('Extracted strengths:', strengths.length);
+  console.log('Extracted challenges:', challenges.length);
+  console.log('Extracted recommendations:', recommendations.length);
   
   // Extract pillar IDs from the recommendations
   const pillarIds = extractPillarIds(diagnosisText);
@@ -48,9 +86,9 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
   // Create the basic response structure
   const response: DiagnosisResponse = {
     summary,
-    strengths,
-    challenges,
-    recommendations,
+    strengths: strengths.length > 0 ? strengths : extractListItems(diagnosisText.match(/strength|talent|skill/i) ? diagnosisText : ''),
+    challenges: challenges.length > 0 ? challenges : extractListItems(diagnosisText.match(/challenge|growth|improvement|weakness/i) ? diagnosisText : ''),
+    recommendations: recommendations.length > 0 ? recommendations : extractListItems(diagnosisText.match(/recommend|action|step|implement/i) ? diagnosisText : ''),
     followupWorksheets: {
       pillars: pillarIds
     }
@@ -97,9 +135,33 @@ export function extractListItems(text: string): string[] {
   
   for (const line of lines) {
     // Match numbered lists (1. Item) or bullet points (- Item, * Item)
-    const match = line.match(/^(\d+\.|\-|\*)\s+(.+)$/);
+    const match = line.match(/^(\d+\.|\-|\*|•)\s+(.+)$/);
     if (match) {
       items.push(match[2].trim());
+    } else {
+      // If not a bullet point, check if it's a short paragraph that might be an item
+      // Only include if it's not too long (likely not a header or long paragraph)
+      const trimmedLine = line.trim();
+      if (trimmedLine && trimmedLine.length > 5 && trimmedLine.length < 200 && 
+          !trimmedLine.startsWith('#') && !items.includes(trimmedLine)) {
+        // Check if it starts with a strength/challenge/recommendation keyword
+        const keywords = ['strength', 'skill', 'talent', 'challenge', 'weakness', 'area', 
+                         'opportunity', 'recommend', 'action', 'step', 'focus'];
+        if (keywords.some(keyword => trimmedLine.toLowerCase().includes(keyword))) {
+          items.push(trimmedLine);
+        }
+      }
+    }
+  }
+  
+  // If we still have no items but have text, take the first few sentences as items
+  if (items.length === 0 && text.trim().length > 0) {
+    const sentences = text.split(/\.\s+/);
+    for (let i = 0; i < Math.min(5, sentences.length); i++) {
+      const sentence = sentences[i].trim();
+      if (sentence && sentence.length > 10 && !items.includes(sentence)) {
+        items.push(sentence);
+      }
     }
   }
   
