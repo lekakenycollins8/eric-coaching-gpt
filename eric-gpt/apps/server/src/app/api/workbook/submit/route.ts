@@ -227,30 +227,58 @@ export async function POST(request: Request) {
       // Log the raw diagnosis response for debugging
       console.log('Raw AI diagnosis response:', JSON.stringify(rawDiagnosisResponse, null, 2));
       
-      const diagnosisResponse = rawDiagnosisResponse;
+      // Log enhanced fields for debugging
+      console.log('Enhanced fields present in AI response:');
+      console.log('- situationAnalysis:', rawDiagnosisResponse.situationAnalysis ? 'present' : 'missing');
+      console.log('- strengthsAnalysis:', Array.isArray(rawDiagnosisResponse.strengthsAnalysis) ? `${rawDiagnosisResponse.strengthsAnalysis.length} items` : 'missing');
+      console.log('- growthAreasAnalysis:', Array.isArray(rawDiagnosisResponse.growthAreasAnalysis) ? `${rawDiagnosisResponse.growthAreasAnalysis.length} items` : 'missing');
+      console.log('- actionableRecommendations:', Array.isArray(rawDiagnosisResponse.actionableRecommendations) ? `${rawDiagnosisResponse.actionableRecommendations.length} items` : 'missing');
+      console.log('- pillarRecommendations:', Array.isArray(rawDiagnosisResponse.pillarRecommendations) ? `${rawDiagnosisResponse.pillarRecommendations.length} items` : 'missing');
+      console.log('- followupRecommendation:', rawDiagnosisResponse.followupRecommendation ? 'present' : 'missing');
+      
+      console.log('Prepared diagnosis object:', JSON.stringify({
+        summary: rawDiagnosisResponse.summary,
+        strengths: rawDiagnosisResponse.strengths,
+        challenges: rawDiagnosisResponse.challenges,
+        recommendations: rawDiagnosisResponse.recommendations,
+        createdAt: new Date(),
+        followupWorksheets: {
+          pillars: Array.isArray(rawDiagnosisResponse.followupWorksheets.pillars) 
+            ? rawDiagnosisResponse.followupWorksheets.pillars 
+            : [],
+          followup: rawDiagnosisResponse.followupWorksheets.followup || undefined
+        },
+        // Add enhanced analysis fields
+        situationAnalysis: rawDiagnosisResponse.situationAnalysis,
+        strengthsAnalysis: rawDiagnosisResponse.strengthsAnalysis,
+        growthAreasAnalysis: rawDiagnosisResponse.growthAreasAnalysis,
+        actionableRecommendations: rawDiagnosisResponse.actionableRecommendations,
+        pillarRecommendations: rawDiagnosisResponse.pillarRecommendations,
+        followupRecommendation: rawDiagnosisResponse.followupRecommendation
+      }, null, 2));
       
       // Update the submission with the diagnosis
       // Add createdAt field required by IDiagnosisResult interface
       // Include all enhanced fields from the parser
       const diagnosis = {
-        summary: diagnosisResponse.summary,
-        strengths: diagnosisResponse.strengths,
-        challenges: diagnosisResponse.challenges,
-        recommendations: diagnosisResponse.recommendations,
+        summary: rawDiagnosisResponse.summary,
+        strengths: rawDiagnosisResponse.strengths,
+        challenges: rawDiagnosisResponse.challenges,
+        recommendations: rawDiagnosisResponse.recommendations,
         createdAt: new Date(),
         followupWorksheets: {
-          pillars: Array.isArray(diagnosisResponse.followupWorksheets.pillars) 
-            ? diagnosisResponse.followupWorksheets.pillars 
+          pillars: Array.isArray(rawDiagnosisResponse.followupWorksheets?.pillars) 
+            ? rawDiagnosisResponse.followupWorksheets.pillars 
             : [],
-          followup: diagnosisResponse.followupWorksheets.followup || undefined
+          followup: rawDiagnosisResponse.followupWorksheets?.followup || undefined
         },
         // Add enhanced analysis fields
-        situationAnalysis: diagnosisResponse.situationAnalysis,
-        strengthsAnalysis: diagnosisResponse.strengthsAnalysis,
-        growthAreasAnalysis: diagnosisResponse.growthAreasAnalysis,
-        actionableRecommendations: diagnosisResponse.actionableRecommendations,
-        pillarRecommendations: diagnosisResponse.pillarRecommendations,
-        followupRecommendation: diagnosisResponse.followupRecommendation
+        situationAnalysis: rawDiagnosisResponse.situationAnalysis,
+        strengthsAnalysis: rawDiagnosisResponse.strengthsAnalysis,
+        growthAreasAnalysis: rawDiagnosisResponse.growthAreasAnalysis,
+        actionableRecommendations: rawDiagnosisResponse.actionableRecommendations,
+        pillarRecommendations: rawDiagnosisResponse.pillarRecommendations,
+        followupRecommendation: rawDiagnosisResponse.followupRecommendation
       };
       
       console.log('Prepared diagnosis object:', JSON.stringify(diagnosis, null, 2));

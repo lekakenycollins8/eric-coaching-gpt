@@ -41,33 +41,33 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
     sections[currentSection] = currentContent.join('\n').trim();
   }
   
-  // Log all section headings found
-  console.log('Sections found:', Object.keys(sections));
-  
-  // Map of possible section headings to standardized names
-  const sectionMappings: Record<string, string[]> = {
-    'Summary': ['summary', 'overview', 'executive summary'],
-    'Leadership Situation Analysis': ['leadership situation analysis', 'situation analysis', 'context', 'current situation'],
-    'Strengths': ['key strengths', 'strengths', 'leadership strengths'],
-    'Growth Areas': ['growth areas', 'challenges', 'areas for improvement', 'development areas', 'weaknesses'],
-    'Actionable Recommendations': ['actionable recommendations', 'recommendations', 'action items', 'action steps', 'next steps'],
-    'Recommended Leadership Pillars': ['recommended leadership pillars', 'leadership pillars', 'pillar recommendations', 'pillars'],
-    'Implementation Support': ['implementation support', 'follow-up', 'follow up', 'followup', 'implementation']
+  // Normalize section names for consistent access
+  const normalizedSections: Record<string, string> = {};
+  const normalizedNames: Record<string, string> = {
+    'leadership situation analysis': 'Leadership Situation Analysis',
+    'key strengths': 'Strengths',
+    'strengths': 'Strengths',
+    'growth areas': 'Growth Areas',
+    'challenges': 'Growth Areas',
+    'actionable recommendations': 'Actionable Recommendations',
+    'recommendations': 'Actionable Recommendations',
+    'recommended leadership pillars': 'Recommended Leadership Pillars',
+    'implementation support': 'Implementation Support',
   };
   
-  // Second pass: normalize section names
-  const normalizedSections: Record<string, string> = {};
-  for (const [standardName, variations] of Object.entries(sectionMappings)) {
-    for (const [sectionName, content] of Object.entries(sections)) {
-      if (variations.includes(sectionName.toLowerCase())) {
-        normalizedSections[standardName] = content;
-        break;
-      }
+  // Map original section names to normalized ones
+  Object.keys(sections).forEach(sectionName => {
+    const normalizedName = normalizedNames[sectionName.toLowerCase()];
+    if (normalizedName) {
+      normalizedSections[normalizedName] = sections[sectionName];
+    } else {
+      // Keep the original section name if no normalized version exists
+      normalizedSections[sectionName] = sections[sectionName];
     }
-  }
+  });
   
-  // Log normalized sections
-  console.log('Normalized sections:', Object.keys(normalizedSections));
+  console.log('Sections found:', JSON.stringify(Object.keys(sections), null, 2));
+  console.log('Normalized sections:', JSON.stringify(Object.keys(normalizedSections), null, 2));
   
   // Extract basic information for backward compatibility
   const summary = normalizedSections['Summary'] || normalizedSections['Leadership Situation Analysis'] || 'No summary provided.';
@@ -95,28 +95,52 @@ export function parseDiagnosisResponse(diagnosisText: string): DiagnosisResponse
   };
   
   // Parse enhanced sections if available
-  if (sections['Leadership Situation Analysis']) {
-    response.situationAnalysis = parseSituationAnalysis(sections['Leadership Situation Analysis']);
+  if (normalizedSections['Leadership Situation Analysis']) {
+    console.log('Parsing Leadership Situation Analysis section');
+    response.situationAnalysis = parseSituationAnalysis(normalizedSections['Leadership Situation Analysis']);
+    console.log('Situation Analysis parsed:', response.situationAnalysis ? 'success' : 'failed');
+  } else {
+    console.log('Leadership Situation Analysis section not found');
   }
   
-  if (sections['Strengths']) {
-    response.strengthsAnalysis = parseStrengthsAnalysis(sections['Strengths']);
+  if (normalizedSections['Strengths']) {
+    console.log('Parsing Strengths section for enhanced analysis');
+    response.strengthsAnalysis = parseStrengthsAnalysis(normalizedSections['Strengths']);
+    console.log('Strengths Analysis parsed:', response.strengthsAnalysis?.length || 0, 'items');
+  } else {
+    console.log('Strengths section not found for enhanced analysis');
   }
   
-  if (sections['Growth Areas']) {
-    response.growthAreasAnalysis = parseGrowthAreasAnalysis(sections['Growth Areas']);
+  if (normalizedSections['Growth Areas']) {
+    console.log('Parsing Growth Areas section for enhanced analysis');
+    response.growthAreasAnalysis = parseGrowthAreasAnalysis(normalizedSections['Growth Areas']);
+    console.log('Growth Areas Analysis parsed:', response.growthAreasAnalysis?.length || 0, 'items');
+  } else {
+    console.log('Growth Areas section not found for enhanced analysis');
   }
   
-  if (sections['Actionable Recommendations']) {
-    response.actionableRecommendations = parseActionableRecommendations(sections['Actionable Recommendations']);
+  if (normalizedSections['Actionable Recommendations']) {
+    console.log('Parsing Actionable Recommendations section for enhanced analysis');
+    response.actionableRecommendations = parseActionableRecommendations(normalizedSections['Actionable Recommendations']);
+    console.log('Actionable Recommendations parsed:', response.actionableRecommendations?.length || 0, 'items');
+  } else {
+    console.log('Actionable Recommendations section not found for enhanced analysis');
   }
   
-  if (sections['Recommended Leadership Pillars']) {
-    response.pillarRecommendations = parsePillarRecommendations(sections['Recommended Leadership Pillars']);
+  if (normalizedSections['Recommended Leadership Pillars']) {
+    console.log('Parsing Recommended Leadership Pillars section');
+    response.pillarRecommendations = parsePillarRecommendations(normalizedSections['Recommended Leadership Pillars']);
+    console.log('Pillar Recommendations parsed:', response.pillarRecommendations?.length || 0, 'items');
+  } else {
+    console.log('Recommended Leadership Pillars section not found');
   }
   
-  if (sections['Implementation Support']) {
-    response.followupRecommendation = parseFollowupRecommendation(sections['Implementation Support']);
+  if (normalizedSections['Implementation Support']) {
+    console.log('Parsing Implementation Support section');
+    response.followupRecommendation = parseFollowupRecommendation(normalizedSections['Implementation Support']);
+    console.log('Followup Recommendation parsed:', response.followupRecommendation ? 'success' : 'failed');
+  } else {
+    console.log('Implementation Support section not found');
   }
   
   return response;
