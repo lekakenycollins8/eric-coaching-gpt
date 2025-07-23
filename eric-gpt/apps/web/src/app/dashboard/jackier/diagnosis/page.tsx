@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { useJackierWorkbook } from '@/hooks/useJackierWorkbook';
+import type { PillarRecommendation } from '@/hooks/useJackierWorkbook';
 
 // Import our custom components
 import { DiagnosisSummary } from '@/components/jackier/DiagnosisSummary';
@@ -19,6 +20,14 @@ import { DiagnosisRecommendations } from '@/components/jackier/DiagnosisRecommen
 import { FollowupWorksheetCard } from '@/components/jackier/FollowupWorksheetCard';
 import { LoadingState } from '@/components/jackier/LoadingState';
 import { ErrorState } from '@/components/jackier/ErrorState';
+
+// Import our enhanced diagnosis components
+import { DetailedStrengthAnalysis } from '@/components/jackier/DetailedStrengthAnalysis';
+import { DetailedGrowthAnalysis } from '@/components/jackier/DetailedGrowthAnalysis';
+import { ActionableRecommendations } from '@/components/jackier/ActionableRecommendations';
+import { PillarRecommendations } from '@/components/jackier/PillarRecommendations';
+import { SituationAnalysis } from '@/components/jackier/SituationAnalysis';
+import { FollowupRecommendationDetail } from '@/components/jackier/FollowupRecommendationDetail';
 
 export default function DiagnosisPage() {
   const router = useRouter();
@@ -103,27 +112,81 @@ export default function DiagnosisPage() {
       </div>
       
       <Tabs defaultValue="summary" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-md">
+        <TabsList className="grid grid-cols-6 w-full">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="strengths">Strengths</TabsTrigger>
           <TabsTrigger value="challenges">Challenges</TabsTrigger>
           <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+          <TabsTrigger value="situation">Situation</TabsTrigger>
+          <TabsTrigger value="detailed">Detailed</TabsTrigger>
         </TabsList>
         
         <TabsContent value="summary">
           <DiagnosisSummary summary={diagnosis.summary} />
+          {diagnosis.situationAnalysis && (
+            <SituationAnalysis situationAnalysis={diagnosis.situationAnalysis} />
+          )}
         </TabsContent>
         
         <TabsContent value="strengths">
           <DiagnosisStrengths strengths={diagnosis.strengths} />
+          {diagnosis.strengthsAnalysis && diagnosis.strengthsAnalysis.length > 0 && (
+            <DetailedStrengthAnalysis strengthsAnalysis={diagnosis.strengthsAnalysis} />
+          )}
         </TabsContent>
         
         <TabsContent value="challenges">
           <DiagnosisChallenges challenges={diagnosis.challenges} />
+          {diagnosis.growthAreasAnalysis && diagnosis.growthAreasAnalysis.length > 0 && (
+            <DetailedGrowthAnalysis growthAreasAnalysis={diagnosis.growthAreasAnalysis} />
+          )}
         </TabsContent>
         
         <TabsContent value="recommendations">
           <DiagnosisRecommendations recommendations={diagnosis.recommendations} />
+          {diagnosis.actionableRecommendations && diagnosis.actionableRecommendations.length > 0 && (
+            <ActionableRecommendations actionableRecommendations={diagnosis.actionableRecommendations} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="situation">
+          {diagnosis.situationAnalysis ? (
+            <SituationAnalysis situationAnalysis={diagnosis.situationAnalysis} />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Situation Analysis</CardTitle>
+                <CardDescription>Analysis of your current leadership context</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">No detailed situation analysis available.</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="detailed">
+          <div className="space-y-6">
+            {diagnosis.pillarRecommendations && diagnosis.pillarRecommendations.length > 0 && (
+              <PillarRecommendations pillarRecommendations={diagnosis.pillarRecommendations} />
+            )}
+            
+            {diagnosis.followupRecommendation && (
+              <FollowupRecommendationDetail followupRecommendation={diagnosis.followupRecommendation} />
+            )}
+            
+            {!diagnosis.pillarRecommendations && !diagnosis.followupRecommendation && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Detailed Analysis</CardTitle>
+                  <CardDescription>In-depth analysis of your leadership profile</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">No detailed analysis available.</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
       
@@ -159,17 +222,23 @@ export default function DiagnosisPage() {
             <h3 className="text-xl font-semibold mb-3">Core Leadership Pillars</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {diagnosis.followupWorksheets.pillars.map((pillarId) => {
+                // Find matching pillar recommendation if available
+                const pillarRec = diagnosis.pillarRecommendations?.find((p: PillarRecommendation) => p.id === pillarId);
+                
                 return (
                   <FollowupWorksheetCard
                     key={pillarId}
                     id={pillarId}
                     title={pillarId.replace(/pillar(\d+)_/i, 'Pillar #$1: ').replace(/_/g, ' ')}
-                    description="Build your leadership foundation with this core pillar worksheet"
+                    description={pillarRec ? pillarRec.reason : "Build your leadership foundation with this core pillar worksheet"}
                     onStart={(id) => handleStartWorksheet(id, 'pillar')}
                     variant="pillar"
                   />
                 );
               })}
+            </div>
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>For a detailed explanation of why these pillars were recommended, check the "Detailed" tab above.</p>
             </div>
           </div>
         )}
@@ -180,18 +249,26 @@ export default function DiagnosisPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {(() => {
                 const followupId = diagnosis.followupWorksheets.followup;
+                // Find matching followup recommendation if available
+                const followupRec = diagnosis.followupRecommendation;
                 
                 return (
                   <FollowupWorksheetCard
                     id={followupId}
                     title={followupId.replace(/_/g, ' ')}
-                    description="Deepen your learning with this targeted follow-up worksheet"
+                    description={followupRec ? followupRec.reason : "Deepen your learning with this targeted follow-up worksheet"}
                     onStart={(id) => handleStartWorksheet(id, 'followup')}
                     variant="followup"
                   />
                 );
               })()}
             </div>
+            {diagnosis.followupRecommendation && (
+              <div className="mt-4 text-sm text-muted-foreground">
+                <p>This worksheet was selected because it {diagnosis.followupRecommendation.connection}</p>
+                <p className="mt-2">For a detailed explanation, check the "Detailed" tab above.</p>
+              </div>
+            )}
           </div>
         )}
       </div>

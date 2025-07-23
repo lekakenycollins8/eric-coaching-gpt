@@ -28,7 +28,46 @@ export interface WorkbookQuestion {
   max?: number;
 }
 
+export interface StrengthAnalysis {
+  strength: string;
+  evidence: string;
+  impact: string;
+  leverage: string;
+}
+
+export interface GrowthAreaAnalysis {
+  area: string;
+  evidence: string;
+  impact: string;
+  rootCause: string;
+}
+
+export interface ActionableRecommendation {
+  action: string;
+  implementation: string;
+  outcome: string;
+  measurement: string;
+}
+
+export interface PillarRecommendation {
+  id: string;
+  title: string;
+  reason: string;
+  impact: string;
+  exercise: string;
+  relevanceScore: number;
+}
+
+export interface FollowupRecommendation {
+  id: string;
+  title: string;
+  reason: string;
+  connection: string;
+  focus: string;
+}
+
 export interface DiagnosisResult {
+  // Basic fields for backward compatibility
   summary: string;
   strengths: string[];
   challenges: string[];
@@ -38,6 +77,20 @@ export interface DiagnosisResult {
     followup?: string;
   };
   createdAt: string;
+  
+  // Enhanced fields for more detailed analysis
+  situationAnalysis?: {
+    context?: string;
+    challenges?: string;
+    patterns?: string;
+    impact?: string;
+    fullText: string;
+  };
+  strengthsAnalysis?: StrengthAnalysis[];
+  growthAreasAnalysis?: GrowthAreaAnalysis[];
+  actionableRecommendations?: ActionableRecommendation[];
+  pillarRecommendations?: PillarRecommendation[];
+  followupRecommendation?: FollowupRecommendation;
 }
 
 export interface WorkbookSubmission {

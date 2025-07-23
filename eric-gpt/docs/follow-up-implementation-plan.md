@@ -44,11 +44,11 @@ We have successfully implemented the core functionality of the platform:
 **Goal:** Improve the AI diagnosis engine to provide more personalized and actionable insights
 
 #### Tasks:
-- [ ] Refine GPT-4 prompts to extract deeper insights from workbook responses
-- [ ] Enhance the analysis of leadership pillars with more specific recommendations
-- [ ] Improve the presentation of diagnosis results in the UI
-- [ ] Add more detailed explanations for why each pillar was identified
-- [ ] Implement better error handling for AI response processing
+- [x] Refine GPT-4 prompts to extract deeper insights from workbook responses
+- [x] Enhance the analysis of leadership pillars with more specific recommendations
+- [x] Improve the presentation of diagnosis results in the UI
+- [x] Add more detailed explanations for why each pillar was identified
+- [x] Implement better error handling for AI response processing
 
 #### Expected Outcome:
 - More accurate identification of leadership pillars
