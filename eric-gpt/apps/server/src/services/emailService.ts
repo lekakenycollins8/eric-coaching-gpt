@@ -32,30 +32,56 @@ export class EmailService {
   }
   
   /**
-   * Send a notification to the coaching team about a new workbook submission
-   * @param user The user who submitted the workbook
-   * @param submission The workbook submission
+   * Send a notification to the coaching team about a new diagnosis
+   * @param user The user who received the diagnosis
+   * @param submission The workbook submission with diagnosis
    */
-  async sendWorkbookSubmissionNotification(user: IUser & Document, submission: IWorkbookSubmission & Document) {
+  async sendDiagnosisNotification(user: IUser & Document, submission: IWorkbookSubmission & Document): Promise<boolean> {
     const coachingEmail = process.env.COACHING_EMAIL || 'coaching@ericjackier.com';
     
+    if (!submission.diagnosis) {
+      console.error('Cannot send diagnosis notification: No diagnosis found in submission');
+      return false;
+    }
+    
     // Extract key information from the diagnosis
-    const strengths = submission.diagnosis?.strengths?.join(', ');
-    const challenges = submission.diagnosis?.challenges?.join(', ');
+    const strengths = submission.diagnosis.strengths?.join(', ') || 'None provided';
+    const challenges = submission.diagnosis.challenges?.join(', ') || 'None provided';
+    const recommendations = submission.diagnosis.recommendations?.join(', ') || 'None provided';
+    
+    // Extract enhanced diagnosis information if available
+    let enhancedDiagnosisInfo = '';
+    
+    if (submission.diagnosis.situationAnalysis) {
+      enhancedDiagnosisInfo += `
+        <h4>Situation Analysis</h4>
+        <p>${submission.diagnosis.situationAnalysis.fullText.substring(0, 200)}...</p>
+      `;
+    }
+    
+    if (submission.diagnosis.followupRecommendation) {
+      enhancedDiagnosisInfo += `
+        <h4>Follow-up Recommendation</h4>
+        <p><strong>Worksheet:</strong> ${submission.diagnosis.followupRecommendation.title}</p>
+        <p><strong>Reason:</strong> ${submission.diagnosis.followupRecommendation.reason}</p>
+      `;
+    }
     
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: coachingEmail,
-      subject: `New Workbook Submission: ${user.name || user.email}`,
+      subject: `New Leadership Diagnosis: ${user.name || user.email}`,
       html: `
-        <h2>New Workbook Submission</h2>
-        <p><strong>User:</strong> ${user.name} (${user.email})</p>
-        <p><strong>Submission Date:</strong> ${new Date(submission.createdAt).toLocaleString()}</p>
-        <p><strong>Diagnosis Generated:</strong> ${submission.diagnosisGeneratedAt ? 'Yes' : 'No'}</p>
+        <h2>New Leadership Diagnosis Generated</h2>
+        <p><strong>User:</strong> ${user.name || 'Not provided'} (${user.email})</p>
+        <p><strong>Diagnosis Generated At:</strong> ${new Date(submission.diagnosisGeneratedAt || submission.updatedAt).toLocaleString()}</p>
         
         <h3>Key Insights</h3>
         <p><strong>Strengths:</strong> ${strengths}</p>
         <p><strong>Challenges:</strong> ${challenges}</p>
+        <p><strong>Recommendations:</strong> ${recommendations}</p>
+        
+        ${enhancedDiagnosisInfo}
       `,
     };
     
@@ -63,46 +89,7 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
       return true;
     } catch (error) {
-      console.error('Error sending workbook submission notification:', error);
-      return false;
-    }
-  }
-  
-  /**
-   * Send a notification to the coaching team about a new follow-up worksheet submission
-   * @param user The user who submitted the follow-up worksheet
-   * @param followupAssessment The follow-up assessment submission
-   * @param workbookSubmission The original workbook submission
-   */
-  async sendFollowupSubmissionNotification(
-    user: IUser & Document, 
-    followupAssessment: IFollowupAssessment & Document,
-    workbookSubmission: IWorkbookSubmission & Document
-  ) {
-    const coachingEmail = process.env.COACHING_EMAIL;
-    
-    // Determine the worksheet type (pillar or follow-up)
-    const isPillar = followupAssessment.followupId.includes('pillar');
-    const worksheetType = isPillar ? 'Pillar' : 'Implementation';
-    
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: coachingEmail,
-      subject: `New ${worksheetType} Follow-up Submission: ${user.name || user.email}`,
-      html: `
-        <h2>New Follow-up Worksheet Submission</h2>
-        <p><strong>User:</strong> ${user.name || 'Not provided'} (${user.email})</p>
-        <p><strong>Submission Date:</strong> ${new Date(followupAssessment.createdAt).toLocaleString()}</p>
-        <p><strong>Worksheet Type:</strong> ${worksheetType}</p>
-        <p><strong>Worksheet ID:</strong> ${followupAssessment.followupId}</p>
-      `,
-    };
-    
-    try {
-      await this.transporter.sendMail(mailOptions);
-      return true;
-    } catch (error) {
-      console.error('Error sending follow-up submission notification:', error);
+      console.error('Error sending diagnosis notification:', error);
       return false;
     }
   }

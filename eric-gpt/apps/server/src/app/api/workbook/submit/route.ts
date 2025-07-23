@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth'
-import User, { IUser } from '@/models/User';
-import WorkbookSubmission, { IWorkbookSubmission } from '@/models/WorkbookSubmission';
-import mongoose from 'mongoose';
+import { authOptions } from '@/lib/auth';
 import { generateAIDiagnosis } from '@/utils/diagnosis/generator';
 import { hasActiveSubscription } from '@/services/quotaManager';
 import { connectToDatabase } from '@/db/connection';
+import { emailService } from '@/services/emailService';
+import WorkbookSubmissionModel, { IWorkbookSubmission } from '@/models/WorkbookSubmission';
+import UserModel, { IUser } from '@/models/User';
+import mongoose from 'mongoose';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,7 +101,7 @@ export async function POST(request: Request) {
 
     // Check if user has an active subscription
     await connectToDatabase();
-    const user = await User.findById(userId);
+    const user = await UserModel.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -128,7 +129,7 @@ export async function POST(request: Request) {
 
     // If submissionId is provided, find the existing draft
     if (submissionId) {
-      submission = await WorkbookSubmission.findOne({
+      submission = await WorkbookSubmissionModel.findOne({
         _id: submissionId,
         userId,
         workbookId
@@ -158,7 +159,7 @@ export async function POST(request: Request) {
       }
 
       // Create new submission
-      submission = new WorkbookSubmission({
+      submission = new WorkbookSubmissionModel({
         userId,
         workbookId,
         status: 'draft',
@@ -290,6 +291,31 @@ export async function POST(request: Request) {
       await submission.save();
       
       console.log('AI diagnosis generated successfully for submission:', submission._id);
+      
+      // Send email notification to the coach
+      try {
+        // Get the user details for the email
+        const userDetails = await UserModel.findById(submission.userId);
+        
+        if (userDetails) {
+          const emailSent = await emailService.sendDiagnosisNotification(userDetails, submission);
+          
+          if (emailSent) {
+            console.log('Diagnosis notification email sent successfully');
+            
+            // Update the emailSent flag in the submission
+            submission.emailSent = true;
+            await submission.save();
+          } else {
+            console.error('Failed to send diagnosis notification email');
+          }
+        } else {
+          console.error('User not found for diagnosis notification email:', submission.userId);
+        }
+      } catch (emailError) {
+        console.error('Error sending diagnosis notification email:', emailError);
+        // Continue even if email sending fails
+      }
     } catch (diagnosisError) {
       console.error('Error generating diagnosis:', diagnosisError);
       // Log more details about the error
