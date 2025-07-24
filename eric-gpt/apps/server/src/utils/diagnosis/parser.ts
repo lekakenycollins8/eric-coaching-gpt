@@ -198,6 +198,7 @@ export function extractListItems(text: string): string[] {
  * @returns Structured situation analysis
  */
 export function parseSituationAnalysis(text: string): DiagnosisResponse['situationAnalysis'] {
+  console.log('Parsing Leadership Situation Analysis section');
   const paragraphs = text.split('\n\n').filter(p => p.trim().length > 0);
   
   // Default structure with full text
@@ -205,20 +206,74 @@ export function parseSituationAnalysis(text: string): DiagnosisResponse['situati
     fullText: text
   };
   
-  // Try to extract specific subsections if they exist
-  for (const paragraph of paragraphs) {
-    const lowerPara = paragraph.toLowerCase();
+  // If we have at least two paragraphs, we can make a better distribution
+  if (paragraphs.length >= 2) {
+    // First paragraph typically describes the context/situation
+    analysis.context = paragraphs[0];
     
-    if (lowerPara.includes('context') || lowerPara.includes('situation')) {
-      analysis.context = paragraph;
-    } else if (lowerPara.includes('challenge') || lowerPara.includes('obstacle')) {
-      analysis.challenges = paragraph;
-    } else if (lowerPara.includes('pattern') || lowerPara.includes('behavior')) {
-      analysis.patterns = paragraph;
-    } else if (lowerPara.includes('impact') || lowerPara.includes('effect')) {
-      analysis.impact = paragraph;
+    // Look for specific content in the remaining paragraphs
+    const remainingText = paragraphs.slice(1).join(' ');
+    const lowerText = remainingText.toLowerCase();
+    
+    // Extract challenges
+    const challengeMatches = remainingText.match(/(?:key challenges|challenges|obstacles).+?(?=\.|$)/i);
+    if (challengeMatches && challengeMatches[0]) {
+      analysis.challenges = challengeMatches[0];
+    } else if (lowerText.includes('challenge') || lowerText.includes('obstacle')) {
+      // Find the sentence containing 'challenge' or 'obstacle'
+      const sentences = remainingText.split('. ');
+      for (const sentence of sentences) {
+        if (sentence.toLowerCase().includes('challenge') || sentence.toLowerCase().includes('obstacle')) {
+          analysis.challenges = sentence + '.';
+          break;
+        }
+      }
     }
+    
+    // Extract patterns
+    const patternMatches = remainingText.match(/(?:underlying patterns|patterns|behaviors|approach).+?(?=\.|$)/i);
+    if (patternMatches && patternMatches[0]) {
+      analysis.patterns = patternMatches[0];
+    } else if (lowerText.includes('pattern') || lowerText.includes('behavior') || lowerText.includes('approach')) {
+      // Find the sentence containing 'pattern', 'behavior', or 'approach'
+      const sentences = remainingText.split('. ');
+      for (const sentence of sentences) {
+        if (sentence.toLowerCase().includes('pattern') || 
+            sentence.toLowerCase().includes('behavior') || 
+            sentence.toLowerCase().includes('approach')) {
+          analysis.patterns = sentence + '.';
+          break;
+        }
+      }
+    }
+    
+    // Extract impact
+    const impactMatches = remainingText.match(/(?:impacts|impact|affects|effects).+?(?=\.|$)/i);
+    if (impactMatches && impactMatches[0]) {
+      analysis.impact = impactMatches[0];
+    } else if (lowerText.includes('impact') || lowerText.includes('affect') || lowerText.includes('effect')) {
+      // Find the sentence containing 'impact', 'affect', or 'effect'
+      const sentences = remainingText.split('. ');
+      for (const sentence of sentences) {
+        if (sentence.toLowerCase().includes('impact') || 
+            sentence.toLowerCase().includes('affect') || 
+            sentence.toLowerCase().includes('effect')) {
+          analysis.impact = sentence + '.';
+          break;
+        }
+      }
+    }
+  } else if (paragraphs.length === 1) {
+    // If there's only one paragraph, use it as context
+    analysis.context = paragraphs[0];
   }
+  
+  // Log the parsing results
+  console.log('Situation Analysis parsed: ' + 
+    (analysis.context ? 'context ✓ ' : 'context ✗ ') +
+    (analysis.challenges ? 'challenges ✓ ' : 'challenges ✗ ') +
+    (analysis.patterns ? 'patterns ✓ ' : 'patterns ✗ ') +
+    (analysis.impact ? 'impact ✓ ' : 'impact ✗ '));
   
   return analysis;
 }
