@@ -18,6 +18,7 @@ export interface ISituationAnalysis {
   challenges?: string;           // Current challenges
   patterns?: string;             // Behavioral patterns
   impact?: string;               // Organizational impact
+  progressLevel?: string;        // Level of progress (e.g., 'excellent', 'good', 'moderate')
   fullText: string;              // Full text of the situation analysis
 }
 
@@ -76,6 +77,7 @@ export interface IFollowupRecommendation {
   reason: string;                // Reason for recommendation
   connection: string;            // Connection to situation
   focus: string;                 // What to focus on
+  implementationProgress?: string; // Level of implementation progress
 }
 
 /**

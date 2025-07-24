@@ -187,6 +187,11 @@ export function getFollowupType(followupId: string): FollowupCategoryType {
     return 'pillar';
   }
   
+  // Check if the ID contains 'jackier-step' (from implementation-support-followup.json)
+  if (followupId.startsWith('jackier-step')) {
+    return 'workbook';
+  }
+  
   // Check if the ID contains 'implementation' or 'workbook'
   if (followupId.includes('implementation') || followupId.includes('workbook')) {
     return 'workbook';
@@ -305,23 +310,6 @@ export async function loadFollowupById(id: string): Promise<{ worksheet: any; ty
         }
       } catch (error) {
         console.error('Error loading implementation follow-up worksheets:', error);
-      }
-    }
-    
-    // If not found in either, try jackier-method-followup.json (legacy)
-    if (!worksheet) {
-      try {
-        const legacyFollowupsPath = path.join(dataDir, 'jackier-method-followup.json');
-        if (fs.existsSync(legacyFollowupsPath)) {
-          const legacyFollowups = JSON.parse(fs.readFileSync(legacyFollowupsPath, 'utf8'));
-          worksheet = legacyFollowups.find((w: any) => w.id === id);
-          
-          if (worksheet) {
-            worksheetType = 'legacy';
-          }
-        }
-      } catch (error) {
-        console.error('Error loading legacy follow-up worksheets:', error);
       }
     }
     

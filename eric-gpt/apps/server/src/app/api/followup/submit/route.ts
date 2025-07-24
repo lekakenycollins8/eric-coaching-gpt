@@ -21,6 +21,7 @@ import { parseFormattedAnswers, formatAnswers } from '@/utils/followup/answerFor
 import { convertToDatabaseFormat } from '@/utils/followup/diagnosisConverter';
 import { calculateTimeElapsed } from '@/utils/followup/timeUtils';
 import { sendFollowupCompletionEmail } from '@/utils/followup/emailNotifier';
+import { calculateImprovementScore } from '@/utils/followup/improvementScoreCalculator';
 
 export const dynamic = 'force-dynamic';
 
@@ -213,11 +214,14 @@ export async function POST(request: Request) {
     
     console.log(`Follow-up type determined: ${followupType}${pillarId ? ', Pillar ID: ' + pillarId : ''}`);
     
+    // Define worksheet variable outside the try block so it's available in the entire scope
+    let worksheetData: { worksheet: any; type: string | null } = { worksheet: null, type: null };
+    
     try {
       // Load the follow-up worksheet to determine its type
-      const { worksheet, type } = await loadFollowupById(followupId);
+      worksheetData = await loadFollowupById(followupId);
       
-      if (!worksheet) {
+      if (!worksheetData.worksheet) {
         return NextResponse.json(
           { error: 'Follow-up worksheet not found' },
           { status: 404 }
@@ -292,20 +296,21 @@ export async function POST(request: Request) {
       // Create the follow-up assessment document with type-specific fields
       followupAssessment = new FollowupAssessmentModel({
         userId: user._id,
+        workbookSubmissionId: originalSubmissionId,
         followupId,
-        originalSubmissionId,
+        followupType, // Using our new explicit followupType field
+        status: 'completed',
         answers: parsedAnswers,
-        needsHelp,
-        completedAt: new Date(),
         diagnosis: rawDiagnosisResponse,
-        followupType, // Explicitly store the follow-up type for filtering and UI
-        pillarId: pillarId || undefined, // Store pillar ID for pillar-specific follow-ups
-        // Add metadata to help with reporting and analytics
+        diagnosisGeneratedAt: new Date(),
+        completedAt: new Date(),
+        // Add structured metadata using our new IFollowupMetadata interface
         metadata: {
+          pillarId: pillarId || undefined, // Only for pillar follow-ups
           timeElapsed,
-          worksheetTitle: contextData.worksheetTitle,
-          worksheetDescription: contextData.worksheetDescription,
-          pillarTitle: contextData.pillarTitle
+          originalTitle: contextData.worksheetTitle,
+          followupTitle: worksheetData.worksheet?.title || followupId,
+          improvementScore: calculateImprovementScore(rawDiagnosisResponse, followupType)
         }
       });
       
