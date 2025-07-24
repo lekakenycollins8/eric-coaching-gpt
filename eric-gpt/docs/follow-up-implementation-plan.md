@@ -95,21 +95,172 @@ We have successfully implemented the core functionality of the platform:
 
 ---
 
-### Milestone 7: Follow-Up System Enhancement
-**Goal:** Create a more effective follow-up worksheet system that builds on initial diagnosis
+## 🎯 Primary Goal
+Implement Milestone 7: Follow-Up System Enhancement. The purpose of this milestone is to ensure users of the Eric GPT leadership coaching tool benefit deeply from the system by:
+- Completing intelligent, personalized **follow-up worksheets**
+- Receiving contextual feedback based on **both their original and follow-up responses**
+- Triggering optional human support via email to `help@jackiercoaching.com` if challenges persist
 
-#### Tasks:
-- [ ] Improve the follow-up worksheet selection algorithm
-- [ ] Create a scheduling system for follow-up worksheet delivery
-- [ ] Build UI components to display previous worksheet insights in follow-ups
-- [ ] Implement storage and retrieval of key insights from prior submissions
-- [ ] Add progress tracking between initial workbook and follow-ups
+---
 
-#### Expected Outcome:
-- More relevant follow-up worksheets based on initial diagnosis
-- Scheduled delivery of follow-up worksheets at appropriate intervals
-- Follow-up worksheets that reference previous answers
-- Clear progress indicators between worksheets
+## 📌 System Background
+The app currently supports:
+- 12 primary worksheets aligned with the **12 Pillars of Crystal Clear Leadership**
+- A structured workbook submission pathway
+- JSON definitions for follow-up worksheets already created (one per pillar and per Jackier Method step)
+
+---
+
+## 🛠️ Implementation Scope (Milestone 7)
+
+### 1. 🔄 Worksheet Trigger Logic
+- ✅ Implemented logic to **schedule and trigger** follow-up worksheets automatically based on:
+  - ✅ Time since previous submission (7–14 days window implemented in `followupTriggerUtils.ts`)
+  - ✅ Scores below a defined threshold (rating ≤ 2 in any self-assessment, implemented in `followupTriggerUtils.ts`)
+  - ✅ Manual trigger from user ("I'm still stuck" or "I want help" detection implemented)
+- ✅ Enhanced `getTriggeredFollowups` function to prioritize recommendations (explicit requests first, then low ratings, then time-based)
+- ✅ Added proper type definitions and error handling for robust operation
+
+### 2. 🧠 AI Context Enhancement
+- ✅ When a follow-up worksheet is submitted, the system retrieves the original submission:
+  - ⏳ **Correction Needed:** We need to distinguish between pillar follow-ups and workbook follow-ups
+  - ⏳ **Correction Needed:** We need specialized prompts for each follow-up type
+  - ⏳ **Correction Needed:** For pillar follow-ups, we need to load the specific pillar submission
+  - ⏳ **Correction Needed:** For workbook follow-ups, we need to load the original workbook submission
+  - ⏳ Include the enhanced AI diagnosis in the email notification to the coaching team
+
+### 3. 🧩 Data Storage & Retrieval
+- ✅ Updated server-side logic to:
+  - ✅ Store both original and follow-up submissions with proper linkage
+  - ✅ Allow for easy retrieval of "previous answers" for comparison or review
+- ⏳ **Correction Needed:** Current worksheet type detection doesn't properly distinguish between pillar and workbook follow-ups
+- ⏳ **Correction Needed:** Need to enhance `followupUtils.ts` with specialized functions:
+  - ⏳ Add `getFollowupType(followupId)` to determine if it's a pillar or workbook follow-up
+  - ⏳ Create `loadFollowupContext(originalSubmission, followupType, pillarId?)` to load appropriate context
+
+### 4. 📬 Email Notification to Eric
+- ✅ On follow-up worksheet submission:
+  - ✅ Compose and send a notification email to `help@jackiercoaching.com` (implemented in `emailService.ts`)
+  - ✅ Email includes basic information:
+    - ✅ User ID and name
+    - ✅ Worksheet ID (e.g., `pillar6-followup`)
+    - ✅ Summary of ratings and reflection response
+    - ✅ Flag if user requested human help or submitted a low score
+  - ⏳ **Correction Needed:** Email content should be specialized based on follow-up type:
+    - ⏳ For pillar follow-ups: Include pillar-specific progress analysis
+    - ⏳ For workbook follow-ups: Include implementation progress analysis
+  - ⏳ **Correction Needed:** Enhanced AI diagnosis in email should match the follow-up type
+
+### 5. 💻 Web App UI Enhancements
+- ⏳ Update the UI to:
+  - ⏳ **Correction Needed:** Create specialized UI components for each follow-up type:
+    - ⏳ Pillar follow-up components focused on specific leadership area progress
+    - ⏳ Workbook follow-up components focused on overall implementation progress
+  - ⏳ Support displaying **prior submission summaries** based on follow-up type
+  - ⏳ Add type-specific progress tracking indicators
+  - ⏳ Add contextual messaging based on follow-up type
+
+### 6. 🔍 Follow-up Recommendations API
+- ✅ Implemented `/api/followup/recommendations` endpoint to:
+  - ✅ Return prioritized follow-up worksheet recommendations
+  - ✅ Include basic worksheet metadata (title, description)
+  - ⏳ **Correction Needed:** Filter recommendations by follow-up type
+  - ⏳ **Correction Needed:** Include type-specific metadata in recommendations
+  - ⏳ **Correction Needed:** Prioritize recommendations based on type-specific criteria
+
+---
+
+## ✅ Final Requirements
+- After implementation, update `@follow-up-implementation-plan.md` with:
+- What was changed
+- Which files were updated or created
+- How this integrates into the broader Eric GPT architecture
+- Risks, notes, or future refactors required
+  - Which files were updated or created
+  - How this integrates into the broader Eric GPT architecture
+  - Risks, notes, or future refactors required
+
+## ✅ Implementation Status
+
+### What Has Been Completed
+
+1. **Backend API Routes and Services**:
+   - ✅ `/api/followup/submit/route.ts`: Basic implementation for follow-up submission
+   - ✅ `/api/followup/recommendations/route.ts`: Basic implementation for follow-up recommendations
+   - ✅ `/api/followup/worksheets/route.ts`: Serves all available follow-up worksheets
+   - ✅ `/api/followup/worksheets/[id]/route.ts`: Serves individual follow-up worksheet data
+
+2. **Core Utilities**:
+   - ✅ `followupTriggerUtils.ts`: Implemented trigger logic for time-based, rating-based, and user-requested follow-ups
+   - ✅ Basic worksheet loading functionality in `followupUtils.ts`
+
+3. **Services**:
+   - ✅ `emailService.ts`: Basic email notification implementation
+
+### What Needs Correction
+
+1. **Follow-up Type Distinction**:
+   - ⏳ Update `followupUtils.ts` to properly distinguish between pillar and workbook follow-ups
+   - ⏳ Create specialized context loading functions for each follow-up type
+   - ⏳ Implement proper storage and retrieval based on follow-up type
+
+2. **AI Prompts**:
+   - ⏳ Create separate prompt templates for pillar and workbook follow-ups
+   - ⏳ Implement a prompt selection system based on follow-up type
+   - ⏳ Ensure prompts include the right context and instructions for each type
+
+3. **Email Notifications**:
+   - ⏳ Update email templates to include type-specific sections
+   - ⏳ Format diagnosis content differently based on follow-up type
+   - ⏳ Include relevant context and comparisons for each type
+
+### What Remains To Be Done
+
+1. **Frontend UI Components**:
+   - ⏳ Create specialized UI components for each follow-up type
+   - ⏳ Implement type-specific progress indicators
+   - ⏳ Add contextual messaging based on follow-up type
+
+2. **Testing and Validation**:
+   - ⏳ Test follow-up type detection with various IDs
+   - ⏳ Test context loading for both follow-up types
+   - ⏳ Test prompt generation for both types
+   - ⏳ Test email notifications for both types
+
+### Integration with Eric GPT Architecture
+
+The follow-up system integrates with the existing architecture by:
+
+1. **Data Flow**:
+   - Original worksheet submissions → Trigger logic → Follow-up recommendations → Follow-up submissions → Enhanced AI diagnosis
+
+2. **Shared Components**:
+   - Uses the same worksheet JSON format as the original worksheets
+   - Leverages the existing email notification system
+   - Builds on the established AI diagnosis engine
+
+3. **Consistency**:
+   - Follows the same API patterns as other endpoints
+   - Uses consistent error handling and type definitions
+   - Maintains separation of concerns between routes, services, and utilities
+
+### Risks and Future Refactors
+
+1. **Potential Risks**:
+   - **Type Confusion**: Without proper distinction between pillar and workbook follow-ups, the system may generate incorrect or irrelevant feedback
+   - **Context Loading**: Incorrect context loading could lead to misleading AI analysis
+   - **User Experience**: Without type-specific UI components, users may be confused about the purpose of follow-ups
+
+2. **Future Refactors**:
+   - Consider moving worksheet data to a database for easier management
+   - Implement more sophisticated trigger algorithms based on user engagement patterns
+   - Add more detailed analytics for follow-up effectiveness
+   - Create a more robust follow-up type detection system that doesn't rely solely on ID patterns
+
+---
+
+**Do not move to the next milestone until I review and approve the integration.** Notify me with a summary of work completed and key decisions.
+
 
 ---
 

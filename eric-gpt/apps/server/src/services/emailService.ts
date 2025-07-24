@@ -3,6 +3,9 @@ import { IUser } from '@/models/User';
 import { IWorkbookSubmission } from '@/models/WorkbookSubmission';
 import { IFollowupAssessment } from '@/models/FollowupAssessment';
 import { Document } from 'mongoose';
+import path from 'path';
+import fs from 'fs';
+import { loadFollowupById, FollowupCategoryType } from '@/utils/followupUtils';
 
 /**
  * Email Service for sending coaching-related notifications
@@ -100,7 +103,7 @@ export class EmailService {
    * @param schedulingDetails The details of the scheduled coaching session
    * @param submissionId Optional submission ID related to this coaching session
    */
-  async sendCoachingPrompt(user: IUser & Document, submissionId?: string, schedulingDetails?: { date: string; time: string; notes?: string }) {
+  async sendCoachingPrompt(user: IUser & Document, submissionId?: string, schedulingDetails?: { date: string; time: string; notes?: string }): Promise<boolean> {
     // Verify required environment variables
     if (!process.env.EMAIL_FROM) {
       console.error('EMAIL_FROM environment variable is not set');
@@ -191,6 +194,208 @@ export class EmailService {
       return true;
     } catch (error) {
       console.error('Error sending coaching emails:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Send a notification about a follow-up worksheet submission
+   * @param user The user who submitted the follow-up
+   * @param originalSubmission The original workbook submission
+   * @param followupAssessment The follow-up assessment submission
+   * @param needsHelp Whether the user has requested help from a coach
+   * @param followupType The category type of follow-up ('pillar' or 'workbook')
+   */
+  async sendFollowupSubmissionNotification(
+    user: IUser & Document,
+    originalSubmission: IWorkbookSubmission & Document,
+    followupAssessment: IFollowupAssessment & Document,
+    needsHelp: boolean = false,
+    followupType: FollowupCategoryType = 'pillar'
+  ): Promise<boolean> {
+    // Use help@jackiercoaching.com as the recipient
+    const helpEmail = process.env.HELP_EMAIL || 'help@jackiercoaching.com';
+    
+    // Verify required environment variables
+    if (!process.env.EMAIL_FROM) {
+      console.error('Cannot send follow-up notification: EMAIL_FROM environment variable is missing');
+      return false;
+    }
+    
+    // Get the follow-up worksheet details
+    let worksheetTitle = 'Follow-up Worksheet';
+    let worksheetDescription = '';
+    
+    try {
+      // Use the provided worksheetType and try to load the worksheet details
+      const { worksheet } = await loadFollowupById(followupAssessment.followupId);
+      
+      if (worksheet) {
+        worksheetTitle = worksheet.title;
+        worksheetDescription = worksheet.description || '';
+      }
+    } catch (error) {
+      console.error('Error loading worksheet information:', error);
+    }
+    
+    // Extract key information from the follow-up answers
+    let keyAnswers = '';
+    try {
+      // Get the self-assessment ratings if they exist
+      const answers = followupAssessment.answers;
+      const ratingKeys = Object.keys(answers).filter(key => key.includes('assessment'));
+      
+      if (ratingKeys.length > 0) {
+        keyAnswers += '<h4>Self-Assessment Ratings</h4><ul>';
+        ratingKeys.forEach(key => {
+          keyAnswers += `<li><strong>${key}:</strong> ${answers[key]}/5</li>`;
+        });
+        keyAnswers += '</ul>';
+      }
+      
+      // Get the reflection answers if they exist
+      const reflectionKeys = Object.keys(answers).filter(key => key.includes('reflection'));
+      
+      if (reflectionKeys.length > 0) {
+        keyAnswers += '<h4>Reflection Responses</h4>';
+        reflectionKeys.forEach(key => {
+          keyAnswers += `<p><strong>${key}:</strong> ${answers[key]}</p>`;
+        });
+      }
+      
+      // Check if the user requested help
+      const helpRequestKeys = Object.keys(answers).filter(key => key.includes('next-steps') || key.includes('help'));
+      if (helpRequestKeys.length > 0 && helpRequestKeys.some(key => answers[key])) {
+        keyAnswers += '<h4>Help Request</h4>';
+        helpRequestKeys.forEach(key => {
+          if (answers[key]) {
+            keyAnswers += `<p><strong>${key}:</strong> ${answers[key]}</p>`;
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error extracting key answers:', error);
+    }
+    
+    // Compare with original submission if available
+    let progressComparison = '';
+    let enhancedDiagnosis = '';
+    if (originalSubmission.diagnosis) {
+      // Basic progress comparison
+      progressComparison = `
+        <h3>Progress Comparison</h3>
+        <p>Original diagnosis date: ${new Date(originalSubmission.diagnosisGeneratedAt || originalSubmission.createdAt).toLocaleDateString()}</p>
+        <p>Follow-up submission date: ${new Date(followupAssessment.completedAt || followupAssessment.createdAt).toLocaleDateString()}</p>
+        <p>Time elapsed: ${Math.round((followupAssessment.createdAt.getTime() - originalSubmission.createdAt.getTime()) / (1000 * 60 * 60 * 24))} days</p>
+      `;
+      
+      // Add enhanced AI diagnosis if available - format differently based on follow-up type
+      if (followupType === 'pillar') {
+        // Pillar-specific diagnosis format
+        enhancedDiagnosis = `
+          <h3>Enhanced Pillar-Specific AI Diagnosis</h3>
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h4>Progress Analysis</h4>
+            <p>${originalSubmission.diagnosis.situationAnalysis || 'No progress analysis available'}</p>
+            
+            <h4>Implementation Effectiveness</h4>
+            <p>${originalSubmission.diagnosis.strengthsAnalysis || 'No implementation analysis available'}</p>
+            
+            <h4>Adjusted Recommendations</h4>
+            <p>${originalSubmission.diagnosis.growthAreasAnalysis || 'No adjusted recommendations available'}</p>
+            
+            <h4>Continued Growth Plan</h4>
+            <p>${originalSubmission.diagnosis.actionableRecommendations || 'No growth plan available'}</p>
+            
+            <h4>Coaching Support Assessment</h4>
+            <p>${originalSubmission.diagnosis.followupRecommendation || 'No coaching assessment available'}</p>
+          </div>
+        `;
+      } else {
+        // Workbook-specific diagnosis format
+        enhancedDiagnosis = `
+          <h3>Enhanced Workbook Implementation AI Diagnosis</h3>
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h4>Implementation Progress Analysis</h4>
+            <p>${originalSubmission.diagnosis.situationAnalysis || 'No progress analysis available'}</p>
+            
+            <h4>Cross-Pillar Integration</h4>
+            <p>${originalSubmission.diagnosis.strengthsAnalysis || 'No integration analysis available'}</p>
+            
+            <h4>Implementation Barriers</h4>
+            <p>${originalSubmission.diagnosis.growthAreasAnalysis || 'No barriers analysis available'}</p>
+            
+            <h4>Comprehensive Adjustment Plan</h4>
+            <p>${originalSubmission.diagnosis.actionableRecommendations || 'No adjustment plan available'}</p>
+            
+            <h4>Next Focus Areas</h4>
+            <p>${originalSubmission.diagnosis.pillarRecommendations || 'No focus areas available'}</p>
+            
+            <h4>Coaching Support Assessment</h4>
+            <p>${originalSubmission.diagnosis.followupRecommendation || 'No coaching assessment available'}</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Create a priority flag if the user needs help
+    const priorityFlag = needsHelp ? 
+      '<div style="background-color: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin: 20px 0; font-weight: bold; font-size: 18px;">⚠️ PRIORITY: User has explicitly requested coaching help</div>' : 
+      '';
+    
+    const mailOptions = {
+      from: process.env.EMAIL_FROM,
+      to: helpEmail,
+      subject: `${needsHelp ? '[PRIORITY] ' : ''}${followupType === 'pillar' ? 'Pillar' : 'Workbook'} Follow-up: ${user.name || user.email} - ${worksheetTitle}`,
+      html: `
+        <h2>New Follow-up Worksheet Submission</h2>
+        ${priorityFlag}
+        
+        <h3>User Information</h3>
+        <p><strong>Name:</strong> ${user.name || 'Not provided'}</p>
+        <p><strong>Email:</strong> ${user.email}</p>
+        <p><strong>Subscription:</strong> ${user.subscription?.planId || 'Unknown'}</p>
+        
+        <h3>Follow-up Details</h3>
+        <p><strong>Worksheet:</strong> ${worksheetTitle} (${followupType})</p>
+        <p><strong>Description:</strong> ${worksheetDescription}</p>
+        <p><strong>Submitted:</strong> ${new Date(followupAssessment.completedAt || followupAssessment.createdAt).toLocaleString()}</p>
+        <p><strong>Original Submission ID:</strong> ${originalSubmission._id}</p>
+        <p><strong>Follow-up ID:</strong> ${followupAssessment._id}</p>
+        
+        <h3>Key Responses</h3>
+        ${keyAnswers || '<p>No key responses extracted</p>'}
+        
+        ${progressComparison}
+        
+        ${enhancedDiagnosis}
+        
+        <h3>Next Steps</h3>
+        <p>You can review the full submission details in the admin dashboard.</p>
+        ${needsHelp ? '<p><strong>This user has explicitly requested coaching assistance. Please reach out to them as soon as possible.</strong></p>' : ''}
+      `,
+    };
+    
+    try {
+      // Add verification step before sending
+      await this.transporter.verify();
+      console.log('SMTP connection verified successfully for follow-up notification');
+      
+      // Send notification email
+      const result = await this.transporter.sendMail(mailOptions);
+      console.log('Follow-up notification email sent result:', result);
+      
+      // Check for rejected or pending emails
+      const failed = [...(result.rejected || []), ...(result.pending || [])].filter(Boolean);
+      
+      if (failed.length) {
+        console.error(`Follow-up notification email(s) (${failed.join(', ')}) could not be sent`);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error sending follow-up notification email:', error);
       return false;
     }
   }

@@ -3,7 +3,10 @@
  * Functions for handling follow-up worksheets based on diagnosis results
  */
 
-import { loadFollowupById } from './workbookLoader';
+import fs from 'fs';
+import path from 'path';
+import { glob } from 'glob';
+import mongoose from 'mongoose';
 
 /**
  * Interface for follow-up worksheet metadata
@@ -58,6 +61,11 @@ export const FOLLOWUP_TYPES = [
 export type FollowupType = typeof FOLLOWUP_TYPES[number];
 
 /**
+ * Follow-up category types
+ */
+export type FollowupCategoryType = 'pillar' | 'workbook';
+
+/**
  * Combined worksheet types (both pillars and follow-ups)
  */
 export const WORKSHEET_TYPES = [...PILLAR_TYPES, ...FOLLOWUP_TYPES] as const;
@@ -77,8 +85,8 @@ export async function loadWorksheet(worksheetType: WorksheetType): Promise<Follo
       return null;
     }
     
-    // Load the worksheet from the workbook loader
-    const worksheet = await loadFollowupById(worksheetType);
+    // Load the worksheet using the loadFollowupById function
+    const { worksheet } = await loadFollowupById(worksheetType);
     
     if (!worksheet) {
       console.error(`Worksheet not found: ${worksheetType}`);
@@ -166,6 +174,162 @@ function mapFieldTypeToQuestionType(fieldType: string): FollowupQuestion['type']
  */
 export async function loadFollowupWorksheet(followupType: FollowupType): Promise<FollowupWorksheet | null> {
   return loadWorksheet(followupType);
+}
+
+/**
+ * Determines the type of follow-up worksheet based on its ID
+ * @param followupId The ID of the follow-up worksheet
+ * @returns The follow-up category type ('pillar' or 'workbook')
+ */
+export function getFollowupType(followupId: string): FollowupCategoryType {
+  // Check if the ID contains 'pillar' or starts with 'pillar'
+  if (followupId.includes('pillar') || /^pillar\d+/.test(followupId)) {
+    return 'pillar';
+  }
+  
+  // Check if the ID contains 'implementation' or 'workbook'
+  if (followupId.includes('implementation') || followupId.includes('workbook')) {
+    return 'workbook';
+  }
+  
+  // Extract pillar number if it's in format like 'pillar1-followup'
+  const pillarMatch = followupId.match(/pillar(\d+)-followup/);
+  if (pillarMatch) {
+    return 'pillar';
+  }
+  
+  // Default to workbook follow-up if we can't determine the type
+  console.warn(`Could not determine follow-up type for ID: ${followupId}, defaulting to 'workbook'`);
+  return 'workbook';
+}
+
+/**
+ * Extracts the pillar ID from a follow-up ID
+ * @param followupId The ID of the follow-up worksheet
+ * @returns The pillar ID or null if not a pillar follow-up
+ */
+export function extractPillarId(followupId: string): string | null {
+  // Check for formats like 'pillar1-followup' or 'pillar1_leadership_mindset-followup'
+  const pillarMatch = followupId.match(/pillar(\d+)[-_]/);
+  if (pillarMatch) {
+    const pillarNumber = pillarMatch[1];
+    // Return the corresponding pillar ID from PILLAR_TYPES
+    const pillarIndex = parseInt(pillarNumber) - 1;
+    if (pillarIndex >= 0 && pillarIndex < PILLAR_TYPES.length) {
+      return PILLAR_TYPES[pillarIndex];
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Loads the appropriate context for a follow-up submission
+ * @param originalSubmission The original workbook submission
+ * @param followupType The type of follow-up ('pillar' or 'workbook')
+ * @param pillarId Optional pillar ID for pillar follow-ups
+ * @returns The context object with relevant data for the follow-up
+ */
+export function loadFollowupContext(originalSubmission: any, followupType: FollowupCategoryType, pillarId?: string): any {
+  // Base context with common fields
+  const baseContext = {
+    userId: originalSubmission.userId,
+    userName: originalSubmission.userName,
+    submissionDate: originalSubmission.submissionDate,
+    diagnosisGeneratedAt: originalSubmission.diagnosisGeneratedAt
+  };
+  
+  if (followupType === 'pillar' && pillarId) {
+    // For pillar follow-ups, include specific pillar data
+    const pillarData = originalSubmission.pillars?.find((p: any) => 
+      p.worksheetId === pillarId || p.worksheetId.includes(pillarId)
+    );
+    
+    return {
+      ...baseContext,
+      pillarId,
+      pillarAnswers: pillarData?.answers || {},
+      pillarDiagnosis: pillarData?.diagnosis || {},
+      originalDiagnosis: originalSubmission.diagnosis || {}
+    };
+  } else {
+    // For workbook follow-ups, include overall workbook data
+    return {
+      ...baseContext,
+      workbookAnswers: originalSubmission.answers || {},
+      workbookDiagnosis: originalSubmission.diagnosis || {},
+      followupHistory: originalSubmission.followup ? [originalSubmission.followup] : []
+    };
+  }
+}
+
+/**
+ * Loads a follow-up worksheet by its ID
+ * @param id The ID of the follow-up worksheet to load
+ * @returns Object containing the worksheet and its type
+ */
+export async function loadFollowupById(id: string): Promise<{ worksheet: any; type: string }> {
+  try {
+    // Try to find the worksheet in pillar follow-ups first
+    let worksheet = null;
+    let worksheetType = '';
+    
+    const dataDir = path.join(process.cwd(), 'src/data');
+    
+    // Try to load from crystal-clear-leadership-followup.json (pillar follow-ups)
+    try {
+      const pillarFollowupsPath = path.join(dataDir, 'crystal-clear-leadership-followup.json');
+      if (fs.existsSync(pillarFollowupsPath)) {
+        const pillarFollowups = JSON.parse(fs.readFileSync(pillarFollowupsPath, 'utf8'));
+        worksheet = pillarFollowups.find((w: any) => w.id === id);
+        
+        if (worksheet) {
+          worksheetType = 'pillar';
+        }
+      }
+    } catch (error) {
+      console.error('Error loading pillar follow-up worksheets:', error);
+    }
+    
+    // If not found in pillar follow-ups, try implementation follow-ups
+    if (!worksheet) {
+      try {
+        const implementationFollowupsPath = path.join(dataDir, 'implementation-support-followup.json');
+        if (fs.existsSync(implementationFollowupsPath)) {
+          const implementationFollowups = JSON.parse(fs.readFileSync(implementationFollowupsPath, 'utf8'));
+          worksheet = implementationFollowups.find((w: any) => w.id === id);
+          
+          if (worksheet) {
+            worksheetType = 'implementation';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading implementation follow-up worksheets:', error);
+      }
+    }
+    
+    // If not found in either, try jackier-method-followup.json (legacy)
+    if (!worksheet) {
+      try {
+        const legacyFollowupsPath = path.join(dataDir, 'jackier-method-followup.json');
+        if (fs.existsSync(legacyFollowupsPath)) {
+          const legacyFollowups = JSON.parse(fs.readFileSync(legacyFollowupsPath, 'utf8'));
+          worksheet = legacyFollowups.find((w: any) => w.id === id);
+          
+          if (worksheet) {
+            worksheetType = 'legacy';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading legacy follow-up worksheets:', error);
+      }
+    }
+    
+    return { worksheet, type: worksheetType };
+  } catch (error) {
+    console.error(`Error loading follow-up worksheet ${id}:`, error);
+    throw error;
+  }
 }
 
 /**
