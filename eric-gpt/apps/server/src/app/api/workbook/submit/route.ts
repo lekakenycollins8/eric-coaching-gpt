@@ -292,30 +292,33 @@ export async function POST(request: Request) {
       
       console.log('AI diagnosis generated successfully for submission:', submission._id);
       
-      // Send email notification to the coach
-      try {
-        // Get the user details for the email
-        const userDetails = await UserModel.findById(submission.userId);
-        
-        if (userDetails) {
-          const emailSent = await emailService.sendDiagnosisNotification(userDetails, submission);
+      // Send email notification to the coach asynchronously (don't await)
+      // This prevents delays in the API response
+      setTimeout(async () => {
+        try {
+          // Get the user details for the email
+          const userDetails = await UserModel.findById(submission.userId);
           
-          if (emailSent) {
-            console.log('Diagnosis notification email sent successfully');
+          if (userDetails) {
+            const emailSent = await emailService.sendDiagnosisNotification(userDetails, submission);
             
-            // Update the emailSent flag in the submission
-            submission.emailSent = true;
-            await submission.save();
+            if (emailSent) {
+              console.log('Diagnosis notification email sent successfully');
+              
+              // Update the emailSent flag in the submission
+              submission.emailSent = true;
+              await submission.save();
+            } else {
+              console.error('Failed to send diagnosis notification email');
+            }
           } else {
-            console.error('Failed to send diagnosis notification email');
+            console.error('User not found for diagnosis notification email:', submission.userId);
           }
-        } else {
-          console.error('User not found for diagnosis notification email:', submission.userId);
+        } catch (emailError) {
+          console.error('Error sending diagnosis notification email:', emailError);
+          // Continue even if email sending fails
         }
-      } catch (emailError) {
-        console.error('Error sending diagnosis notification email:', emailError);
-        // Continue even if email sending fails
-      }
+      }, 100); // Small timeout to ensure this runs after the response is sent
     } catch (diagnosisError) {
       console.error('Error generating diagnosis:', diagnosisError);
       // Log more details about the error
