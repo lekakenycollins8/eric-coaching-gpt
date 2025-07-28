@@ -12,8 +12,6 @@ export async function middleware(request: NextRequest) {
     '/',
     '/api',  // Root API route
     '/api/worksheets',
-    '/api/worksheets/recommendations',
-    '/api/worksheets/relationships',
     '/api/submissions',
     '/api/stripe/create-checkout-session',
     '/api/stripe/webhook',
@@ -39,7 +37,13 @@ export async function middleware(request: NextRequest) {
     '/api/workbook/submit',
     '/api/workbook/submission',
     '/api/diagnosis',
+    // Follow-up system routes
     '/api/followup',
+    '/api/followup/worksheets',
+    '/api/followup/recommendations',
+    '/api/followup/submit',
+    // Dynamic routes with parameters - these cover routes like /api/followup/worksheets/[id]
+    '/api/followup/worksheets/'
     // Add other known API routes here
   ];
   

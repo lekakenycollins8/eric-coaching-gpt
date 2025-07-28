@@ -10,13 +10,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 interface FollowupPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function FollowupPage({ params }: FollowupPageProps) {
-  const { id } = params;
+export default async function FollowupPage({ params }: FollowupPageProps) {
+  const { id } = await params;
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submission');
   

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * API route for fetching worksheet submissions
  */
@@ -23,10 +25,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const pillarId = searchParams.get('pillarId');
     
-    // Construct URL with query parameters
-    const url = new URL(`${apiUrl}/api/worksheet/submissions`);
+    // Construct URL with query parameters - use the correct endpoint /api/submissions
+    const url = new URL(`${apiUrl}/api/submissions`);
     url.searchParams.append('userId', session.user.id);
     if (pillarId) url.searchParams.append('pillarId', pillarId);
+    
+    console.log('Web app: Forwarding worksheet submissions request to:', url.toString());
 
     // Forward to backend server
     const response = await fetch(url.toString(), {
