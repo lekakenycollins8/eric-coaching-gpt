@@ -109,7 +109,7 @@ export const followupApi = {
    * @returns List of workbook submissions
    */
   async getWorkbookSubmissions(): Promise<{ submissions: any[] }> {
-    const response = await fetch('/api/workbook/submissions');
+    const response = await fetch('/api/jackier/workbook/submission');
     
     if (!response.ok) {
       throw new Error(`Failed to fetch workbook submissions: ${response.status}`);

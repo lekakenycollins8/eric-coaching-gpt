@@ -338,7 +338,7 @@ export async function POST(request: Request) {
     // Find the original submission
     const submission = await WorkbookSubmission.findOne({
       _id: submissionId,
-      userId: userId, // Use the validated userId variable instead of session.user.id
+      userId: session.user.id,
       status: 'submitted',
       diagnosis: { $exists: true }
     }).exec();
