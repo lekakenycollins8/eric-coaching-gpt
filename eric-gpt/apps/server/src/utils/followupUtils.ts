@@ -182,24 +182,37 @@ export async function loadFollowupWorksheet(followupType: FollowupType): Promise
  * @returns The follow-up category type ('pillar' or 'workbook')
  */
 export function getFollowupType(followupId: string): FollowupCategoryType {
-  // Check if the ID contains 'pillar' or starts with 'pillar'
-  if (followupId.includes('pillar') || /^pillar\d+/.test(followupId)) {
+  // First, check for exact patterns from crystal-clear-leadership-followup.json
+  // Format: pillarX-followup (e.g., pillar1-followup, pillar12-followup)
+  if (/^pillar\d+-followup$/.test(followupId)) {
     return 'pillar';
   }
   
-  // Check if the ID contains 'jackier-step' (from implementation-support-followup.json)
-  if (followupId.startsWith('jackier-step')) {
+  // Check for exact patterns from implementation-support-followup.json
+  // Format: jackier-stepX-followup (e.g., jackier-step1-followup)
+  if (/^jackier-step\d+-followup$/.test(followupId)) {
     return 'workbook';
   }
   
-  // Check if the ID contains 'implementation' or 'workbook'
-  if (followupId.includes('implementation') || followupId.includes('workbook')) {
+  // Fallback checks for other naming patterns
+  // Check if it starts with 'pillar' and is likely a pillar-related worksheet
+  if (/^pillar\d+/.test(followupId)) {
+    return 'pillar';
+  }
+  
+  // Check for implementation or workbook keywords
+  if (followupId.includes('implementation') || 
+      followupId.includes('workbook') || 
+      followupId.includes('jackier')) {
     return 'workbook';
   }
   
-  // Extract pillar number if it's in format like 'pillar1-followup'
-  const pillarMatch = followupId.match(/pillar(\d+)-followup/);
-  if (pillarMatch) {
+  // Log a warning for IDs that don't match expected patterns
+  console.warn(`Follow-up ID does not match expected patterns: ${followupId}`);
+  
+  // If the ID contains 'pillar' anywhere, assume it's a pillar follow-up
+  if (followupId.includes('pillar')) {
+    console.warn(`Assuming '${followupId}' is a pillar follow-up based on naming`);
     return 'pillar';
   }
   

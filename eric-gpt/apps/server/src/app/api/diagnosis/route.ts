@@ -172,8 +172,13 @@ export async function POST(request: Request) {
     }
 
     try {
+      // Convert formatted answers array to string format expected by the diagnosis generator
+      const formattedAnswersString = formattedAnswers.map(qa => 
+        `Question: ${qa.question}\nAnswer: ${qa.answer}`
+      ).join('\n\n');
+      
       // Generate the AI diagnosis using our utility function
-      const diagnosis = await generateAIDiagnosis(formattedAnswers, user.name || 'Client');
+      const diagnosis = await generateAIDiagnosis(formattedAnswersString, user.name || 'Client');
       
       // Determine the most appropriate follow-up worksheets
       const followupWorksheets = determineFollowupWorksheets(diagnosis);

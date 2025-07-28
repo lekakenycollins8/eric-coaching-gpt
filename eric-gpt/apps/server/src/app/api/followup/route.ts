@@ -105,15 +105,27 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check if the submission belongs to the user
+    // Get the authenticated user from session or query parameter
+    let userId;
+    
+    // First try to get userId from the session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else {
+      // If no session, try to get userId from query parameters (for web app proxy requests)
+      userId = searchParams.get('userId');
+      
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
     }
-    if (submission.userId.toString() !== session.user.id) {
+    
+    // Check if the submission belongs to the user
+    if (submission.userId.toString() !== userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
@@ -275,9 +287,21 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
-    // Check authentication
+    // Parse request body first to get potential userId
+    const body = await request.json();
+    const { submissionId, worksheetId, answers, needsHelp, userId: bodyUserId } = body;
+    
+    // Get the authenticated user from session or request body
+    let userId;
+    
+    // First try to get userId from the session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else if (bodyUserId) {
+      // If no session, try to get userId from request body (for web app proxy requests)
+      userId = bodyUserId;
+    } else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -286,7 +310,7 @@ export async function POST(request: Request) {
 
     // Check if user has an active subscription
     await connectToDatabase();
-    const user = await User.findById(session.user.id);
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -303,10 +327,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse request body
-    const body = await request.json();
-    const { submissionId, worksheetId, answers } = body;
-
     // Validate required fields
     if (!submissionId || !worksheetId || !answers) {
       return NextResponse.json(
@@ -318,7 +338,7 @@ export async function POST(request: Request) {
     // Find the original submission
     const submission = await WorkbookSubmission.findOne({
       _id: submissionId,
-      userId: session.user.id,
+      userId: userId, // Use the validated userId variable instead of session.user.id
       status: 'submitted',
       diagnosis: { $exists: true }
     }).exec();
@@ -408,7 +428,7 @@ export async function POST(request: Request) {
       const followupDoc = followupAssessment as IFollowupAssessment & Document;
       const submissionDoc = submission as IWorkbookSubmission & Document;
       
-      await emailService.sendFollowupSubmissionNotification(userDoc, followupDoc, submissionDoc);
+      await emailService.sendFollowupSubmissionNotification(userDoc, submissionDoc, followupDoc);
     } catch (emailError) {
       console.error('Error sending follow-up notification email:', emailError);
       // Continue processing even if email fails

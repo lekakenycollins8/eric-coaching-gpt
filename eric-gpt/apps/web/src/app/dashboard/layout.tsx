@@ -15,7 +15,8 @@ import {
   XMarkIcon,
   ArrowTrendingUpIcon,
   CalendarIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  ClipboardIcon
 } from '@heroicons/react/24/outline';
 
 export default function DashboardLayout({
@@ -34,6 +35,7 @@ export default function DashboardLayout({
     { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
+    { name: 'Follow-ups', href: '/dashboard/followup', icon: ClipboardIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
     { name: 'Coaching', href: '/dashboard/coaching', icon: ChatBubbleLeftRightIcon },
     { name: 'Schedule Session', href: '/dashboard/coaching/schedule', icon: CalendarIcon },

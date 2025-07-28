@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { hasActiveSubscription } from '@/services/quotaManager';
@@ -70,16 +70,24 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const type = url.searchParams.get('type') || 'all';
     
-    // Try to authenticate via session
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    // Get the authenticated user from session or query parameter
+    let userId;
     
-    const userId = session.user.id;
+    // First try to get userId from the session
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else {
+      // If no session, try to get userId from query parameters (for web app proxy requests)
+      userId = url.searchParams.get('userId');
+      
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+    }
     
     // Connect to database and verify user
     await connectToDatabase();
