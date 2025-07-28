@@ -8,13 +8,15 @@ import { PageHeader } from '../../../../components/ui/page-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { use } from 'react';
 
 interface FollowupPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function FollowupPage({ params }: FollowupPageProps) {
-  const { id } = await params;
+export default function FollowupPage({ params }: FollowupPageProps) {
+  // Use React.use to unwrap the params Promise
+  const { id } = use(params);
   const searchParams = useSearchParams();
   const submissionId = searchParams.get('submission');
   
