@@ -10,9 +10,8 @@ import { CoachingPrompt } from '@/components/coaching/CoachingPrompt';
 import type { FollowupSubmissionData } from '@/types/followup';
 
 interface FollowupSubmissionSuccessProps {
-  followupId: string;
-  submissionData: FollowupSubmissionData;
-  submissionResult: any;
+  worksheetId: string;
+  result: any;
 }
 
 /**
@@ -20,19 +19,18 @@ interface FollowupSubmissionSuccessProps {
  * Includes coaching prompt integration when user indicates they need help
  */
 export function FollowupSubmissionSuccess({ 
-  followupId, 
-  submissionData, 
-  submissionResult 
+  worksheetId, 
+  result 
 }: FollowupSubmissionSuccessProps) {
   const [showCoachingPrompt, setShowCoachingPrompt] = useState(false);
-  const followupType = useFollowupType(followupId);
+  const followupType = useFollowupType(worksheetId);
   
-  // Determine if coaching prompt should be shown based on submission data
+  // Determine if coaching prompt should be shown based on submission result
   useEffect(() => {
-    if (submissionData.needsHelp) {
+    if (result?.needsHelp) {
       setShowCoachingPrompt(true);
     }
-  }, [submissionData.needsHelp]);
+  }, [result]);
   
   return (
     <div className="space-y-6">
@@ -52,10 +50,10 @@ export function FollowupSubmissionSuccess({
             and provides valuable insights for your leadership development journey.
           </p>
           
-          {submissionResult?.diagnosis && (
+          {result?.diagnosis && (
             <div className="mt-4 p-4 bg-white rounded-md border">
               <h3 className="font-medium mb-2">Initial Analysis:</h3>
-              <p className="text-sm">{submissionResult.diagnosis}</p>
+              <p className="text-sm">{result.diagnosis}</p>
             </div>
           )}
         </CardContent>
@@ -66,7 +64,7 @@ export function FollowupSubmissionSuccess({
             </Button>
           </Link>
           
-          <Link href={`/dashboard/progress${followupType === 'pillar' ? `/${followupId.split('-')[0]}` : ''}`}>
+          <Link href={`/dashboard/progress${followupType === 'pillar' ? `/${worksheetId.split('-')[0]}` : ''}`}>
             <Button>
               View Progress <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -75,10 +73,14 @@ export function FollowupSubmissionSuccess({
       </Card>
       
       {showCoachingPrompt && (
-        <CoachingPrompt
-          submissionId={submissionResult?.id || ''}
-          showPrompt={true}
-          onDismiss={() => setShowCoachingPrompt(false)}
+        <CoachingPrompt 
+          submissionId={result?.originalSubmissionId || ''}
+          followupId={worksheetId}
+          context={{
+            type: followupType || 'workbook',
+            title: result?.title || '',
+            diagnosis: result?.diagnosis || ''
+          }}
         />
       )}
     </div>

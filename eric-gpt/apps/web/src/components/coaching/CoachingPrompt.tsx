@@ -5,9 +5,16 @@ import { CalendarIcon, CheckCircleIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
+interface CoachingContext {
+  type: 'pillar' | 'workbook';
+  title: string;
+  diagnosis: string;
+}
+
 interface CoachingPromptProps {
   submissionId: string;
-  showPrompt: boolean;
+  followupId: string;
+  context: CoachingContext;
   onDismiss?: () => void;
 }
 
@@ -17,19 +24,20 @@ interface CoachingPromptProps {
  */
 export const CoachingPrompt: React.FC<CoachingPromptProps> = ({
   submissionId,
-  showPrompt,
+  followupId,
+  context,
   onDismiss
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
   
-  if (!showPrompt || !session) {
+  if (!session) {
     return null;
   }
   
   const handleScheduleClick = () => {
-    // Navigate to the scheduling page with the submission ID
-    router.push(`/dashboard/coaching/schedule?submission=${submissionId}`);
+    // Navigate to the scheduling page with the submission ID and followup ID
+    router.push(`/dashboard/coaching/schedule?submission=${submissionId}&followup=${followupId}`);
   };
   
   return (
@@ -37,7 +45,7 @@ export const CoachingPrompt: React.FC<CoachingPromptProps> = ({
       <CardHeader className="pb-2">
         <CardTitle className="text-blue-800">Ready for Personalized Coaching?</CardTitle>
         <CardDescription className="text-blue-700">
-          Your follow-up worksheet insights suggest you might benefit from a coaching session.
+          Your {context.type} follow-up insights suggest you might benefit from a coaching session.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-sm text-blue-700">

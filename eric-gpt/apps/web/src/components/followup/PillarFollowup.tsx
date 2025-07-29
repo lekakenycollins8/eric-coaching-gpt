@@ -45,7 +45,10 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
   // Handle submission selection
   const handleSelectSubmission = (submissionId: string) => {
     setSelectedSubmissionId(submissionId);
-    setShowForm(true);
+    // Delay showing the form until the next render cycle to ensure the worksheet data is refetched
+    setTimeout(() => {
+      setShowForm(true);
+    }, 100);
   };
   
   // Handle successful submission
@@ -112,7 +115,9 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
                       <div>
                         <CardTitle className="text-base">{pillarId} Submission</CardTitle>
                         <CardDescription>
-                          Completed on {new Date(submission.completedAt).toLocaleDateString()}
+                          Completed on {submission.completedAt ? new Date(submission.completedAt).toLocaleDateString() : 
+                            (submission.updatedAt ? new Date(submission.updatedAt).toLocaleDateString() : 
+                              new Date(submission.createdAt || Date.now()).toLocaleDateString())}
                         </CardDescription>
                       </div>
                       <Button onClick={() => handleSelectSubmission(submission._id)}>

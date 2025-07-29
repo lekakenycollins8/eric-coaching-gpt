@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +25,14 @@ export function FollowupForm({ worksheet, originalSubmissionId, onSuccess }: Fol
   const [needsHelp, setNeedsHelp] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const [isReady, setIsReady] = useState(false);
+  
+  // Ensure worksheet data is fully loaded before rendering
+  useEffect(() => {
+    if (worksheet && worksheet.fields) {
+      setIsReady(true);
+    }
+  }, [worksheet]);
   
   // Get submission mutation and draft functions
   const { mutate: submitFollowup, isPending } = useFollowupSubmission();
@@ -88,16 +96,31 @@ export function FollowupForm({ worksheet, originalSubmissionId, onSuccess }: Fol
   // If submission was successful, show success component
   if (submissionSuccess && submissionResult) {
     return (
-      <FollowupSubmissionSuccess
-        followupId={worksheet.id}
-        submissionData={{
-          followupId: worksheet.id,
-          originalSubmissionId,
-          answers: form.getValues(),
-          needsHelp
+      <FollowupSubmissionSuccess 
+        result={{
+          ...submissionResult,
+          originalSubmissionId: originalSubmissionId,
+          needsHelp: needsHelp
         }}
-        submissionResult={submissionResult}
+        worksheetId={worksheet?.id || ''}
       />
+    );
+  }
+  
+  // Show loading state if worksheet data is not ready
+  if (!isReady || !worksheet || !worksheet.fields) {
+    return (
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-4 w-full mt-2" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </CardContent>
+      </Card>
     );
   }
   
