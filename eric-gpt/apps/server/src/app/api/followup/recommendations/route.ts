@@ -69,16 +69,30 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: Request) {
   try {
-    // Try to authenticate via session
+    // Parse URL to get query parameters
+    const { searchParams } = new URL(request.url);
+    const queryUserId = searchParams.get('userId');
+    
+    // Try to authenticate via session first
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    let userId;
+    
+    // If session exists, use the user ID from the session
+    if (session && session.user) {
+      userId = session.user.id;
+    } 
+    // Otherwise, check if userId was provided in query parameters
+    else if (queryUserId) {
+      userId = queryUserId;
+      console.log(`Using userId parameter for authentication: ${queryUserId}`);
+    } 
+    // If no authentication method worked, return 401
+    else {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
-    
-    const userId = session.user.id;
     
     // Connect to database and verify user
     await connectToDatabase();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -34,23 +34,31 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
+      cache: 'no-store',
     });
 
+    // Check if the response is valid JSON before parsing
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Non-JSON response received from server:', await response.text());
+      return NextResponse.json(
+        { error: 'Invalid response from server' },
+        { status: 500 }
+      );
+    }
+    
     // Check if response is OK before trying to parse JSON
     if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Could not read error response');
-      console.error('Server returned an error:', response.status, errorText);
+      const errorData = await response.json();
+      console.error('Server returned an error:', response.status, errorData);
       return NextResponse.json(
-        { error: `Server error: ${response.status}`, message: 'The server API returned an error' },
+        { error: errorData.message || `Server error: ${response.status}` },
         { status: response.status }
       );
     }
 
     // Get the response data
-    const data = await response.json().catch(error => {
-      console.error('Failed to parse JSON response:', error);
-      throw new Error('Invalid JSON response from server');
-    });
+    const data = await response.json();
 
     // Return the response from the server
     return NextResponse.json(data, { status: response.status });
