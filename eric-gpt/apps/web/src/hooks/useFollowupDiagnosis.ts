@@ -30,6 +30,37 @@ export function useFollowupDiagnosis(followupId: string) {
         throw new Error('Follow-up ID is required');
       }
       
+      // Special case handling for direct access to diagnosis URLs
+      if (followupId === 'diagnosis') {
+        try {
+          // Try to fetch the most recent follow-up submission to determine the correct diagnosis type
+          const recentData = await followupApi.getRecentFollowupSubmission();
+          
+          if (recentData.submission) {
+            const submissionType = recentData.submission.followupType;
+            const submissionId = recentData.submission.followupId;
+            
+            console.log(`Found recent ${submissionType} follow-up submission: ${submissionId}`);
+            
+            // Redirect to the appropriate diagnosis based on the submission type
+            if (submissionType === 'workbook') {
+              return await followupApi.getWorkbookFollowupDiagnosis();
+            } else if (submissionId) {
+              // For pillar follow-ups, use the specific follow-up ID
+              return await followupApi.getFollowupDiagnosis(submissionId);
+            }
+          }
+          
+          // Fallback to workbook diagnosis if we can't determine the type
+          console.log('No recent submission found, defaulting to workbook diagnosis');
+          return await followupApi.getWorkbookFollowupDiagnosis();
+        } catch (error) {
+          console.error('Error fetching recent submission:', error);
+          // Fallback to workbook diagnosis on error
+          return await followupApi.getWorkbookFollowupDiagnosis();
+        }
+      }
+      
       console.log(`Fetching diagnosis for ${followupType} follow-up: ${followupId}`);
       
       try {

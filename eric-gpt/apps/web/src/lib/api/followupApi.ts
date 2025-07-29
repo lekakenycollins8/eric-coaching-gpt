@@ -243,5 +243,24 @@ export const followupApi = {
     }
     
     return response.json();
+  },
+
+  /**
+   * Get the most recent follow-up submission for the current user
+   * @returns The most recent follow-up submission data
+   */
+  async getRecentFollowupSubmission(): Promise<{ submission?: { id: string, followupId: string, followupType: FollowupCategoryType } }> {
+    try {
+      const response = await fetch('/api/followup/submissions/recent');
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch recent follow-up submission: ${response.statusText}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching recent follow-up submission:', error);
+      throw error;
+    }
   }
 };
