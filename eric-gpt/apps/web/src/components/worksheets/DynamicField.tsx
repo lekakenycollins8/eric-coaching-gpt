@@ -40,13 +40,20 @@ export function DynamicField({ field, control, errors }: DynamicFieldProps) {
       case 'text':
         return (
           <FormControl>
-            <Input {...field} />
+            <Input 
+              {...field} 
+              value={field.value || ''} // Ensure value is always defined
+            />
           </FormControl>
         );
       case 'textarea':
         return (
           <FormControl>
-            <Textarea {...field} rows={5} />
+            <Textarea 
+              {...field} 
+              value={field.value || ''} // Ensure value is always defined
+              rows={5} 
+            />
           </FormControl>
         );
       case 'rating':
@@ -114,7 +121,10 @@ export function DynamicField({ field, control, errors }: DynamicFieldProps) {
       default:
         return (
           <FormControl>
-            <Input {...field} />
+            <Input 
+              {...field} 
+              value={field.value || ''} // Ensure value is always defined
+            />
           </FormControl>
         );
     }
