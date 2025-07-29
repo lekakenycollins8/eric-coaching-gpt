@@ -240,8 +240,9 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   };
   
   // Handle successful submission
-  const handleSuccess = () => {
-    router.push('/dashboard/progress');
+  const handleSuccess = (data: any) => {
+    // Redirect to the diagnosis page for this workbook follow-up
+    router.push(`/dashboard/followup/workbook/diagnosis`);
   };
   
   if (isLoading) {

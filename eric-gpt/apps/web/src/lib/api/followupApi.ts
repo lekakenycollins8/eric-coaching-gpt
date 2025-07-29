@@ -17,6 +17,43 @@ import type {
  */
 export const followupApi = {
   /**
+   * Get diagnosis data for a pillar follow-up
+   * @param followupId The ID of the follow-up (pillar ID)
+   * @returns The diagnosis data
+   */
+  async getFollowupDiagnosis(followupId: string) {
+    try {
+      // Use the correct API endpoint for pillar diagnosis
+      const response = await fetch(`/api/followup/diagnosis/${followupId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch follow-up diagnosis: ${response.statusText}`);
+      }
+      
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching follow-up diagnosis:', error);
+      throw error;
+    }
+  },
+  
+  /**
+   * Get diagnosis data for a workbook follow-up
+   * @returns The workbook diagnosis data
+   */
+  async getWorkbookFollowupDiagnosis() {
+    try {
+      const response = await fetch('/api/followup/diagnosis/workbook');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch workbook follow-up diagnosis: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching workbook follow-up diagnosis:', error);
+      throw error;
+    }
+  },
+  
+  /**
    * Submit a follow-up assessment
    * @param data The follow-up submission data
    * @returns The created follow-up assessment

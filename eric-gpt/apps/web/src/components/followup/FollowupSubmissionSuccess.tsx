@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { useFollowupType } from '@/hooks/useFollowupWorksheet';
+import { useFollowupType } from '@/hooks/useFollowupType';
 import { CoachingPrompt } from '@/components/coaching/CoachingPrompt';
 import type { FollowupSubmissionData } from '@/types/followup';
 
@@ -64,9 +64,12 @@ export function FollowupSubmissionSuccess({
             </Button>
           </Link>
           
-          <Link href={`/dashboard/progress${followupType === 'pillar' ? `/${worksheetId.split('-')[0]}` : ''}`}>
+          <Link href={followupType === 'pillar' 
+            ? `/dashboard/followup/${worksheetId}/diagnosis` 
+            : `/dashboard/followup/workbook/diagnosis`
+          }>
             <Button>
-              View Progress <ArrowRight className="ml-2 h-4 w-4" />
+              View Diagnosis <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </CardFooter>

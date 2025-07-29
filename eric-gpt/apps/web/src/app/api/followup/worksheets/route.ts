@@ -1,78 +1,83 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
-export const dynamic = 'force-dynamic';
-
 /**
- * API route for fetching all follow-up worksheets
+ * Proxy route for /api/followup/worksheets
+ * Forwards requests to the server API
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    // Get the authenticated user session
+    // Get the authenticated user from session
     const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
       );
     }
 
-    // Get query parameters
-    const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get('type');
-    const queryString = searchParams.toString();
-    const queryPart = queryString ? `?${queryString}` : '';
-
-    // Forward the request to the server API
+    // Get the URL and query parameters
+    const url = new URL(request.url);
+    const type = url.searchParams.get('type');
+    
+    // Create the server URL with proper query parameters
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    console.log('Web app: Forwarding to server URL:', serverUrl);
-    
-    // Add the user ID to the query parameters
-    const userId = session.user.id;
-    const userQueryParam = queryString ? `&userId=${userId}` : `?userId=${userId}`;
-    
-    // Construct URL with query parameters
-    const apiUrl = `${serverUrl}/api/followup/worksheets${queryPart}${userQueryParam}`;
-    console.log('Web app: Forwarding request to:', apiUrl);
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // Check if the response is valid JSON before parsing
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      console.error('Non-JSON response received from server:', await response.text());
-      return NextResponse.json(
-        { error: 'Invalid response from server' },
-        { status: 500 }
-      );
+    const apiUrl = new URL(`${serverUrl}/api/followup/worksheets`);
+    if (type) {
+      apiUrl.searchParams.append('type', type);
     }
-    
-    // Check if response is OK before trying to parse JSON
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Server returned an error:', response.status, errorData);
-      return NextResponse.json(
-        { error: errorData.message || `Server error: ${response.status}` },
-        { status: response.status }
-      );
+    // Add userId as a query parameter for server-side authentication
+    apiUrl.searchParams.append('userId', session.user.id);
+
+    console.log(`Web app: Forwarding request to: ${apiUrl.toString()}`);
+
+    // Create an AbortController with a timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    try {
+      // Forward the request to the server
+      const serverResponse = await fetch(apiUrl.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Forwarded-From': 'web-app',
+        },
+        credentials: 'include',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId); // Clear the timeout if the request completes
+
+      if (!serverResponse.ok) {
+        console.error(`Server error: ${serverResponse.status} ${serverResponse.statusText}`);
+        const errorText = await serverResponse.text();
+        console.error(`Error details: ${errorText}`);
+        return NextResponse.json(
+          { error: `Server error: ${serverResponse.status}` },
+          { status: serverResponse.status }
+        );
+      }
+
+      // Return the server response
+      const data = await serverResponse.json();
+      return NextResponse.json(data);
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Request timed out');
+        return NextResponse.json(
+          { error: 'Request timed out' },
+          { status: 504 }
+        );
+      }
+      throw error; // Re-throw for the outer catch block
     }
-
-    // Get the response data
-    const data = await response.json();
-
-    // Return the response from the server
-    return NextResponse.json(data, { status: response.status });
-  } catch (error) {
-    console.error('Error in followup worksheets proxy:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: unknown) {
+    console.error('Error in worksheets proxy route:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch follow-up worksheets', message: errorMessage },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

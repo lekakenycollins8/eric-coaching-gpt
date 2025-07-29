@@ -214,7 +214,7 @@ export class EmailService {
     followupType: FollowupCategoryType = 'pillar'
   ): Promise<boolean> {
     // Use help@jackiercoaching.com as the recipient
-    const helpEmail = process.env.HELP_EMAIL || 'help@jackiercoaching.com';
+    const helpEmail = process.env.COACHING_EMAIL || 'help@jackiercoaching.com';
     
     // Verify required environment variables
     if (!process.env.EMAIL_FROM) {

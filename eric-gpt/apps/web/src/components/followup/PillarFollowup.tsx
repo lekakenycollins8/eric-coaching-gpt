@@ -216,8 +216,9 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   };
   
   // Handle successful submission
-  const handleSuccess = () => {
-    router.push(`/dashboard/pillars/${effectivePillarId}`);
+  const handleSuccess = (data: any) => {
+    // Redirect to the diagnosis page for this pillar follow-up
+    router.push(`/dashboard/followup/${effectivePillarId}/diagnosis`);
   };
   
   if (isLoading) {
