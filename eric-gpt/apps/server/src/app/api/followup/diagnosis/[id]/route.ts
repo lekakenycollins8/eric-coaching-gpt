@@ -16,7 +16,7 @@ export async function GET(
 ) {
   try {
     // Get the follow-up ID from the route params
-    const followupId = params.id;
+    const followupId = await params.id;
     
     if (!followupId) {
       return NextResponse.json({ error: 'Follow-up ID is required' }, { status: 400 });

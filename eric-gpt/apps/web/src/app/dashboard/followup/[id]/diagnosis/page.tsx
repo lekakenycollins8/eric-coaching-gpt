@@ -125,7 +125,55 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
               <>
                 <h3 className="font-medium text-lg">Analysis:</h3>
                 <div className="p-4 bg-white rounded-md border">
-                  <p className="whitespace-pre-wrap">{diagnosis.diagnosis}</p>
+                  {typeof diagnosis.diagnosis === 'string' ? (
+                    <p className="whitespace-pre-wrap">{diagnosis.diagnosis}</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Handle complex diagnosis object structure for pillar follow-ups */}
+                      {diagnosis.diagnosis.summary && (
+                        <div>
+                          <h4 className="font-medium text-md">Summary:</h4>
+                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.summary}</p>
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.situationAnalysis?.fullText && (
+                        <div>
+                          <h4 className="font-medium text-md">Situation Analysis:</h4>
+                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.situationAnalysis.fullText}</p>
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
+                        <div>
+                          <h4 className="font-medium text-md">Strengths:</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.strengths.map((strength: string, index: number) => (
+                              <li key={`strength-${index}`} className="text-gray-800">{strength}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.challenges && diagnosis.diagnosis.challenges.length > 0 && (
+                        <div>
+                          <h4 className="font-medium text-md">Challenges:</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.challenges.map((challenge: string, index: number) => (
+                              <li key={`challenge-${index}`} className="text-gray-800">{challenge}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.actionableRecommendations && diagnosis.diagnosis.actionableRecommendations.length > 0 && (
+                        <div>
+                          <h4 className="font-medium text-md">Actionable Recommendations:</h4>
+                          <div className="whitespace-pre-wrap">{diagnosis.diagnosis.actionableRecommendations[0]}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -143,8 +191,25 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                 <h3 className="font-medium text-lg mt-6">Recommendations:</h3>
                 <div className="p-4 bg-white rounded-md border">
                   <ul className="list-disc pl-5 space-y-2">
-                    {diagnosis.recommendations.map((recommendation: string, index: number) => (
-                      <li key={index} className="text-gray-800">{recommendation}</li>
+                    {diagnosis.recommendations.map((recommendation: any, index: number) => (
+                      <li key={index} className="text-gray-800">
+                        {typeof recommendation === 'string' ? recommendation : (
+                          <div className="space-y-2">
+                            {recommendation.action && (
+                              <div><strong>Action:</strong> {recommendation.action}</div>
+                            )}
+                            {recommendation.implementation && (
+                              <div><strong>Implementation:</strong> {recommendation.implementation}</div>
+                            )}
+                            {recommendation.outcome && (
+                              <div><strong>Outcome:</strong> {recommendation.outcome}</div>
+                            )}
+                            {recommendation.measurement && (
+                              <div><strong>Measurement:</strong> {recommendation.measurement}</div>
+                            )}
+                          </div>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>

@@ -20,8 +20,16 @@ export default function DiagnosisLandingPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['recentFollowupSubmission'],
     queryFn: async () => {
-      return await followupApi.getRecentFollowupSubmission();
+      try {
+        const result = await followupApi.getRecentFollowupSubmission();
+        console.log('Recent submission data:', result);
+        return result;
+      } catch (err) {
+        console.error('Error fetching recent submission:', err);
+        throw err;
+      }
     },
+    retry: 1,
   });
 
   // Redirect based on the submission type

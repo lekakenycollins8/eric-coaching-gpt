@@ -117,7 +117,11 @@ export default function WorkbookDiagnosisPage() {
               <>
                 <h3 className="font-medium text-lg">Overall Analysis:</h3>
                 <div className="p-4 bg-white rounded-md border">
-                  <p className="whitespace-pre-wrap">{diagnosis.diagnosis}</p>
+                  {typeof diagnosis.diagnosis === 'string' ? (
+                    <p className="whitespace-pre-wrap">{diagnosis.diagnosis}</p>
+                  ) : (
+                    <p className="whitespace-pre-wrap">Please view the detailed analysis in the sections below.</p>
+                  )}
                 </div>
               </>
             ) : (
@@ -135,8 +139,25 @@ export default function WorkbookDiagnosisPage() {
                 <h3 className="font-medium text-lg mt-6">Recommendations:</h3>
                 <div className="p-4 bg-white rounded-md border">
                   <ul className="list-disc pl-5 space-y-2">
-                    {diagnosis.recommendations.map((recommendation: string, index: number) => (
-                      <li key={index} className="text-gray-800">{recommendation}</li>
+                    {diagnosis.recommendations.map((recommendation: any, index: number) => (
+                      <li key={index} className="text-gray-800">
+                        {typeof recommendation === 'string' ? recommendation : (
+                          <div className="space-y-2">
+                            {recommendation.action && (
+                              <div><strong>Action:</strong> {recommendation.action}</div>
+                            )}
+                            {recommendation.implementation && (
+                              <div><strong>Implementation:</strong> {recommendation.implementation}</div>
+                            )}
+                            {recommendation.outcome && (
+                              <div><strong>Outcome:</strong> {recommendation.outcome}</div>
+                            )}
+                            {recommendation.measurement && (
+                              <div><strong>Measurement:</strong> {recommendation.measurement}</div>
+                            )}
+                          </div>
+                        )}
+                      </li>
                     ))}
                   </ul>
                 </div>

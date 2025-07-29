@@ -23,7 +23,8 @@ export async function GET(request: Request) {
     
     // Forward the request to the server API
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const targetEndpoint = `${serverUrl}/api/followup/submissions/recent`;
+    const userId = session.user?.id;
+    const targetEndpoint = `${serverUrl}/api/followup/submissions/recent?userId=${userId}`;
     
     console.log(`Fetching most recent follow-up submission from: ${targetEndpoint}`);
     
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
           'Content-Type': 'application/json',
           // Pass along the cookie which contains the session information
           'Cookie': request.headers.get('cookie') || '',
-          'X-User-Id': session.user?.id || ''
+          'X-User-Id': userId || ''
         },
         signal: controller.signal,
         credentials: 'include',
@@ -56,9 +57,21 @@ export async function GET(request: Request) {
         );
       }
       
-      // Return the server response
-      const data = await serverResponse.json();
-      return NextResponse.json(data);
+      // Check content type before parsing as JSON
+      const contentType = serverResponse.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        // Return the server response as JSON
+        const data = await serverResponse.json();
+        return NextResponse.json(data);
+      } else {
+        // Handle non-JSON response
+        const text = await serverResponse.text();
+        console.error('Server returned non-JSON response:', text.substring(0, 200) + '...');
+        return NextResponse.json(
+          { error: 'Server returned invalid response format' },
+          { status: 500 }
+        );
+      }
     } catch (error) {
       // Clear the timeout
       clearTimeout(timeoutId);

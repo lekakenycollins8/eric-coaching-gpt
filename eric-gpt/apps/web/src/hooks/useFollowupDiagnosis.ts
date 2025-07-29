@@ -3,12 +3,35 @@ import { followupApi } from '@/lib/api/followupApi';
 import { useFollowupType } from './useFollowupType';
 
 /**
+ * Interface for pillar diagnosis structure
+ */
+export interface PillarDiagnosis {
+  summary?: string;
+  situationAnalysis?: {
+    fullText: string;
+  };
+  strengths?: string[];
+  challenges?: string[];
+  actionableRecommendations?: string[];
+}
+
+/**
+ * Interface for structured recommendation objects
+ */
+export interface RecommendationObject {
+  action?: string;
+  implementation?: string;
+  outcome?: string;
+  measurement?: string;
+}
+
+/**
  * Interface for follow-up diagnosis data
  */
 export interface FollowupDiagnosis {
   title: string;
-  diagnosis: string;
-  recommendations: string[];
+  diagnosis: string | PillarDiagnosis;
+  recommendations: (string | RecommendationObject)[];
   completedAt?: string;
   progressData?: Record<string, string | number>;
   followupType?: 'pillar' | 'workbook';
