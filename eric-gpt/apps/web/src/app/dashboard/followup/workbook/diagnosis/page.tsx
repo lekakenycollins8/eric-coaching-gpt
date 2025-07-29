@@ -120,7 +120,48 @@ export default function WorkbookDiagnosisPage() {
                   {typeof diagnosis.diagnosis === 'string' ? (
                     <p className="whitespace-pre-wrap">{diagnosis.diagnosis}</p>
                   ) : (
-                    <p className="whitespace-pre-wrap">Please view the detailed analysis in the sections below.</p>
+                    <div className="space-y-2">
+                      {diagnosis.diagnosis.summary && (
+                        <p className="whitespace-pre-wrap">{diagnosis.diagnosis.summary}</p>
+                      )}
+                      {diagnosis.diagnosis.situationAnalysis?.fullText && (
+                        <div>
+                          <h4 className="font-medium">Situation Analysis:</h4>
+                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.situationAnalysis.fullText}</p>
+                        </div>
+                      )}
+
+                      {diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
+                        <div>
+                          <h4 className="font-medium">Strengths:</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.strengths.map((strength, idx) => (
+                              <li key={idx}>{strength}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.challenges && diagnosis.diagnosis.challenges.length > 0 && (
+                        <div>
+                          <h4 className="font-medium">Challenges:</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.challenges.map((challenge, idx) => (
+                              <li key={idx}>{challenge}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.actionableRecommendations && diagnosis.diagnosis.actionableRecommendations.length > 0 && (
+                        <div>
+                          <h4 className="font-medium">Actionable Recommendations:</h4>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.actionableRecommendations.map((rec, idx) => (
+                              <li key={idx}>{rec}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </>
