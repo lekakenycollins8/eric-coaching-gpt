@@ -162,13 +162,32 @@ export async function POST(request: Request) {
 
     // Connect to database and verify user
     await connectToDatabase();
-    const user = await UserModel.findOne({ userId });
+    
+    // Try to find the user by email first (if session exists)
+    let user = null;
+    if (session && session.user && session.user.email) {
+      user = await UserModel.findOne({ email: session.user.email });
+      console.log(`Looking up user by email: ${session.user.email}`);
+    }
+    
+    // If user not found by email, try by userId as a fallback
+    if (!user && userId) {
+      // Try different ways to find the user
+      user = await UserModel.findOne({ _id: userId }) || 
+             await UserModel.findById(userId);
+      console.log(`Looking up user by ID: ${userId}`);
+    }
+    
     if (!user) {
+      console.error(`User not found with userId: ${userId} or session email`);
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
+    
+    console.log(`User found: ${user.email}`);
+    
 
     // Check if user has an active subscription
     const validStatuses = ['active', 'past_due'];
