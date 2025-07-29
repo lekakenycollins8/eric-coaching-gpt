@@ -24,12 +24,12 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
   // Get pillar ID from follow-up ID
   const pillarId = usePillarId(followupId);
   
-  // Fetch follow-up worksheet
+  // Fetch follow-up worksheet with optional submission context
   const { 
     data: worksheet, 
     isLoading: isLoadingWorksheet,
     error: worksheetError 
-  } = useFollowupWorksheet(followupId);
+  } = useFollowupWorksheet(followupId, selectedSubmissionId);
   
   // Fetch previous worksheet submissions for this pillar
   const {

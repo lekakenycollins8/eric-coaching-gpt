@@ -51,10 +51,33 @@ export function useFollowupBySubmission(submissionId: string | null) {
 export function useFollowupType(followupId: string | null): FollowupCategoryType | null {
   if (!followupId) return null;
   
-  // Extract follow-up type from ID
-  // Pillar follow-ups have IDs like "pillar1-followup"
-  // Workbook follow-ups have IDs like "implementation-step1-followup"
-  return followupId.includes('pillar') ? 'pillar' : 'workbook';
+  // First, check for exact patterns for pillar follow-ups
+  // Format: pillarX-followup (e.g., pillar1-followup, pillar12-followup)
+  if (/^pillar\d+-followup$/.test(followupId)) {
+    return 'pillar';
+  }
+  
+  // Check for exact patterns for workbook follow-ups
+  // Format: jackier-stepX-followup (e.g., jackier-step1-followup)
+  if (/^jackier-step\d+-followup$/.test(followupId)) {
+    return 'workbook';
+  }
+  
+  // Fallback checks for other naming patterns
+  if (/^pillar\d+/.test(followupId) || followupId.includes('pillar')) {
+    return 'pillar';
+  }
+  
+  // Check for implementation or workbook keywords
+  if (followupId.includes('implementation') || 
+      followupId.includes('workbook') || 
+      followupId.includes('jackier')) {
+    return 'workbook';
+  }
+  
+  // Default to workbook follow-up if we can't determine the type
+  console.warn(`Could not determine follow-up type for ID: ${followupId}, defaulting to 'workbook'`);
+  return 'workbook';
 }
 
 /**

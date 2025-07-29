@@ -31,8 +31,18 @@ export async function GET(
     // Add the user ID to the query parameters
     const userId = session.user.id;
     
+    // Get the submissionId from the request URL if present
+    const { searchParams } = new URL(request.url);
+    const submissionId = searchParams.get('submissionId');
+    
     // Construct URL with query parameters
-    const apiUrl = `${serverUrl}/api/followup/worksheets/${id}?userId=${userId}`;
+    let apiUrl = `${serverUrl}/api/followup/worksheets/${id}?userId=${userId}`;
+    
+    // Add submissionId parameter if provided
+    if (submissionId) {
+      apiUrl += `&submissionId=${submissionId}`;
+    }
+    
     console.log('Web app: Forwarding request to:', apiUrl);
 
     const response = await fetch(apiUrl, {
