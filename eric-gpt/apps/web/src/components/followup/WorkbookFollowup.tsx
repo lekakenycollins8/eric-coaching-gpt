@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { followupApi } from '@/lib/api/followupApi';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useFollowupWorksheet } from '@/hooks/useFollowupWorksheet';
 import { useWorkbookSubmissions } from '@/hooks/useOriginalSubmission';
 import { FollowupForm, FollowupFormSkeleton } from './FollowupForm';
@@ -28,6 +28,7 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   
   // Fetch follow-up worksheet with optional submission context
@@ -50,11 +51,47 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   } = useWorkbookSubmissions();
   
   const submissions = submissionsData?.submissions || [];
+  
+  // Auto-select the most recent valid submission when submissions are loaded
+  useEffect(() => {
+    if (submissions.length > 0 && !selectedSubmissionId) {
+      // Sort submissions by date (newest first)
+      const sortedSubmissions = [...submissions].sort((a, b) => {
+        const dateA = a.completedAt || a.updatedAt || a.createdAt || 0;
+        const dateB = b.completedAt || b.updatedAt || b.createdAt || 0;
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      });
+      
+      // Find the first submission with a valid MongoDB ObjectId
+      const validSubmission = sortedSubmissions.find(submission => {
+        const id = submission.id || submission._id;
+        return id && /^[0-9a-fA-F]{24}$/.test(id);
+      });
+      
+      if (validSubmission) {
+        const validId = validSubmission.id || validSubmission._id;
+        console.log(`WorkbookFollowup - Auto-selecting most recent valid submission: ${validId}`);
+        handleSelectSubmission(validId);
+      } else {
+        console.error('WorkbookFollowup - No valid submission IDs found in submissions');
+        setValidationError('No valid submission IDs found. Please contact support.');
+      }
+    }
+  }, [submissions.length]);
   const isLoading = isLoadingWorksheet || isLoadingSubmissions;
   const error = worksheetError || submissionsError;
   
   // Handle submission selection
   const handleSelectSubmission = async (submissionId: string) => {
+    // Reset any previous validation errors
+    setValidationError(null);
+    
+    // Validate submission ID format
+    if (!submissionId || !/^[0-9a-fA-F]{24}$/.test(submissionId)) {
+      console.error(`WorkbookFollowup - Invalid submission ID format: ${submissionId}`);
+      setValidationError(`Invalid submission ID format: ${submissionId}`);
+      return;
+    }
     try {
       console.log(`WorkbookFollowup - Selecting submission: ${submissionId}`);
       setSelectedSubmissionId(submissionId);
@@ -75,6 +112,23 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
           
           // Update the cache with this data
           queryClient.setQueryData(['followupWorksheet', followupId, submissionId], directResponse);
+          
+          // Check if we have a previousSubmission and use its ID if available
+          if (directResponse.previousSubmission && directResponse.previousSubmission.id) {
+            console.log(`WorkbookFollowup - Using previousSubmission ID from API: ${directResponse.previousSubmission.id}`);
+            // Update the selected submission ID to match what the server knows
+            setSelectedSubmissionId(directResponse.previousSubmission.id);
+          } else {
+            console.log(`WorkbookFollowup - No previousSubmission in API response, using original ID: ${submissionId}`);
+            // Keep using the original submission ID since no alternative was provided
+          }
+          
+          // Verify we have a valid submission ID before showing the form
+          if (directResponse.previousSubmission === null && !submissionId) {
+            console.error('WorkbookFollowup - No valid submission ID available');
+            alert('Could not find a valid submission to associate with this follow-up. Please try again.');
+            return;
+          }
           
           // Now that we have valid data, show the form
           console.log('WorkbookFollowup - Showing form with valid worksheet from direct API call');
@@ -118,6 +172,23 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
             responseData.worksheet.title && 
             ((responseData.worksheet.fields && responseData.worksheet.fields.length > 0) || 
              (responseData.worksheet.sections && responseData.worksheet.sections.length > 0))) {
+          // Check if we have a previousSubmission and use its ID if available
+          if (responseData.previousSubmission && responseData.previousSubmission.id) {
+            console.log(`WorkbookFollowup - Using previousSubmission ID from refetch: ${responseData.previousSubmission.id}`);
+            // Update the selected submission ID to match what the server knows
+            setSelectedSubmissionId(responseData.previousSubmission.id);
+          } else {
+            console.log(`WorkbookFollowup - No previousSubmission in refetch response, using original ID: ${submissionId}`);
+            // Keep using the original submission ID since no alternative was provided
+          }
+          
+          // Verify we have a valid submission ID before showing the form
+          if (responseData.previousSubmission === null && !submissionId) {
+            console.error('WorkbookFollowup - No valid submission ID available');
+            alert('Could not find a valid submission to associate with this follow-up. Please try again.');
+            return;
+          }
+          
           // Now that we have the updated data, show the form
           console.log('WorkbookFollowup - Showing form with valid worksheet');
           setShowForm(true);
@@ -142,11 +213,27 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
       return null;
     }
     
+    // Ensure we have a valid submission ID
+    if (!selectedSubmissionId) {
+      console.error('Cannot render form - missing submission ID');
+      return (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Missing Submission ID</AlertTitle>
+          <AlertDescription>
+            Could not find a valid submission to associate with this follow-up. Please try selecting a different submission.
+          </AlertDescription>
+        </Alert>
+      );
+    }
+    
     console.log('Rendering form with worksheet:', typedResponse.worksheet);
+    console.log('Using submission ID:', selectedSubmissionId);
+    
     return (
       <FollowupForm 
         worksheet={typedResponse.worksheet} 
-        originalSubmissionId={selectedSubmissionId!} 
+        originalSubmissionId={selectedSubmissionId} 
         onSuccess={handleSuccess}
       />
     );
@@ -201,6 +288,14 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   
   return (
     <div className="space-y-6">
+      {validationError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Validation Error</AlertTitle>
+          <AlertDescription>{validationError}</AlertDescription>
+        </Alert>
+      )}
+      
       {!showForm ? (
         <Card>
           <CardHeader>
@@ -211,25 +306,39 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {submissions.map((submission: any) => (
-                <Card key={submission.id || submission._id} className="cursor-pointer hover:bg-accent/50 transition-colors">
-                  <CardHeader className="p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle className="text-base">Workbook Implementation</CardTitle>
-                        <CardDescription>
-                          Completed on {submission.completedAt ? new Date(submission.completedAt).toLocaleDateString() : 
-                            (submission.updatedAt ? new Date(submission.updatedAt).toLocaleDateString() : 
-                              new Date(submission.createdAt || Date.now()).toLocaleDateString())}
-                        </CardDescription>
+              {submissions.map((submission: any) => {
+                const submissionId = submission.id || submission._id;
+                const isValidId = /^[0-9a-fA-F]{24}$/.test(submissionId);
+                
+                return (
+                  <Card 
+                    key={submissionId} 
+                    className={`cursor-pointer transition-colors ${isValidId ? 'hover:bg-accent/50' : 'opacity-50'}`}
+                  >
+                    <CardHeader className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <CardTitle className="text-base">Workbook Implementation</CardTitle>
+                          <CardDescription>
+                            Completed on {submission.completedAt ? new Date(submission.completedAt).toLocaleDateString() : 
+                              (submission.updatedAt ? new Date(submission.updatedAt).toLocaleDateString() : 
+                                new Date(submission.createdAt || Date.now()).toLocaleDateString())}
+                          </CardDescription>
+                          {!isValidId && (
+                            <p className="text-xs text-destructive mt-1">Invalid submission ID format</p>
+                          )}
+                        </div>
+                        <Button 
+                          onClick={() => handleSelectSubmission(submissionId)}
+                          disabled={!isValidId}
+                        >
+                          Select
+                        </Button>
                       </div>
-                      <Button onClick={() => handleSelectSubmission(submission.id || submission._id)}>
-                        Select
-                      </Button>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
+                    </CardHeader>
+                  </Card>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

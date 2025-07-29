@@ -22,23 +22,54 @@ export const followupApi = {
    * @returns The created follow-up assessment
    */
   async submitFollowup(data: FollowupSubmissionData): Promise<FollowupAssessment> {
-    const response = await fetch('/api/followup/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      // Try to parse error message if available
-      try {
-        const error = await response.json();
-        throw new Error(error.message || error.error || `Failed to submit follow-up: ${response.status}`);
-      } catch (e) {
-        throw new Error(`Failed to submit follow-up: ${response.status}`);
+    // Validate the submission ID format before sending to server
+    if (data.originalSubmissionId) {
+      const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(data.originalSubmissionId);
+      if (!isValidObjectId) {
+        console.error(`Invalid submission ID format: ${data.originalSubmissionId}`);
+        throw new Error(`Invalid submission ID format: ${data.originalSubmissionId}. Please select a valid submission.`);
       }
+      console.log(`Submitting follow-up with original submission ID: ${data.originalSubmissionId}`);
+    } else {
+      console.error('No original submission ID provided');
+      throw new Error('No original submission ID provided. Please select a submission before continuing.');
     }
     
-    return response.json();
+    try {
+      const response = await fetch('/api/followup/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        // Try to parse error message if available
+        try {
+          const error = await response.json();
+          
+          // Check if the server provided recent submission IDs as alternatives
+          if (error.recentSubmissionIds && Array.isArray(error.recentSubmissionIds) && error.recentSubmissionIds.length > 0) {
+            console.log('Server provided alternative submission IDs:', error.recentSubmissionIds);
+            throw new Error(`${error.message || error.error || 'Failed to submit follow-up'}. The server suggests using one of these recent submissions instead.`);
+          } else {
+            throw new Error(error.message || error.error || `Failed to submit follow-up: ${response.status}`);
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            throw e; // Re-throw the parsed error
+          } else {
+            throw new Error(`Failed to submit follow-up: ${response.status}`);
+          }
+        }
+      }
+      
+      const result = await response.json();
+      console.log('Follow-up submission successful:', result);
+      return result;
+    } catch (error) {
+      console.error('Error in submitFollowup:', error);
+      throw error;
+    }
   },
   
   /**
@@ -57,42 +88,49 @@ export const followupApi = {
   
   /**
    * Get a follow-up worksheet by ID
-   * @param followupId The follow-up worksheet ID
+   * @param id The ID of the follow-up worksheet to retrieve
    * @param submissionId Optional ID of a previous submission to provide context
-   * @returns API response containing the worksheet and optional previous submission
+   * @returns The follow-up worksheet data
    */
-  async getFollowupWorksheet(followupId: string, submissionId?: string): Promise<{ 
-    success: boolean; 
-    worksheet: FollowupWorksheet; 
-    previousSubmission?: any 
-  }> {
-    const url = submissionId
-      ? `/api/followup/worksheets/${followupId}?submissionId=${submissionId}`
-      : `/api/followup/worksheets/${followupId}`;
-    
-    console.log(`Fetching follow-up worksheet from URL: ${url}`);
-    
-    try {  
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        // Try to parse error message if available
-        try {
-          const errorData = await response.json();
-          console.error('API error response:', errorData);
-          throw new Error(errorData.message || errorData.error || `Failed to fetch follow-up worksheet: ${response.status}`);
-        } catch (parseError) {
-          throw new Error(`Failed to fetch follow-up worksheet: ${response.status}`);
+  async getFollowupWorksheet(id: string, submissionId?: string): Promise<any> {
+    try {
+      // Build the URL with optional submission ID parameter
+      let url = `/api/followup/worksheets/${id}`;
+      if (submissionId) {
+        // Validate submission ID format
+        const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(submissionId);
+        if (!isValidObjectId) {
+          console.warn(`Invalid submission ID format: ${submissionId}. Using without ID.`);
+        } else {
+          url += `?submissionId=${submissionId}`;
         }
       }
       
+      console.log(`Fetching follow-up worksheet: ${url}`);
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error fetching follow-up worksheet: ${response.status} ${response.statusText}`, errorText);
+        throw new Error(`Failed to fetch follow-up worksheet: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
-      console.log('API response data:', data);
+      
+      // Enhanced logging for debugging
+      console.log('Follow-up worksheet data:', {
+        success: data?.success,
+        worksheetId: data?.worksheet?.id,
+        worksheetTitle: data?.worksheet?.title,
+        hasPreviousSubmission: !!data?.previousSubmission,
+        previousSubmissionId: data?.previousSubmission?.id || 'none',
+        requestedSubmissionId: submissionId || 'none'
+      });
       
       // Validate the response structure
-      if (!data.success || !data.worksheet) {
-        console.error('Invalid API response structure:', data);
-        throw new Error('Invalid response structure: missing worksheet data');
+      if (!data || typeof data !== 'object') {
+        console.error('Invalid API response format:', data);
+        throw new Error('Invalid API response format');
       }
       
       // Return the complete API response

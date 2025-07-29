@@ -37,7 +37,20 @@ export function useFollowupWorksheet(followupId: string | null, submissionId?: s
         const response = await followupApi.getFollowupWorksheet(followupId, submissionId || undefined);
         console.log('API response received:', response);
         
-        // The API returns { success, worksheet, previousSubmission } structure
+        // Log the response to help with debugging
+        console.log('API response:', {
+          success: response?.success,
+          hasWorksheet: !!response?.worksheet,
+          hasPreviousSubmission: !!response?.previousSubmission,
+          previousSubmissionId: response?.previousSubmission?.id || 'none'
+        });
+        
+        // Validate the API response structure
+        if (!response || typeof response !== 'object') {
+          console.error('Invalid API response format');
+          throw new Error('Invalid API response format');
+        }
+        
         if (!response.success || !response.worksheet) {
           console.error('Invalid API response structure:', response);
           throw new Error('Invalid response received from server');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { followupApi } from '@/lib/api/followupApi';
@@ -39,6 +39,7 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   const effectivePillarId = derivedPillarId || '';
   
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   
   // Fetch follow-up worksheet with optional submission context
@@ -61,6 +62,33 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   } = useWorksheetSubmissions(effectivePillarId);
   
   const submissions = submissionsData?.submissions || [];
+  
+  // Auto-select the most recent valid submission when submissions are loaded
+  useEffect(() => {
+    if (submissions.length > 0 && !selectedSubmissionId) {
+      // Sort submissions by date (newest first)
+      const sortedSubmissions = [...submissions].sort((a, b) => {
+        const dateA = a.completedAt || a.updatedAt || a.createdAt || 0;
+        const dateB = b.completedAt || b.updatedAt || b.createdAt || 0;
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      });
+      
+      // Find the first submission with a valid MongoDB ObjectId
+      const validSubmission = sortedSubmissions.find(submission => {
+        const id = submission.id || submission._id;
+        return id && /^[0-9a-fA-F]{24}$/.test(id);
+      });
+      
+      if (validSubmission) {
+        const validId = validSubmission.id || validSubmission._id;
+        console.log(`PillarFollowup - Auto-selecting most recent valid submission: ${validId}`);
+        handleSelectSubmission(validId);
+      } else {
+        console.error('PillarFollowup - No valid submission IDs found in submissions');
+        setValidationError('No valid submission IDs found. Please contact support.');
+      }
+    }
+  }, [submissions.length]);
   const isLoading = isLoadingWorksheet || isLoadingSubmissions;
   const error = worksheetError || submissionsError;
   
@@ -83,6 +111,15 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   
   // Handle submission selection
   const handleSelectSubmission = async (submissionId: string) => {
+    // Reset any previous validation errors
+    setValidationError(null);
+    
+    // Validate submission ID format
+    if (!submissionId || !/^[0-9a-fA-F]{24}$/.test(submissionId)) {
+      console.error(`PillarFollowup - Invalid submission ID format: ${submissionId}`);
+      setValidationError(`Invalid submission ID format: ${submissionId}`);
+      return;
+    }
     try {
       console.log(`PillarFollowup - Selecting submission: ${submissionId}`);
       setSelectedSubmissionId(submissionId);
@@ -103,6 +140,13 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
           
           // Update the cache with this data
           queryClient.setQueryData(['followupWorksheet', followupId, submissionId], directResponse);
+          
+          // Check if we have a previousSubmission and use its ID if available
+          if (directResponse.previousSubmission && directResponse.previousSubmission.id) {
+            console.log(`PillarFollowup - Using previousSubmission ID from API: ${directResponse.previousSubmission.id}`);
+            // Update the selected submission ID to match what the server knows
+            setSelectedSubmissionId(directResponse.previousSubmission.id);
+          }
           
           // Now that we have valid data, show the form
           console.log('PillarFollowup - Showing form with valid worksheet from direct API call');
@@ -146,6 +190,14 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
             responseData.worksheet.title && 
             ((responseData.worksheet.fields && responseData.worksheet.fields.length > 0) || 
              (responseData.worksheet.sections && responseData.worksheet.sections.length > 0))) {
+          
+          // Check if we have a previousSubmission and use its ID if available
+          if (responseData.previousSubmission && responseData.previousSubmission.id) {
+            console.log(`PillarFollowup - Using previousSubmission ID from refetch: ${responseData.previousSubmission.id}`);
+            // Update the selected submission ID to match what the server knows
+            setSelectedSubmissionId(responseData.previousSubmission.id);
+          }
+          
           // Now that we have the updated data, show the form
           console.log('PillarFollowup - Showing form with valid worksheet');
           setShowForm(true);
@@ -211,7 +263,15 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   }
   
   return (
-    <div>
+    <div className="space-y-6">
+      {validationError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Validation Error</AlertTitle>
+          <AlertDescription>{validationError}</AlertDescription>
+        </Alert>
+      )}
+      
       {showForm ? (
         <div className="space-y-6">
           <Button 
@@ -235,16 +295,27 @@ export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
           <CardContent>
             <div className="space-y-4">
               <div className="grid gap-2">
-                {submissions.map((submission: any) => (
-                  <Button 
-                    key={submission.id || submission._id} 
-                    variant="outline" 
-                    className="justify-start text-left font-normal" 
-                    onClick={() => handleSelectSubmission(submission.id || submission._id)}
-                  >
-                    {submission.title || `Submission from ${new Date(submission.createdAt).toLocaleDateString()}`}
-                  </Button>
-                ))}
+                {submissions.map((submission: any) => {
+                  const submissionId = submission.id || submission._id;
+                  const isValidId = /^[0-9a-fA-F]{24}$/.test(submissionId);
+                  
+                  return (
+                    <Button 
+                      key={submissionId} 
+                      variant="outline" 
+                      className={`justify-start text-left font-normal ${!isValidId ? 'opacity-50' : ''}`}
+                      onClick={() => handleSelectSubmission(submissionId)}
+                      disabled={!isValidId}
+                    >
+                      <div className="flex flex-col items-start">
+                        <span>{submission.title || `Submission from ${new Date(submission.createdAt).toLocaleDateString()}`}</span>
+                        {!isValidId && (
+                          <span className="text-xs text-destructive">Invalid ID format</span>
+                        )}
+                      </div>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </CardContent>
