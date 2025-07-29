@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { followupApi } from '@/lib/api/followupApi';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -55,39 +56,82 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   // Handle submission selection
   const handleSelectSubmission = async (submissionId: string) => {
     try {
+      console.log(`WorkbookFollowup - Selecting submission: ${submissionId}`);
       setSelectedSubmissionId(submissionId);
       setShowForm(false); // Hide form while loading
       
+      // First, manually fetch the data directly using the API instead of relying on React Query
+      console.log(`WorkbookFollowup - Directly fetching worksheet: ${followupId} with submission: ${submissionId}`);
+      try {
+        const directResponse = await followupApi.getFollowupWorksheet(followupId || '', submissionId);
+        console.log('WorkbookFollowup - Direct API response:', directResponse);
+        
+        // Verify we have valid data from direct API call
+        if (directResponse && 
+            directResponse.success === true && 
+            directResponse.worksheet && 
+            directResponse.worksheet.id && 
+            directResponse.worksheet.title) {
+          
+          // Update the cache with this data
+          queryClient.setQueryData(['followupWorksheet', followupId, submissionId], directResponse);
+          
+          // Now that we have valid data, show the form
+          console.log('WorkbookFollowup - Showing form with valid worksheet from direct API call');
+          setShowForm(true);
+          return;
+        }
+      } catch (directError) {
+        console.error('WorkbookFollowup - Error with direct API call:', directError);
+        // Continue with the refetch approach as fallback
+      }
+      
+      // If direct API call failed, try the refetch approach
       // Invalidate the query cache to ensure fresh data
-      queryClient.invalidateQueries({ queryKey: ['followupWorksheet', followupId, submissionId] });
+      console.log(`WorkbookFollowup - Invalidating cache for worksheet: ${followupId} with submission: ${submissionId}`);
+      await queryClient.invalidateQueries({ queryKey: ['followupWorksheet', followupId, submissionId] });
       
       // Explicitly refetch the data with the new submissionId
+      console.log('WorkbookFollowup - Refetching worksheet data...');
       const result = await refetchWorksheet();
-      console.log('Refetched worksheet data:', result.data);
       
       // Log the structure of the data to help debug
-      console.log('WorkbookFollowup - Worksheet data structure:', JSON.stringify(result.data, null, 2));
+      console.log('WorkbookFollowup - Refetched data:', result);
+      console.log('WorkbookFollowup - Refetched data.data:', result.data);
+      
+      // Check if result.data is undefined before proceeding
+      if (!result.data) {
+        console.error('WorkbookFollowup - Refetched data is undefined');
+        alert('Failed to load follow-up worksheet data. Please try again.');
+        return;
+      }
       
       // Type assertion for the result data
       const responseData = result.data as WorksheetApiResponse | undefined;
       
       // Verify we have valid data before showing the form
-      if (responseData && 
-          responseData.success === true && 
-          responseData.worksheet && 
-          responseData.worksheet.id && 
-          responseData.worksheet.title && 
-          ((responseData.worksheet.fields && responseData.worksheet.fields.length > 0) || 
-           (responseData.worksheet.sections && responseData.worksheet.sections.length > 0))) {
-        // Now that we have the updated data, show the form
-        setShowForm(true);
+      if (responseData && responseData.success === true && responseData.worksheet) {
+        console.log('WorkbookFollowup - Valid worksheet data received:', responseData.worksheet);
+        
+        // Additional validation for worksheet structure
+        if (responseData.worksheet.id && 
+            responseData.worksheet.title && 
+            ((responseData.worksheet.fields && responseData.worksheet.fields.length > 0) || 
+             (responseData.worksheet.sections && responseData.worksheet.sections.length > 0))) {
+          // Now that we have the updated data, show the form
+          console.log('WorkbookFollowup - Showing form with valid worksheet');
+          setShowForm(true);
+        } else {
+          console.error('WorkbookFollowup - Worksheet missing required fields:', responseData.worksheet);
+          alert('The follow-up worksheet is missing required fields. Please try again.');
+        }
       } else {
-        console.error('Invalid worksheet data structure:', responseData);
+        console.error('WorkbookFollowup - Invalid worksheet data structure:', responseData);
         alert('The follow-up worksheet data is invalid. Please try again.');
       }
     } catch (error) {
-      console.error('Error selecting submission:', error);
-      alert('Failed to load follow-up worksheet with the selected submission. Please try again.');
+      console.error('WorkbookFollowup - Error selecting submission:', error);
+      alert('Failed to load follow-up worksheet. Please try again.');
     }
   };
   
