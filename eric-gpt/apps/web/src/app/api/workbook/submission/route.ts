@@ -21,38 +21,46 @@ export async function GET(request: NextRequest) {
       console.error('NEXT_PUBLIC_API_URL is not defined');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
-    
-    // Construct URL with query parameters
-    const url = new URL(`${apiUrl}/api/workbook/submission`);
-    url.searchParams.append('userId', session.user.id);
-    
-    console.log('Web app: Forwarding workbook submission request to:', url.toString());
 
-    // Forward to backend server
-    const response = await fetch(url.toString(), {
+    // Get the user ID from the session
+    const userId = session.user.id;
+    
+    // Parse the request URL to get query parameters
+    const { searchParams } = new URL(request.url);
+    const submissionId = searchParams.get('submissionId');
+    
+    // Construct the backend URL with appropriate query parameters
+    let backendUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/workbook/submission?userId=${userId}`;
+    
+    // Add submissionId parameter if provided
+    if (submissionId) {
+      backendUrl += `&submissionId=${submissionId}`;
+    }
+    
+    // Make the request to the backend
+    const response = await fetch(backendUrl, {
       headers: {
         'Content-Type': 'application/json',
       },
       cache: 'no-store',
     });
 
-    // Check if the response is valid JSON before parsing
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      console.error('Non-JSON response received from server:', await response.text());
+    // Check if the response is OK
+    if (!response.ok) {
+      const errorData = await response.json();
       return NextResponse.json(
-        { error: 'Invalid response from server' },
-        { status: 500 }
+        { error: errorData.error || 'Failed to fetch workbook submission' },
+        { status: response.status }
       );
     }
 
+    // Return the JSON data
     const data = await response.json();
-    
-    return NextResponse.json(data, { status: response.status });
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error in workbook submission API route:', error);
+    console.error('Error in workbook submission proxy:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch workbook submission' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

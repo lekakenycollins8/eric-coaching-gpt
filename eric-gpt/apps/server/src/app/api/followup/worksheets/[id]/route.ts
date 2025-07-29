@@ -3,8 +3,17 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { connectToDatabase } from '@/db/connection';
 import { hasActiveSubscription } from '@/services/quotaManager';
-import { loadFollowupById } from '@/utils/followupUtils';
+import { loadFollowupById, getFollowupType } from '@/utils/followupUtils';
 import UserModel from '@/models/User';
+import WorkbookSubmissionModel, { IWorkbookSubmission } from '@/models/WorkbookSubmission';
+
+// Define a type for WorkbookSubmission document that includes both model instance and interface properties
+type WorkbookSubmission = InstanceType<typeof WorkbookSubmissionModel> & IWorkbookSubmission & {
+  submittedAt?: Date;
+  createdAt: Date;
+  _id: any;
+  worksheetId?: string;
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -151,9 +160,62 @@ export async function GET(
     // Add type field to the worksheet
     worksheet.type = worksheetType;
     
+    // Get the submission ID from the query parameters (if provided)
+    const submissionId = url.searchParams.get('submissionId');
+    
+    // Check if we need to include previous submission data for context
+    let previousSubmission = null;
+    if (submissionId) {
+      try {
+        // Find the specified submission
+        previousSubmission = await WorkbookSubmissionModel.findById(submissionId) as WorkbookSubmission;
+        
+        // Verify that the submission belongs to the user
+        if (previousSubmission && previousSubmission.userId.toString() !== userId) {
+          previousSubmission = null; // Don't include if it doesn't belong to the user
+        }
+      } catch (error) {
+        console.error('Error fetching previous submission:', error);
+        // Continue without the previous submission
+      }
+    } else {
+      // If no submission ID was provided, try to find the most recent submission
+      try {
+        // Determine the follow-up type to know what kind of submission to look for
+        const followupType = getFollowupType(id);
+        
+        // Find the user's most recent workbook submission
+        const recentSubmission = await WorkbookSubmissionModel.findOne({ 
+          userId: userId 
+        }).sort({ submittedAt: -1, createdAt: -1 }) as WorkbookSubmission;
+        
+        if (recentSubmission) {
+          previousSubmission = recentSubmission;
+        }
+      } catch (error) {
+        console.error('Error finding recent submission:', error);
+        // Continue without the previous submission
+      }
+    }
+    
+    // Prepare the previous submission data for the response, handling optional fields safely
+    let previousSubmissionData = null;
+    if (previousSubmission) {
+      previousSubmissionData = {
+        id: previousSubmission._id,
+        submittedAt: previousSubmission.submittedAt || previousSubmission.createdAt,
+        // Use worksheetId as title if title is not available
+        title: previousSubmission.worksheetId ? `Workbook: ${previousSubmission.worksheetId}` : 'Workbook Submission',
+        answers: previousSubmission.answers || {},
+        pillars: previousSubmission.pillars || [],
+        diagnosis: previousSubmission.diagnosis || null
+      };
+    }
+    
     return NextResponse.json({
       success: true,
-      worksheet
+      worksheet,
+      previousSubmission: previousSubmissionData
     }, { status: 200 });
   } catch (error) {
     console.error('Error retrieving follow-up worksheet:', error);

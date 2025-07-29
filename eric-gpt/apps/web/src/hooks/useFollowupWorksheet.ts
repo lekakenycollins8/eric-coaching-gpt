@@ -7,12 +7,13 @@ import type { FollowupCategoryType, FollowupWorksheet } from '@/types/followup';
 /**
  * Hook to fetch a follow-up worksheet by ID
  * @param followupId The follow-up worksheet ID
- * @returns Query result with the follow-up worksheet
+ * @param submissionId Optional ID of a previous submission to provide context
+ * @returns Query result with the follow-up worksheet and optional previous submission
  */
-export function useFollowupWorksheet(followupId: string | null) {
+export function useFollowupWorksheet(followupId: string | null, submissionId?: string | null) {
   return useQuery({
-    queryKey: ['followupWorksheet', followupId],
-    queryFn: () => followupApi.getFollowupWorksheet(followupId!),
+    queryKey: ['followupWorksheet', followupId, submissionId],
+    queryFn: () => followupApi.getFollowupWorksheet(followupId!, submissionId || undefined),
     enabled: !!followupId,
   });
 }

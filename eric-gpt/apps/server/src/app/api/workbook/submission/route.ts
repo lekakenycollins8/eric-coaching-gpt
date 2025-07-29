@@ -86,30 +86,55 @@ export async function GET(request: Request) {
       await mongoose.connect(process.env.MONGODB_URI as string);
     }
 
-    // Find the user's workbook submission
+    // Find all of the user's workbook submissions
     const workbookId = 'jackier-method-workbook';
     
-    const submission = await WorkbookSubmission.findOne({
-      userId,
-      workbookId
-    }).sort({ updatedAt: -1 }).exec();
-
-    // If no submission is found, return an empty response with status 200
-    // This allows the frontend to handle the case where the user hasn't started the workbook yet
-    if (!submission) {
+    // Get the specific submission ID if provided
+    const submissionId = searchParams.get('submissionId');
+    
+    if (submissionId) {
+      // If a specific submission ID is requested, return just that submission
+      const submission = await WorkbookSubmission.findOne({
+        _id: submissionId,
+        userId
+      }).exec();
+      
+      if (!submission) {
+        return NextResponse.json({
+          exists: false,
+          message: 'Requested submission not found',
+          data: null
+        }, { status: 404 });
+      }
+      
       return NextResponse.json({
-        exists: false,
-        message: 'User has not started the workbook yet',
-        data: null
+        exists: true,
+        message: 'Workbook submission found',
+        data: submission
+      }, { status: 200 });
+    } else {
+      // Otherwise, return all submissions for this user
+      const submissions = await WorkbookSubmission.find({
+        userId,
+        workbookId
+      }).sort({ updatedAt: -1 }).exec();
+
+      // If no submissions are found, return an empty array with status 200
+      if (!submissions || submissions.length === 0) {
+        return NextResponse.json({
+          exists: false,
+          message: 'User has not started the workbook yet',
+          submissions: []
+        }, { status: 200 });
+      }
+
+      // Return all submissions with a consistent response format
+      return NextResponse.json({
+        exists: true,
+        message: 'Workbook submissions found',
+        submissions: submissions
       }, { status: 200 });
     }
-
-    // Return the submission with a consistent response format
-    return NextResponse.json({
-      exists: true,
-      message: 'Workbook submission found',
-      data: submission
-    }, { status: 200 });
   } catch (error) {
     console.error('Error fetching workbook submission:', error);
     return NextResponse.json(

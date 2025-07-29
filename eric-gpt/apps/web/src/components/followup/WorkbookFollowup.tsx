@@ -19,12 +19,12 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   
-  // Fetch follow-up worksheet
+  // Fetch follow-up worksheet with optional submission context
   const { 
     data: worksheet, 
     isLoading: isLoadingWorksheet,
     error: worksheetError 
-  } = useFollowupWorksheet(followupId);
+  } = useFollowupWorksheet(followupId, selectedSubmissionId);
   
   // Fetch previous workbook submissions
   const {

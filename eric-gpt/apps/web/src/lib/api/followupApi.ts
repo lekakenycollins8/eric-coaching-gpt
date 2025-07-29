@@ -58,10 +58,15 @@ export const followupApi = {
   /**
    * Get a follow-up worksheet by ID
    * @param followupId The follow-up worksheet ID
-   * @returns The follow-up worksheet
+   * @param submissionId Optional ID of a previous submission to provide context
+   * @returns The follow-up worksheet with optional previous submission context
    */
-  async getFollowupWorksheet(followupId: string): Promise<FollowupWorksheet> {
-    const response = await fetch(`/api/followup/worksheets/${followupId}`);
+  async getFollowupWorksheet(followupId: string, submissionId?: string): Promise<FollowupWorksheet & { previousSubmission?: any }> {
+    const url = submissionId
+      ? `/api/followup/worksheets/${followupId}?submissionId=${submissionId}`
+      : `/api/followup/worksheets/${followupId}`;
+      
+    const response = await fetch(url);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch follow-up worksheet: ${response.status}`);
@@ -109,7 +114,7 @@ export const followupApi = {
    * @returns List of workbook submissions
    */
   async getWorkbookSubmissions(): Promise<{ submissions: any[] }> {
-    const response = await fetch('/api/jackier/workbook/submission');
+    const response = await fetch('/api/workbook/submission');
     
     if (!response.ok) {
       throw new Error(`Failed to fetch workbook submissions: ${response.status}`);
