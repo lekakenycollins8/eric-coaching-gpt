@@ -1,8 +1,9 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { followupApi } from '@/lib/api/followupApi';
 import type { FollowupCategoryType, FollowupWorksheet } from '@/types/followup';
+import { useEffect } from 'react';
 
 /**
  * Hook to fetch a follow-up worksheet by ID
@@ -11,10 +12,57 @@ import type { FollowupCategoryType, FollowupWorksheet } from '@/types/followup';
  * @returns Query result with the follow-up worksheet and optional previous submission
  */
 export function useFollowupWorksheet(followupId: string | null, submissionId?: string | null) {
+  const queryClient = useQueryClient();
+  
+  // Invalidate the query cache when submissionId changes
+  useEffect(() => {
+    if (followupId) {
+      console.log(`Invalidating cache for worksheet: ${followupId} with submission: ${submissionId}`);
+      // Invalidate all queries for this followupId to ensure fresh data
+      queryClient.invalidateQueries({ 
+        queryKey: ['followupWorksheet', followupId]
+      });
+    }
+  }, [followupId, submissionId, queryClient]);
+  
   return useQuery({
     queryKey: ['followupWorksheet', followupId, submissionId],
-    queryFn: () => followupApi.getFollowupWorksheet(followupId!, submissionId || undefined),
+    queryFn: async () => {
+      if (!followupId) {
+        throw new Error('Follow-up ID is required');
+      }
+      
+      console.log(`Fetching worksheet: ${followupId} with submission: ${submissionId}`);
+      try {
+        const response = await followupApi.getFollowupWorksheet(followupId, submissionId || undefined);
+        console.log('API response received:', response);
+        
+        // The API returns { success, worksheet, previousSubmission } structure
+        if (!response.success || !response.worksheet) {
+          console.error('Invalid API response structure:', response);
+          throw new Error('Invalid response received from server');
+        }
+        
+        const worksheet = response.worksheet;
+        
+        // Validate the worksheet data structure
+        if (!worksheet || !worksheet.id || !worksheet.title) {
+          console.error('Invalid worksheet data structure:', worksheet);
+          throw new Error('Invalid worksheet data received from server');
+        }
+        
+        // Return the original API response structure
+        return response;
+      } catch (error) {
+        console.error('Error fetching worksheet data:', error);
+        throw error;
+      }
+    },
     enabled: !!followupId,
+    // Force refetch when submissionId changes
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: submissionId ? 0 : 5 * 60 * 1000, // Don't cache submission-specific data
   });
 }
 

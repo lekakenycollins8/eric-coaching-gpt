@@ -59,20 +59,48 @@ export const followupApi = {
    * Get a follow-up worksheet by ID
    * @param followupId The follow-up worksheet ID
    * @param submissionId Optional ID of a previous submission to provide context
-   * @returns The follow-up worksheet with optional previous submission context
+   * @returns API response containing the worksheet and optional previous submission
    */
-  async getFollowupWorksheet(followupId: string, submissionId?: string): Promise<FollowupWorksheet & { previousSubmission?: any }> {
+  async getFollowupWorksheet(followupId: string, submissionId?: string): Promise<{ 
+    success: boolean; 
+    worksheet: FollowupWorksheet; 
+    previousSubmission?: any 
+  }> {
     const url = submissionId
       ? `/api/followup/worksheets/${followupId}?submissionId=${submissionId}`
       : `/api/followup/worksheets/${followupId}`;
+    
+    console.log(`Fetching follow-up worksheet from URL: ${url}`);
+    
+    try {  
+      const response = await fetch(url);
       
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch follow-up worksheet: ${response.status}`);
+      if (!response.ok) {
+        // Try to parse error message if available
+        try {
+          const errorData = await response.json();
+          console.error('API error response:', errorData);
+          throw new Error(errorData.message || errorData.error || `Failed to fetch follow-up worksheet: ${response.status}`);
+        } catch (parseError) {
+          throw new Error(`Failed to fetch follow-up worksheet: ${response.status}`);
+        }
+      }
+      
+      const data = await response.json();
+      console.log('API response data:', data);
+      
+      // Validate the response structure
+      if (!data.success || !data.worksheet) {
+        console.error('Invalid API response structure:', data);
+        throw new Error('Invalid response structure: missing worksheet data');
+      }
+      
+      // Return the complete API response
+      return data;
+    } catch (error) {
+      console.error('Error in getFollowupWorksheet:', error);
+      throw error;
     }
-    
-    return response.json();
   },
   
   /**

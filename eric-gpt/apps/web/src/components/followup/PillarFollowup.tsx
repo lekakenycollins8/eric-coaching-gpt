@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -9,51 +10,118 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFollowupWorksheet } from '@/hooks/useFollowupWorksheet';
 import { useWorksheetSubmissions } from '@/hooks/useOriginalSubmission';
 import { FollowupForm, FollowupFormSkeleton } from './FollowupForm';
-import { usePillarId } from '@/hooks/useFollowupWorksheet';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import type { FollowupWorksheet } from '@/types/followup';
 
 interface PillarFollowupProps {
   followupId: string;
+  pillarId?: string;
 }
 
-export function PillarFollowup({ followupId }: PillarFollowupProps) {
+// Define the API response type to match the actual structure
+interface WorksheetApiResponse {
+  success: boolean;
+  worksheet: FollowupWorksheet;
+  previousSubmission?: any;
+}
+
+export function PillarFollowup({ followupId, pillarId }: PillarFollowupProps) {
   const router = useRouter();
+  const params = useParams();
+  const queryClient = useQueryClient();
+  
+  // Derive pillar ID from props or URL params
+  const derivedPillarId = pillarId || (params?.pillarId as string);
+  
+  // Ensure we have a valid pillar ID
+  const effectivePillarId = derivedPillarId || '';
+  
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   
-  // Get pillar ID from follow-up ID
-  const pillarId = usePillarId(followupId);
-  
   // Fetch follow-up worksheet with optional submission context
   const { 
-    data: worksheet, 
+    data: worksheetResponse, 
     isLoading: isLoadingWorksheet,
-    error: worksheetError 
+    error: worksheetError,
+    refetch: refetchWorksheet
   } = useFollowupWorksheet(followupId, selectedSubmissionId);
   
-  // Fetch previous worksheet submissions for this pillar
+  // Type assertion to ensure TypeScript recognizes the correct structure
+  const typedResponse = worksheetResponse as WorksheetApiResponse | undefined;
+  const worksheet = typedResponse?.worksheet;
+  
+  // Fetch previous pillar submissions
   const {
     data: submissionsData,
     isLoading: isLoadingSubmissions,
     error: submissionsError
-  } = useWorksheetSubmissions(pillarId || undefined);
+  } = useWorksheetSubmissions(effectivePillarId);
   
   const submissions = submissionsData?.submissions || [];
   const isLoading = isLoadingWorksheet || isLoadingSubmissions;
   const error = worksheetError || submissionsError;
   
+  // Render the follow-up form when data is ready
+  const renderForm = () => {
+    if (!typedResponse?.success || !typedResponse?.worksheet) {
+      console.log('Cannot render form - missing worksheet data:', typedResponse);
+      return null;
+    }
+    
+    console.log('Rendering form with worksheet:', typedResponse.worksheet);
+    return (
+      <FollowupForm 
+        worksheet={typedResponse.worksheet} 
+        originalSubmissionId={selectedSubmissionId!} 
+        onSuccess={handleSuccess}
+      />
+    );
+  };
+  
   // Handle submission selection
-  const handleSelectSubmission = (submissionId: string) => {
-    setSelectedSubmissionId(submissionId);
-    // Delay showing the form until the next render cycle to ensure the worksheet data is refetched
-    setTimeout(() => {
-      setShowForm(true);
-    }, 100);
+  const handleSelectSubmission = async (submissionId: string) => {
+    try {
+      setSelectedSubmissionId(submissionId);
+      setShowForm(false); // Hide form while loading
+      
+      // Invalidate the query cache to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ['followupWorksheet', followupId, submissionId] });
+      
+      // Explicitly refetch the data with the new submissionId
+      const result = await refetchWorksheet();
+      console.log('PillarFollowup - Refetched worksheet data:', result.data);
+      
+      // Log the structure of the data to help debug
+      console.log('PillarFollowup - Worksheet data structure:', JSON.stringify(result.data, null, 2));
+      
+      // Type assertion for the result data
+      const responseData = result.data as WorksheetApiResponse | undefined;
+      
+      // Verify we have valid data before showing the form
+      if (responseData && 
+          responseData.success === true && 
+          responseData.worksheet && 
+          responseData.worksheet.id && 
+          responseData.worksheet.title && 
+          ((responseData.worksheet.fields && responseData.worksheet.fields.length > 0) || 
+           (responseData.worksheet.sections && responseData.worksheet.sections.length > 0))) {
+        // Now that we have the updated data, show the form
+        setShowForm(true);
+      } else {
+        console.error('PillarFollowup - Invalid worksheet data structure:', responseData);
+        alert('The follow-up worksheet data is invalid. Please try again.');
+      }
+    } catch (error) {
+      console.error('PillarFollowup - Error selecting submission:', error);
+      alert('Failed to load follow-up worksheet. Please try again.');
+    }
   };
   
   // Handle successful submission
   const handleSuccess = () => {
-    router.push('/dashboard/progress');
+    router.push(`/dashboard/pillars/${effectivePillarId}`);
   };
   
   if (isLoading) {
@@ -72,7 +140,9 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
     );
   }
   
-  if (!worksheet) {
+  // Check if we have a valid worksheet response
+  if (!typedResponse?.success || !typedResponse?.worksheet) {
+    console.log('Missing or invalid worksheet data:', typedResponse);
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -90,47 +160,15 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>No Previous Submissions</AlertTitle>
         <AlertDescription>
-          You need to complete the {pillarId} worksheet before you can do a follow-up.
+          You need to complete the {effectivePillarId} pillar worksheet before you can do a follow-up.
         </AlertDescription>
       </Alert>
     );
   }
   
   return (
-    <div className="space-y-6">
-      {!showForm ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Select a Previous Submission</CardTitle>
-            <CardDescription>
-              Choose which {worksheet.title} submission you want to follow up on.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {submissions.map((submission) => (
-                <Card key={submission._id} className="cursor-pointer hover:bg-accent/50 transition-colors">
-                  <CardHeader className="p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle className="text-base">{pillarId} Submission</CardTitle>
-                        <CardDescription>
-                          Completed on {submission.completedAt ? new Date(submission.completedAt).toLocaleDateString() : 
-                            (submission.updatedAt ? new Date(submission.updatedAt).toLocaleDateString() : 
-                              new Date(submission.createdAt || Date.now()).toLocaleDateString())}
-                        </CardDescription>
-                      </div>
-                      <Button onClick={() => handleSelectSubmission(submission._id)}>
-                        Select
-                      </Button>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
+    <div>
+      {showForm ? (
         <div className="space-y-6">
           <Button 
             variant="outline" 
@@ -140,12 +178,33 @@ export function PillarFollowup({ followupId }: PillarFollowupProps) {
             ← Back to Submissions
           </Button>
           
-          <FollowupForm 
-            worksheet={worksheet} 
-            originalSubmissionId={selectedSubmissionId!}
-            onSuccess={handleSuccess}
-          />
+          {renderForm()}
         </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Follow-up Worksheet</CardTitle>
+            <CardDescription>
+              Select a previous submission to use as context for this follow-up.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid gap-2">
+                {submissions.map((submission: any) => (
+                  <Button 
+                    key={submission.id} 
+                    variant="outline" 
+                    className="justify-start text-left font-normal" 
+                    onClick={() => handleSelectSubmission(submission.id)}
+                  >
+                    {submission.title || `Submission from ${new Date(submission.createdAt).toLocaleDateString()}`}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

@@ -47,6 +47,27 @@ export interface FollowupAssessment {
 }
 
 /**
+ * Question in a follow-up worksheet section
+ */
+export interface FollowupQuestion {
+  id: string;
+  text: string;
+  type: string;
+  options?: string[];
+  required?: boolean;
+  min?: number;
+  max?: number;
+}
+
+/**
+ * Section in a follow-up worksheet
+ */
+export interface FollowupSection {
+  title: string;
+  questions: FollowupQuestion[];
+}
+
+/**
  * Follow-up worksheet structure
  */
 export interface FollowupWorksheet {
@@ -54,7 +75,9 @@ export interface FollowupWorksheet {
   title: string;
   description: string;
   type: FollowupCategoryType;
-  fields: FollowupField[];
+  // Support both data structures
+  fields?: FollowupField[];
+  sections?: FollowupSection[];
   relatedPillarId?: string;
 }
 

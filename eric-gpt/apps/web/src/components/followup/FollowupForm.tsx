@@ -29,14 +29,15 @@ export function FollowupForm({ worksheet, originalSubmissionId, onSuccess }: Fol
   
   // Ensure worksheet data is fully loaded before rendering
   useEffect(() => {
-    if (worksheet && worksheet.fields) {
+    // Check for both possible data structures (fields or sections with questions)
+    if (worksheet && (worksheet.fields || (worksheet.sections && worksheet.sections.length > 0))) {
       setIsReady(true);
     }
   }, [worksheet]);
   
   // Get submission mutation and draft functions
   const { mutate: submitFollowup, isPending } = useFollowupSubmission();
-  const { draftExists, saveDraft, loadDraft, clearDraft } = useFollowupDraft(worksheet.id);
+  const { draftExists, saveDraft, loadDraft, clearDraft } = useFollowupDraft(worksheet?.id || '');
   
   // Set up form with React Hook Form
   const form = useForm<Record<string, any>>({
@@ -108,7 +109,7 @@ export function FollowupForm({ worksheet, originalSubmissionId, onSuccess }: Fol
   }
   
   // Show loading state if worksheet data is not ready
-  if (!isReady || !worksheet || !worksheet.fields) {
+  if (!isReady || !worksheet) {
     return (
       <Card className="w-full max-w-3xl mx-auto">
         <CardHeader>
@@ -135,14 +136,45 @@ export function FollowupForm({ worksheet, originalSubmissionId, onSuccess }: Fol
         <Form {...form}>
           <form onChange={form.handleSubmit(handleFormChange)} onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-6">
-              {worksheet.fields.map((field) => (
-                <DynamicField
-                  key={field.id}
-                  field={field}
-                  control={form.control}
-                  errors={form.formState.errors}
-                />
-              ))}
+              {/* Handle both data structures - fields or sections with questions */}
+              {worksheet.fields ? (
+                // Original structure with fields
+                worksheet.fields.map((field) => (
+                  <DynamicField
+                    key={field.id}
+                    field={field}
+                    control={form.control}
+                    errors={form.formState.errors}
+                  />
+                ))
+              ) : worksheet.sections ? (
+                // New structure with sections containing questions
+                worksheet.sections.flatMap((section, sectionIndex) => [
+                  // Add section title
+                  <div key={`section-${sectionIndex}`} className="mb-4">
+                    <h3 className="text-lg font-medium">{section.title}</h3>
+                  </div>,
+                  // Map questions to fields
+                  ...section.questions.map((question) => (
+                    <DynamicField
+                      key={question.id}
+                      field={{
+                        id: question.id,
+                        label: question.text,
+                        type: question.type,
+                        options: question.options ? question.options.map(opt => ({ label: opt, value: opt })) : undefined,
+                        required: question.required
+                      }}
+                      control={form.control}
+                      errors={form.formState.errors}
+                    />
+                  ))
+                ])
+              ) : (
+                <div className="p-4 text-center text-muted-foreground">
+                  No questions found in this worksheet.
+                </div>
+              )}
               
               <div className="flex items-center space-x-2 pt-4 border-t">
                 <Switch
