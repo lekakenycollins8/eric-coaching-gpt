@@ -13,6 +13,7 @@ export interface FollowupContextData {
   pillarId?: string;
   pillarTitle?: string;
   userName?: string;
+  needsPillarSubmissionLookup?: boolean; // Flag indicating if we need to look up a separate pillar submission
 }
 
 /**

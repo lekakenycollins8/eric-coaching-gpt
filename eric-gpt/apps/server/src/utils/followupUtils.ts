@@ -258,17 +258,22 @@ export function loadFollowupContext(originalSubmission: any, followupType: Follo
   };
   
   if (followupType === 'pillar' && pillarId) {
-    // For pillar follow-ups, include specific pillar data
-    const pillarData = originalSubmission.pillars?.find((p: any) => 
+    // For pillar follow-ups, first try to find pillar data in the workbook submission
+    let pillarData = originalSubmission.pillars?.find((p: any) => 
       p.worksheetId === pillarId || p.worksheetId.includes(pillarId)
     );
+    
+    // If pillar data is not found in the workbook submission, we'll need to look for
+    // a separate pillar submission in the database. This will be handled in the submit route.
+    // Here we just prepare the context with what we have.
     
     return {
       ...baseContext,
       pillarId,
       pillarAnswers: pillarData?.answers || {},
       pillarDiagnosis: pillarData?.diagnosis || {},
-      originalDiagnosis: originalSubmission.diagnosis || {}
+      originalDiagnosis: originalSubmission.diagnosis || {},
+      needsPillarSubmissionLookup: !pillarData // Flag to indicate we need to look up a separate pillar submission
     };
   } else {
     // For workbook follow-ups, include overall workbook data
