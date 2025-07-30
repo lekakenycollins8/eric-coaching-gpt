@@ -61,15 +61,125 @@ export async function GET(
     console.log(`Found submission: ${submission._id}`);
     
     // Extract and return the diagnosis data
+    // Process the diagnosis data to ensure it's properly structured for the frontend
+    let processedDiagnosis = null;
+    let processedRecommendations = submission.recommendations || [];
+    
+    // Check if we have diagnosis data in the submission
+    if (submission.diagnosis) {
+      console.log('Found diagnosis data, structuring for frontend display');
+      
+      // Define the diagnosis object type with all possible fields
+      interface EnhancedDiagnosis {
+        summary: string;
+        situationAnalysis: {
+          fullText: string;
+        };
+        strengths: string[];
+        challenges: string[];
+        actionableRecommendations: string[];
+        progressAnalysis?: string;
+        implementationEffectiveness?: string;
+        adjustedRecommendations?: string;
+        continuedGrowthPlan?: string;
+        implementationProgressAnalysis?: string;
+        crossPillarIntegration?: string;
+        implementationBarriers?: string;
+        comprehensiveAdjustmentPlan?: string;
+        nextFocusAreas?: string;
+        coachingSupportAssessment?: string;
+      }
+      
+      // Create a structured diagnosis object from the database diagnosis data
+      processedDiagnosis = {
+        summary: submission.diagnosis.summary || '',
+        situationAnalysis: {
+          fullText: submission.diagnosis.situationAnalysis?.fullText || 
+                    submission.diagnosis.situationAnalysis || 
+                    ''
+        },
+        strengths: Array.isArray(submission.diagnosis.strengths) ? 
+                  submission.diagnosis.strengths : 
+                  [submission.diagnosis.strengthsAnalysis || ''],
+        challenges: Array.isArray(submission.diagnosis.challenges) ? 
+                   submission.diagnosis.challenges : 
+                   [submission.diagnosis.growthAreasAnalysis || ''],
+        actionableRecommendations: Array.isArray(submission.diagnosis.recommendations) ? 
+                                  submission.diagnosis.recommendations : 
+                                  [submission.diagnosis.actionableRecommendations || '']
+      } as EnhancedDiagnosis;
+      
+      // Add follow-up type specific fields
+      if (submission.followupType === 'pillar') {
+        processedDiagnosis.progressAnalysis = submission.diagnosis.situationAnalysis?.fullText || 
+                                             submission.diagnosis.situationAnalysis || '';
+        processedDiagnosis.implementationEffectiveness = submission.diagnosis.strengthsAnalysis || '';
+        processedDiagnosis.adjustedRecommendations = submission.diagnosis.growthAreasAnalysis || '';
+        processedDiagnosis.continuedGrowthPlan = submission.diagnosis.actionableRecommendations || '';
+      } else {
+        processedDiagnosis.implementationProgressAnalysis = submission.diagnosis.situationAnalysis?.fullText || 
+                                                          submission.diagnosis.situationAnalysis || '';
+        processedDiagnosis.crossPillarIntegration = submission.diagnosis.strengthsAnalysis || '';
+        processedDiagnosis.implementationBarriers = submission.diagnosis.growthAreasAnalysis || '';
+        processedDiagnosis.comprehensiveAdjustmentPlan = submission.diagnosis.actionableRecommendations || '';
+        processedDiagnosis.nextFocusAreas = submission.diagnosis.pillarRecommendations || '';
+      }
+      
+      // Add coaching support assessment
+      processedDiagnosis.coachingSupportAssessment = submission.diagnosis.followupRecommendation || '';
+      if (submission.emailContent.implementationEffectiveness) {
+        const impl = submission.emailContent.implementationEffectiveness;
+        processedDiagnosis.summary = impl.strength || '';
+        
+        // Add evidence, impact, and leverage if available
+        if (impl.evidence) processedDiagnosis.strengths.push(impl.evidence);
+        if (impl.impact) processedDiagnosis.challenges.push(impl.impact);
+        if (impl.leverage) processedDiagnosis.actionableRecommendations.push(impl.leverage);
+      }
+      
+      // Extract progress analysis
+      if (submission.emailContent.progressAnalysis && submission.emailContent.progressAnalysis.fullText) {
+        processedDiagnosis.situationAnalysis = {
+          fullText: submission.emailContent.progressAnalysis.fullText
+        };
+      }
+      
+      // Extract adjusted recommendations
+      if (submission.emailContent.adjustedRecommendations) {
+        const rec = submission.emailContent.adjustedRecommendations;
+        if (rec.area) {
+          processedRecommendations.push({
+            action: rec.area,
+            evidence: rec.evidence || '',
+            impact: rec.impact || '',
+            rootCause: rec.rootCause || ''
+          });
+        }
+      }
+      
+      // Extract continued growth plan
+      if (submission.emailContent.continuedGrowthPlan) {
+        const plan = submission.emailContent.continuedGrowthPlan;
+        if (plan.action) {
+          processedRecommendations.push({
+            action: plan.action,
+            implementation: plan.implementation || '',
+            outcome: plan.outcome || '',
+            measurement: plan.measurement || ''
+          });
+        }
+      }
+    }
+    
     const diagnosisData = {
       id: submission._id,
       title: submission.title || `Follow-up for ${followupId}`,
-      diagnosis: submission.diagnosis || null,
-      recommendations: submission.recommendations || [],
+      diagnosis: processedDiagnosis || null,
+      recommendations: processedRecommendations,
       completedAt: submission.createdAt,
-      followupType: followupId.includes('pillar') ? 'pillar' : 'workbook',
-      // Include additional data if available
+      followupType: submission.followupType || (followupId.includes('pillar') ? 'pillar' : 'workbook'),
       progressData: submission.progressData || null,
+      metadata: submission.metadata || null
     };
     
     return NextResponse.json(diagnosisData);

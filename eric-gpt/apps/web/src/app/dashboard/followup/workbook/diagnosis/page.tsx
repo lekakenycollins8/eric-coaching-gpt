@@ -13,6 +13,76 @@ import type { FollowupDiagnosis } from '@/hooks/useFollowupDiagnosis';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 
+// Helper component to safely render potentially complex objects
+const SafeRender = ({ value }: { value: any }) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  
+  if (typeof value === 'string') {
+    return <p className="whitespace-pre-wrap">{value}</p>;
+  }
+  
+  if (typeof value === 'object') {
+    // Handle specific object structures we know about
+    if ('fullText' in value) {
+      return <p className="whitespace-pre-wrap">{value.fullText}</p>;
+    }
+    
+    if ('action' in value) {
+      return (
+        <div className="space-y-1">
+          {value.action && <p><strong>Action:</strong> {value.action}</p>}
+          {value.implementation && <p><strong>Implementation:</strong> {value.implementation}</p>}
+          {value.outcome && <p><strong>Outcome:</strong> {value.outcome}</p>}
+          {value.measurement && <p><strong>Measurement:</strong> {value.measurement}</p>}
+        </div>
+      );
+    }
+    
+    if ('strength' in value) {
+      return (
+        <div className="space-y-1">
+          {value.strength && <p><strong>Strength:</strong> {value.strength}</p>}
+          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.leverage && <p><strong>Leverage:</strong> {value.leverage}</p>}
+        </div>
+      );
+    }
+    
+    if ('area' in value) {
+      return (
+        <div className="space-y-1">
+          {value.area && <p><strong>Area:</strong> {value.area}</p>}
+          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.rootCause && <p><strong>Root Cause:</strong> {value.rootCause}</p>}
+        </div>
+      );
+    }
+    
+    if ('reason' in value) {
+      return (
+        <div className="space-y-1">
+          {value.title && <p><strong>Title:</strong> {value.title}</p>}
+          {value.reason && <p><strong>Reason:</strong> {value.reason}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.exercise && <p><strong>Exercise:</strong> {value.exercise}</p>}
+          {value.connection && <p><strong>Connection:</strong> {value.connection}</p>}
+          {value.focus && <p><strong>Focus:</strong> {value.focus}</p>}
+        </div>
+      );
+    }
+    
+    // Fallback for unknown object structures
+    return <p className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</p>;
+  }
+  
+  // Fallback for other types
+  return <p>{String(value)}</p>;
+};
+
 export default function WorkbookDiagnosisPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -122,15 +192,52 @@ export default function WorkbookDiagnosisPage() {
                   ) : (
                     <div className="space-y-2">
                       {diagnosis.diagnosis.summary && (
-                        <p className="whitespace-pre-wrap">{diagnosis.diagnosis.summary}</p>
+                        <div>
+                          <SafeRender value={diagnosis.diagnosis.summary} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.implementationProgressAnalysis && (
+                        <div>
+                          <h4 className="font-medium">Implementation Progress Analysis:</h4>
+                          <SafeRender value={diagnosis.diagnosis.implementationProgressAnalysis} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.crossPillarIntegration && (
+                        <div>
+                          <h4 className="font-medium">Cross-Pillar Integration:</h4>
+                          <SafeRender value={diagnosis.diagnosis.crossPillarIntegration} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.implementationBarriers && (
+                        <div>
+                          <h4 className="font-medium">Implementation Barriers:</h4>
+                          <SafeRender value={diagnosis.diagnosis.implementationBarriers} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.comprehensiveAdjustmentPlan && (
+                        <div>
+                          <h4 className="font-medium">Comprehensive Adjustment Plan:</h4>
+                          <SafeRender value={diagnosis.diagnosis.comprehensiveAdjustmentPlan} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.nextFocusAreas && (
+                        <div>
+                          <h4 className="font-medium">Next Focus Areas:</h4>
+                          <SafeRender value={diagnosis.diagnosis.nextFocusAreas} />
+                        </div>
+                      )}
+                      {diagnosis.diagnosis.coachingSupportAssessment && (
+                        <div>
+                          <h4 className="font-medium">Coaching Support Assessment:</h4>
+                          <SafeRender value={diagnosis.diagnosis.coachingSupportAssessment} />
+                        </div>
                       )}
                       {diagnosis.diagnosis.situationAnalysis?.fullText && (
                         <div>
                           <h4 className="font-medium">Situation Analysis:</h4>
-                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.situationAnalysis.fullText}</p>
+                          <p className="whitespace-pre-wrap">{typeof diagnosis.diagnosis.situationAnalysis.fullText === 'string' ? diagnosis.diagnosis.situationAnalysis.fullText : JSON.stringify(diagnosis.diagnosis.situationAnalysis.fullText)}</p>
                         </div>
                       )}
-
                       {diagnosis.diagnosis.strengths && diagnosis.diagnosis.strengths.length > 0 && (
                         <div>
                           <h4 className="font-medium">Strengths:</h4>
@@ -182,21 +289,10 @@ export default function WorkbookDiagnosisPage() {
                   <ul className="list-disc pl-5 space-y-2">
                     {diagnosis.recommendations.map((recommendation: any, index: number) => (
                       <li key={index} className="text-gray-800">
-                        {typeof recommendation === 'string' ? recommendation : (
-                          <div className="space-y-2">
-                            {recommendation.action && (
-                              <div><strong>Action:</strong> {recommendation.action}</div>
-                            )}
-                            {recommendation.implementation && (
-                              <div><strong>Implementation:</strong> {recommendation.implementation}</div>
-                            )}
-                            {recommendation.outcome && (
-                              <div><strong>Outcome:</strong> {recommendation.outcome}</div>
-                            )}
-                            {recommendation.measurement && (
-                              <div><strong>Measurement:</strong> {recommendation.measurement}</div>
-                            )}
-                          </div>
+                        {typeof recommendation === 'string' ? (
+                          recommendation
+                        ) : (
+                          <SafeRender value={recommendation} />
                         )}
                       </li>
                     ))}

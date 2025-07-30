@@ -247,9 +247,22 @@ export const followupApi = {
 
   /**
    * Get the most recent follow-up submission for the current user
-   * @returns The most recent follow-up submission data
+   * @returns The most recent follow-up submission data with diagnosis summary
    */
-  async getRecentFollowupSubmission(): Promise<{ submission?: { id: string, followupId: string, followupType: FollowupCategoryType } }> {
+  async getRecentFollowupSubmission(): Promise<{ 
+    submission?: { 
+      id: string, 
+      followupId: string, 
+      followupType: FollowupCategoryType,
+      createdAt: string,
+      completedAt: string,
+      diagnosisSummary?: {
+        summary: string,
+        hasDetailedDiagnosis: boolean
+      },
+      metadata?: Record<string, any>
+    } 
+  }> {
     try {
       const response = await fetch('/api/followup/submissions/recent');
       

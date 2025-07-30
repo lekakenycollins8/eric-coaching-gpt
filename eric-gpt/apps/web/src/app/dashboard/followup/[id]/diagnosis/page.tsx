@@ -14,6 +14,76 @@ import { useFollowupDiagnosis } from '@/hooks/useFollowupDiagnosis';
 import type { FollowupDiagnosis } from '@/hooks/useFollowupDiagnosis';
 import Link from 'next/link';
 
+// Helper component to safely render potentially complex objects
+const SafeRender = ({ value }: { value: any }) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+  
+  if (typeof value === 'string') {
+    return <p className="whitespace-pre-wrap">{value}</p>;
+  }
+  
+  if (typeof value === 'object') {
+    // Handle specific object structures we know about
+    if ('fullText' in value) {
+      return <p className="whitespace-pre-wrap">{value.fullText}</p>;
+    }
+    
+    if ('action' in value) {
+      return (
+        <div className="space-y-1">
+          {value.action && <p><strong>Action:</strong> {value.action}</p>}
+          {value.implementation && <p><strong>Implementation:</strong> {value.implementation}</p>}
+          {value.outcome && <p><strong>Outcome:</strong> {value.outcome}</p>}
+          {value.measurement && <p><strong>Measurement:</strong> {value.measurement}</p>}
+        </div>
+      );
+    }
+    
+    if ('strength' in value) {
+      return (
+        <div className="space-y-1">
+          {value.strength && <p><strong>Strength:</strong> {value.strength}</p>}
+          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.leverage && <p><strong>Leverage:</strong> {value.leverage}</p>}
+        </div>
+      );
+    }
+    
+    if ('area' in value) {
+      return (
+        <div className="space-y-1">
+          {value.area && <p><strong>Area:</strong> {value.area}</p>}
+          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.rootCause && <p><strong>Root Cause:</strong> {value.rootCause}</p>}
+        </div>
+      );
+    }
+    
+    if ('reason' in value) {
+      return (
+        <div className="space-y-1">
+          {value.title && <p><strong>Title:</strong> {value.title}</p>}
+          {value.reason && <p><strong>Reason:</strong> {value.reason}</p>}
+          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+          {value.exercise && <p><strong>Exercise:</strong> {value.exercise}</p>}
+          {value.connection && <p><strong>Connection:</strong> {value.connection}</p>}
+          {value.focus && <p><strong>Focus:</strong> {value.focus}</p>}
+        </div>
+      );
+    }
+    
+    // Fallback for unknown object structures
+    return <p className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</p>;
+  }
+  
+  // Fallback for other types
+  return <p>{String(value)}</p>;
+};
+
 interface DiagnosisPageProps {
   params: Promise<{ id: string }>;
 }
@@ -133,14 +203,42 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                       {diagnosis.diagnosis.summary && (
                         <div>
                           <h4 className="font-medium text-md">Summary:</h4>
-                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.summary}</p>
+                          <SafeRender value={diagnosis.diagnosis.summary} />
                         </div>
                       )}
                       
-                      {diagnosis.diagnosis.situationAnalysis?.fullText && (
+                      {diagnosis.diagnosis.situationAnalysis && (
                         <div>
                           <h4 className="font-medium text-md">Situation Analysis:</h4>
-                          <p className="whitespace-pre-wrap">{diagnosis.diagnosis.situationAnalysis.fullText}</p>
+                          <SafeRender value={diagnosis.diagnosis.situationAnalysis} />
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.progressAnalysis && (
+                        <div>
+                          <h4 className="font-medium text-md">Progress Analysis:</h4>
+                          <SafeRender value={diagnosis.diagnosis.progressAnalysis} />
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.implementationEffectiveness && (
+                        <div>
+                          <h4 className="font-medium text-md">Implementation Effectiveness:</h4>
+                          <SafeRender value={diagnosis.diagnosis.implementationEffectiveness} />
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.adjustedRecommendations && (
+                        <div>
+                          <h4 className="font-medium text-md">Adjusted Recommendations:</h4>
+                          <SafeRender value={diagnosis.diagnosis.adjustedRecommendations} />
+                        </div>
+                      )}
+                      
+                      {diagnosis.diagnosis.continuedGrowthPlan && (
+                        <div>
+                          <h4 className="font-medium text-md">Continued Growth Plan:</h4>
+                          <SafeRender value={diagnosis.diagnosis.continuedGrowthPlan} />
                         </div>
                       )}
                       
@@ -148,8 +246,10 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                         <div>
                           <h4 className="font-medium text-md">Strengths:</h4>
                           <ul className="list-disc pl-5 space-y-1">
-                            {diagnosis.diagnosis.strengths.map((strength: string, index: number) => (
-                              <li key={`strength-${index}`} className="text-gray-800">{strength}</li>
+                            {diagnosis.diagnosis.strengths.map((strength: any, index: number) => (
+                              <li key={`strength-${index}`} className="text-gray-800">
+                                {typeof strength === 'string' ? strength : <SafeRender value={strength} />}
+                              </li>
                             ))}
                           </ul>
                         </div>
@@ -159,8 +259,10 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                         <div>
                           <h4 className="font-medium text-md">Challenges:</h4>
                           <ul className="list-disc pl-5 space-y-1">
-                            {diagnosis.diagnosis.challenges.map((challenge: string, index: number) => (
-                              <li key={`challenge-${index}`} className="text-gray-800">{challenge}</li>
+                            {diagnosis.diagnosis.challenges.map((challenge: any, index: number) => (
+                              <li key={`challenge-${index}`} className="text-gray-800">
+                                {typeof challenge === 'string' ? challenge : <SafeRender value={challenge} />}
+                              </li>
                             ))}
                           </ul>
                         </div>
@@ -169,7 +271,13 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                       {diagnosis.diagnosis.actionableRecommendations && diagnosis.diagnosis.actionableRecommendations.length > 0 && (
                         <div>
                           <h4 className="font-medium text-md">Actionable Recommendations:</h4>
-                          <div className="whitespace-pre-wrap">{diagnosis.diagnosis.actionableRecommendations[0]}</div>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {diagnosis.diagnosis.actionableRecommendations.map((rec: any, index: number) => (
+                              <li key={`rec-${index}`} className="text-gray-800">
+                                {typeof rec === 'string' ? rec : <SafeRender value={rec} />}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       )}
                     </div>
@@ -193,24 +301,14 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                   <ul className="list-disc pl-5 space-y-2">
                     {diagnosis.recommendations.map((recommendation: any, index: number) => (
                       <li key={index} className="text-gray-800">
-                        {typeof recommendation === 'string' ? recommendation : (
-                          <div className="space-y-2">
-                            {recommendation.action && (
-                              <div><strong>Action:</strong> {recommendation.action}</div>
-                            )}
-                            {recommendation.implementation && (
-                              <div><strong>Implementation:</strong> {recommendation.implementation}</div>
-                            )}
-                            {recommendation.outcome && (
-                              <div><strong>Outcome:</strong> {recommendation.outcome}</div>
-                            )}
-                            {recommendation.measurement && (
-                              <div><strong>Measurement:</strong> {recommendation.measurement}</div>
-                            )}
-                          </div>
+                        {typeof recommendation === 'string' ? (
+                          recommendation
+                        ) : (
+                          <SafeRender value={recommendation} />
                         )}
                       </li>
                     ))}
+                  
                   </ul>
                 </div>
               </>

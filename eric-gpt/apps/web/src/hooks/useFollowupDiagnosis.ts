@@ -13,6 +13,18 @@ export interface PillarDiagnosis {
   strengths?: string[];
   challenges?: string[];
   actionableRecommendations?: string[];
+  // Fields for pillar follow-ups
+  progressAnalysis?: string;
+  implementationEffectiveness?: string;
+  adjustedRecommendations?: string;
+  continuedGrowthPlan?: string;
+  // Fields for workbook follow-ups
+  implementationProgressAnalysis?: string | { fullText: string };
+  crossPillarIntegration?: string | { strength: string; evidence?: string; impact?: string; leverage?: string };
+  implementationBarriers?: string | { area: string; evidence?: string; impact?: string; rootCause?: string };
+  comprehensiveAdjustmentPlan?: string | { action: string; implementation?: string; outcome?: string; measurement?: string };
+  nextFocusAreas?: string | { id?: string; title?: string; reason: string; impact?: string; exercise?: string };
+  coachingSupportAssessment?: string | { id?: string; title?: string; reason: string; connection?: string; focus?: string };
 }
 
 /**

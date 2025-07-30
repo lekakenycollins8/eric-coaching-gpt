@@ -48,7 +48,9 @@ export async function GET(request: NextRequest) {
         followupType: 1, 
         createdAt: 1, 
         completedAt: 1,
-        _id: 1
+        _id: 1,
+        diagnosis: 1,
+        metadata: 1
       }
     ).sort({ createdAt: -1 }).limit(1);
 
@@ -58,7 +60,17 @@ export async function GET(request: NextRequest) {
       followupId: recentSubmission.followupId,
       followupType: recentSubmission.followupType,
       createdAt: recentSubmission.createdAt,
-      completedAt: recentSubmission.completedAt
+      completedAt: recentSubmission.completedAt,
+      // Include a summary of the diagnosis data for the frontend
+      diagnosisSummary: recentSubmission.diagnosis ? {
+        summary: recentSubmission.diagnosis.summary || '',
+        hasDetailedDiagnosis: !!(
+          recentSubmission.diagnosis.situationAnalysis || 
+          recentSubmission.diagnosis.strengthsAnalysis || 
+          recentSubmission.diagnosis.growthAreasAnalysis
+        )
+      } : null,
+      metadata: recentSubmission.metadata || null
     } : null;
 
     // Return the submission data
