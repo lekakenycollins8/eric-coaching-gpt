@@ -12,10 +12,10 @@ import FollowupAssessment from '@/models/FollowupAssessment';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Extract followupId outside try/catch to make it available in catch block
-  const { id: followupId } = params;
+  const { id: followupId } = await params;
   
   try {
     
@@ -118,11 +118,58 @@ export async function GET(
                                              submission.diagnosis.situationAnalysis.fullText : 
                                              (typeof submission.diagnosis.situationAnalysis === 'string' ? submission.diagnosis.situationAnalysis : '');
         processedDiagnosis.implementationEffectiveness = submission.diagnosis.strengthsAnalysis || '';
-        processedDiagnosis.adjustedRecommendations = submission.diagnosis.growthAreasAnalysis || '';
-        processedDiagnosis.continuedGrowthPlan = typeof submission.diagnosis.actionableRecommendations === 'string' ? 
-                                               submission.diagnosis.actionableRecommendations : 
-                                               (Array.isArray(submission.diagnosis.actionableRecommendations) ? 
-                                                submission.diagnosis.actionableRecommendations.join('\n') : '');
+        // Format adjustedRecommendations properly to avoid formatting issues
+        if (typeof submission.diagnosis.growthAreasAnalysis === 'string') {
+          processedDiagnosis.adjustedRecommendations = submission.diagnosis.growthAreasAnalysis;
+        } else if (Array.isArray(submission.diagnosis.growthAreasAnalysis)) {
+          // If it's an array of objects, format them properly
+          if (submission.diagnosis.growthAreasAnalysis.length > 0 && 
+              typeof submission.diagnosis.growthAreasAnalysis[0] === 'object') {
+            // Format each object in the array into a readable string with bullet points
+            const formattedRecs = submission.diagnosis.growthAreasAnalysis.map((item: any, index: number) => {
+              if (item.area) {
+                return item.area;
+              }
+              return JSON.stringify(item);
+            });
+            processedDiagnosis.adjustedRecommendations = formattedRecs.join('\n\n');
+          } else {
+            // Simple array of strings
+            processedDiagnosis.adjustedRecommendations = submission.diagnosis.growthAreasAnalysis.join('\n\n');
+          }
+        } else if (typeof submission.diagnosis.growthAreasAnalysis === 'object') {
+          // Handle single object case
+          const item = submission.diagnosis.growthAreasAnalysis;
+          processedDiagnosis.adjustedRecommendations = item.area || JSON.stringify(item);
+        } else {
+          processedDiagnosis.adjustedRecommendations = '';
+        }
+        // Format continuedGrowthPlan properly to avoid [object Object] display
+        if (typeof submission.diagnosis.actionableRecommendations === 'string') {
+          processedDiagnosis.continuedGrowthPlan = submission.diagnosis.actionableRecommendations;
+        } else if (Array.isArray(submission.diagnosis.actionableRecommendations)) {
+          // If it's an array of objects, format them properly
+          if (submission.diagnosis.actionableRecommendations.length > 0 && 
+              typeof submission.diagnosis.actionableRecommendations[0] === 'object') {
+            // Format each object in the array into a readable string
+            const formattedPlans = submission.diagnosis.actionableRecommendations.map((item: any) => {
+              if (item.action) {
+                return `- ${item.action}`;
+              }
+              return JSON.stringify(item);
+            });
+            processedDiagnosis.continuedGrowthPlan = formattedPlans.join('\n');
+          } else {
+            // Simple array of strings
+            processedDiagnosis.continuedGrowthPlan = submission.diagnosis.actionableRecommendations.join('\n');
+          }
+        } else if (typeof submission.diagnosis.actionableRecommendations === 'object') {
+          // Handle single object case
+          const item = submission.diagnosis.actionableRecommendations;
+          processedDiagnosis.continuedGrowthPlan = item.action || JSON.stringify(item);
+        } else {
+          processedDiagnosis.continuedGrowthPlan = '';
+        }
       } else {
         processedDiagnosis.implementationProgressAnalysis = submission.diagnosis.situationAnalysis?.fullText || 
                                                           submission.diagnosis.situationAnalysis || '';

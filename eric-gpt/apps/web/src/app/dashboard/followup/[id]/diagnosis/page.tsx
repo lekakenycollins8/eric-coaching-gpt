@@ -20,6 +20,19 @@ const SafeRender = ({ value }: { value: any }) => {
     return null;
   }
   
+  // Handle arrays specially
+  if (Array.isArray(value)) {
+    return (
+      <div className="space-y-3">
+        {value.map((item, index) => (
+          <div key={index} className="pl-2 border-l-2 border-gray-200">
+            <SafeRender value={item} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  
   if (typeof value === 'string') {
     return <p className="whitespace-pre-wrap">{value}</p>;
   }
@@ -55,10 +68,10 @@ const SafeRender = ({ value }: { value: any }) => {
       if ('strength' in value) {
         return (
           <div className="space-y-1">
-            {value.strength && <p><strong>Strength:</strong> {value.strength}</p>}
-            {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
-            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-            {value.leverage && <p><strong>Leverage:</strong> {value.leverage}</p>}
+            {value.strength && <p className="whitespace-pre-wrap"><strong>Strength:</strong> {value.strength}</p>}
+            {value.evidence && <p className="whitespace-pre-wrap"><strong>Evidence:</strong> {value.evidence}</p>}
+            {value.impact && <p className="whitespace-pre-wrap"><strong>Impact:</strong> {value.impact}</p>}
+            {value.leverage && <p className="whitespace-pre-wrap"><strong>Leverage:</strong> {value.leverage}</p>}
           </div>
         );
       }
@@ -66,10 +79,10 @@ const SafeRender = ({ value }: { value: any }) => {
       if ('area' in value) {
         return (
           <div className="space-y-1">
-            {value.area && <p><strong>Area:</strong> {value.area}</p>}
-            {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
-            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-            {value.rootCause && <p><strong>Root Cause:</strong> {value.rootCause}</p>}
+            {value.area && <p className="whitespace-pre-wrap"><strong>Area:</strong> {value.area}</p>}
+            {value.evidence && <p className="whitespace-pre-wrap"><strong>Evidence:</strong> {value.evidence}</p>}
+            {value.impact && <p className="whitespace-pre-wrap"><strong>Impact:</strong> {value.impact}</p>}
+            {value.rootCause && <p className="whitespace-pre-wrap"><strong>Root Cause:</strong> {value.rootCause}</p>}
           </div>
         );
       }
@@ -77,12 +90,12 @@ const SafeRender = ({ value }: { value: any }) => {
       if ('reason' in value) {
         return (
           <div className="space-y-1">
-            {value.title && <p><strong>Title:</strong> {value.title}</p>}
-            {value.reason && <p><strong>Reason:</strong> {value.reason}</p>}
-            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-            {value.exercise && <p><strong>Exercise:</strong> {value.exercise}</p>}
-            {value.connection && <p><strong>Connection:</strong> {value.connection}</p>}
-            {value.focus && <p><strong>Focus:</strong> {value.focus}</p>}
+            {value.title && <p className="whitespace-pre-wrap"><strong>Title:</strong> {value.title}</p>}
+            {value.reason && <p className="whitespace-pre-wrap"><strong>Reason:</strong> {value.reason}</p>}
+            {value.impact && <p className="whitespace-pre-wrap"><strong>Impact:</strong> {value.impact}</p>}
+            {value.exercise && <p className="whitespace-pre-wrap"><strong>Exercise:</strong> {value.exercise}</p>}
+            {value.connection && <p className="whitespace-pre-wrap"><strong>Connection:</strong> {value.connection}</p>}
+            {value.focus && <p className="whitespace-pre-wrap"><strong>Focus:</strong> {value.focus}</p>}
           </div>
         );
       }

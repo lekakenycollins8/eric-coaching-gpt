@@ -10,11 +10,11 @@ import { authOptions } from '@/lib/auth';
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the follow-up ID from the route params
-    const followupId = params.id;
+    const { id: followupId } = await params;
     
     if (!followupId) {
       return NextResponse.json({ error: 'Follow-up ID is required' }, { status: 400 });
