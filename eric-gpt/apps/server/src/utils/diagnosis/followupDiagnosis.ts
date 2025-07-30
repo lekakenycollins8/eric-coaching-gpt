@@ -5,6 +5,87 @@ import { PILLAR_FOLLOWUP_PROMPT, PILLAR_FOLLOWUP_SYSTEM_MESSAGE } from '@/config
 import { WORKBOOK_FOLLOWUP_PROMPT, WORKBOOK_FOLLOWUP_SYSTEM_MESSAGE } from '@/config/prompts/workbookFollowupPrompt';
 
 /**
+ * Format answers for better readability in the prompt
+ * @param answers The answers to format
+ * @returns Formatted answers as a string
+ */
+function formatAnswersForPrompt(answers: Record<string, any>): string {
+  if (!answers || Object.keys(answers).length === 0) {
+    return 'No answers provided.';
+  }
+  
+  let formatted = '';
+  
+  // Format each answer as a question-answer pair
+  for (const [key, value] of Object.entries(answers)) {
+    // Skip empty or undefined values
+    if (value === undefined || value === null || value === '') continue;
+    
+    // Format the question key to be more readable
+    const question = key
+      .replace(/-/g, ' ')
+      .replace(/p\d+/g, '') // Remove pillar number indicators like p1, p2
+      .replace(/^(\w)/, (match) => match.toUpperCase()); // Capitalize first letter
+    
+    formatted += `**${question}**: ${value}\n\n`;
+  }
+  
+  return formatted || 'No answers provided.';
+}
+
+/**
+ * Format diagnosis data for better readability in the prompt
+ * @param diagnosis The diagnosis data to format
+ * @returns Formatted diagnosis as a string
+ */
+function formatDiagnosisForPrompt(diagnosis: any): string {
+  if (!diagnosis) {
+    return 'No previous diagnosis available.';
+  }
+  
+  let formatted = '';
+  
+  // Add summary if available
+  if (diagnosis.summary) {
+    formatted += `**Summary**:\n${diagnosis.summary}\n\n`;
+  }
+  
+  // Add strengths if available
+  if (diagnosis.strengths && diagnosis.strengths.length > 0) {
+    formatted += `**Strengths**:\n`;
+    diagnosis.strengths.forEach((strength: string, index: number) => {
+      formatted += `${index + 1}. ${strength}\n`;
+    });
+    formatted += '\n';
+  }
+  
+  // Add challenges if available
+  if (diagnosis.challenges && diagnosis.challenges.length > 0) {
+    formatted += `**Challenges**:\n`;
+    diagnosis.challenges.forEach((challenge: string, index: number) => {
+      formatted += `${index + 1}. ${challenge}\n`;
+    });
+    formatted += '\n';
+  }
+  
+  // Add recommendations if available
+  if (diagnosis.recommendations && diagnosis.recommendations.length > 0) {
+    formatted += `**Recommendations**:\n`;
+    diagnosis.recommendations.forEach((recommendation: string, index: number) => {
+      formatted += `${index + 1}. ${recommendation}\n`;
+    });
+    formatted += '\n';
+  }
+  
+  // Add enhanced diagnosis sections if available
+  if (diagnosis.situationAnalysis?.fullText) {
+    formatted += `**Situation Analysis**:\n${diagnosis.situationAnalysis.fullText}\n\n`;
+  }
+  
+  return formatted || 'No previous diagnosis available.';
+}
+
+/**
  * Extract a section from the generated text by heading
  * @param text The full text to extract from
  * @param sectionHeading The heading to look for
@@ -51,22 +132,41 @@ export async function generateFollowupDiagnosis(
     const promptTemplate = followupType === 'pillar' ? PILLAR_FOLLOWUP_PROMPT : WORKBOOK_FOLLOWUP_PROMPT;
     const systemMessage = followupType === 'pillar' ? PILLAR_FOLLOWUP_SYSTEM_MESSAGE : WORKBOOK_FOLLOWUP_SYSTEM_MESSAGE;
     
+    // Format the answers for better readability in the prompt
+    const formattedAnswers = formatAnswersForPrompt(contextData.followupAnswers);
+    const originalPillarAnswers = formatAnswersForPrompt(contextData.originalAnswers);
+    
+    // Format the original diagnosis for better readability
+    const formattedOriginalDiagnosis = formatDiagnosisForPrompt(contextData.originalDiagnosis);
+    
+    console.log(`Preparing prompt with userName: ${contextData.userName}, pillarTitle: ${contextData.pillarTitle}`);
+    
     // Format the prompt with context data
-    const formattedPrompt = promptTemplate
-      .replace('{{originalAnswers}}', JSON.stringify(contextData.originalAnswers, null, 2))
-      .replace('{{followupAnswers}}', JSON.stringify(contextData.followupAnswers, null, 2))
-      .replace('{{originalDiagnosis}}', JSON.stringify(contextData.originalDiagnosis, null, 2))
-      .replace('{{worksheetTitle}}', contextData.worksheetTitle || 'Unknown Worksheet')
-      .replace('{{worksheetDescription}}', contextData.worksheetDescription || 'No description available')
-      .replace('{{timeElapsed}}', contextData.timeElapsed?.toString() || 'Unknown');
+    let formattedPrompt = promptTemplate
+      .replace(/\{\{originalAnswers\}\}/g, JSON.stringify(contextData.originalAnswers, null, 2))
+      .replace(/\{\{followupAnswers\}\}/g, JSON.stringify(contextData.followupAnswers, null, 2))
+      .replace(/\{\{originalDiagnosis\}\}/g, formattedOriginalDiagnosis)
+      .replace(/\{\{worksheetTitle\}\}/g, contextData.worksheetTitle || 'Unknown Worksheet')
+      .replace(/\{\{worksheetDescription\}\}/g, contextData.worksheetDescription || 'No description available')
+      .replace(/\{\{timeElapsed\}\}/g, contextData.timeElapsed?.toString() || 'Unknown')
+      .replace(/\{\{clientName\}\}/g, contextData.userName || 'Client')
+      .replace(/\{\{pillarName\}\}/g, contextData.pillarTitle || 'Leadership')
+      .replace(/\{\{formattedAnswers\}\}/g, formattedAnswers)
+      .replace(/\{\{originalPillarAnswers\}\}/g, originalPillarAnswers)
+      .replace(/\{\{pillarId\}\}/g, contextData.pillarId || '');
     
     // If it's a pillar follow-up, include the pillar-specific context
     if (followupType === 'pillar' && contextData.pillarId) {
       const pillarContext = `This follow-up is specifically for the "${contextData.pillarTitle || 'Unknown'}" pillar (ID: ${contextData.pillarId}).`;
-      formattedPrompt.replace('{{additionalContext}}', pillarContext);
+      formattedPrompt = formattedPrompt.replace(/\{\{additionalContext\}\}/g, pillarContext);
     } else {
-      formattedPrompt.replace('{{additionalContext}}', '');
+      formattedPrompt = formattedPrompt.replace(/\{\{additionalContext\}\}/g, '');
     }
+    
+    // Replace any remaining placeholders with empty strings to avoid them appearing in the output
+    formattedPrompt = formattedPrompt.replace(/\{\{[^\}]+\}\}/g, '');
+    
+    console.log('Formatted prompt with all placeholders replaced');
     
     // Call the OpenAI API
     const response = await openai.chat.completions.create({
