@@ -98,11 +98,22 @@ export async function findOriginalSubmission(originalSubmissionId: string, userI
  * Finds a pillar-specific submission
  */
 export async function findPillarSubmission(userId: string, pillarId: string) {
+  console.log(`Finding pillar submission for user ${userId} and pillar ${pillarId}`);
+  
   // Find the most recent submission for this specific pillar by the user
-  const pillarSubmission = await WorkbookSubmissionModel.findOne({
+  // Use SubmissionModel instead of WorkbookSubmissionModel for pillar submissions
+  const pillarPattern = new RegExp(`^pillar${pillarId.replace(/[^0-9]/g, '')}`); // Extract pillar number
+  
+  const pillarSubmission = await SubmissionModel.findOne({
     userId,
-    'metadata.worksheetType': { $regex: new RegExp(pillarId, 'i') } // Case-insensitive match for pillar ID
+    worksheetId: { $regex: pillarPattern } // Match pillar ID in worksheetId
   }).sort({ createdAt: -1 });
+  
+  if (pillarSubmission) {
+    console.log(`Found pillar submission for ${pillarId}: ${pillarSubmission.worksheetId}`);
+  } else {
+    console.log(`No pillar submission found for ${pillarId}`);
+  }
   
   return pillarSubmission;
 }
@@ -111,40 +122,52 @@ export async function findPillarSubmission(userId: string, pillarId: string) {
  * Prepares the submission context, looking up pillar-specific submissions if needed
  */
 export async function prepareSubmissionContext(originalSubmission: any, followupType: FollowupCategoryType, pillarId: string | null, parsedAnswers: any) {
-  const timeElapsed = calculateTimeElapsed(originalSubmission.submissionDate);
+  const timeElapsed = calculateTimeElapsed(originalSubmission.createdAt || originalSubmission.submissionDate);
+  console.log(`Time elapsed since original submission: ${timeElapsed}`);
   
-  // Build initial context data for follow-up diagnosis
-  let contextData = buildFollowupContext(
+  // For pillar follow-ups, always try to find the specific pillar submission first
+  if (followupType === 'pillar' && pillarId) {
+    console.log(`Looking up specific pillar submission for pillar ID: ${pillarId}`);
+    
+    // Get the user ID from the original submission
+    const userId = originalSubmission.userId?.toString();
+    if (!userId) {
+      console.error('No userId found in original submission');
+      // Continue with original submission as fallback
+    } else {
+      const pillarSubmission = await findPillarSubmission(userId, pillarId);
+      
+      if (pillarSubmission) {
+        console.log(`Found specific pillar submission for ${pillarId}: ${pillarSubmission._id}`);
+        console.log(`Using pillar submission with worksheetId: ${pillarSubmission.worksheetId}`);
+        
+        // Build context with the specific pillar submission data
+        const contextData = buildFollowupContext(
+          followupType,
+          pillarSubmission,
+          parsedAnswers,
+          pillarId,
+          timeElapsed
+        );
+        
+        console.log('Context built with pillar-specific submission data');
+        return { contextData, timeElapsed, pillarSubmission };
+      } else {
+        console.log(`No specific pillar submission found for ${pillarId}, using original submission as fallback`);
+      }
+    }
+  }
+  
+  // If we get here, either it's not a pillar follow-up or we couldn't find a specific pillar submission
+  // Build context data with the original submission
+  console.log('Building context with original submission data');
+  const contextData = buildFollowupContext(
     followupType,
     originalSubmission,
     parsedAnswers,
     pillarId || undefined,
     timeElapsed
   );
-  
-  // For pillar follow-ups, check if we need to look up a separate pillar submission
-  if (followupType === 'pillar' && pillarId && contextData.needsPillarSubmissionLookup) {
-    console.log(`Looking up specific pillar submission for pillar ID: ${pillarId}`);
-    
-    const pillarSubmission = await findPillarSubmission(originalSubmission.userId, pillarId);
-    
-    if (pillarSubmission) {
-      console.log(`Found specific pillar submission for ${pillarId}: ${pillarSubmission._id}`);
-      
-      // Rebuild context with the specific pillar submission data
-      contextData = buildFollowupContext(
-        followupType,
-        pillarSubmission,
-        parsedAnswers,
-        pillarId,
-        timeElapsed
-      );
-      
-      console.log('Context rebuilt with pillar-specific submission data');
-    } else {
-      console.log(`No specific pillar submission found for ${pillarId}, using workbook data as fallback`);
-    }
-  }
   
   return { contextData, timeElapsed };
 }
