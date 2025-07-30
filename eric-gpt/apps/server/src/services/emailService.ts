@@ -8,6 +8,53 @@ import fs from 'fs';
 import { loadFollowupById, FollowupCategoryType } from '@/utils/followupUtils';
 
 /**
+ * Helper function to extract text from diagnosis objects
+ * @param diagnosisField The diagnosis field which might be a string or an object with fullText property
+ * @returns The extracted text content
+ */
+function extractDiagnosisText(diagnosisField: any): string {
+  if (!diagnosisField) return 'Not available';
+  
+  // If it's a string, return it directly
+  if (typeof diagnosisField === 'string') return diagnosisField;
+  
+  // If it's an object with fullText property, return that
+  if (typeof diagnosisField === 'object' && diagnosisField.fullText) {
+    return diagnosisField.fullText;
+  }
+  
+  // If it's an object with action property (for recommendations)
+  if (typeof diagnosisField === 'object' && diagnosisField.action) {
+    return diagnosisField.action;
+  }
+  
+  // If it's an object with area property (for adjusted recommendations)
+  if (typeof diagnosisField === 'object' && diagnosisField.area) {
+    return diagnosisField.area;
+  }
+  
+  // If it's an object with reason property (for coaching assessment)
+  if (typeof diagnosisField === 'object' && diagnosisField.reason) {
+    return diagnosisField.reason;
+  }
+  
+  // If it's an array, try to join the items
+  if (Array.isArray(diagnosisField)) {
+    return diagnosisField.map(item => {
+      if (typeof item === 'string') return item;
+      if (typeof item === 'object') {
+        // Try common properties that might contain text
+        return item.fullText || item.action || item.area || item.reason || JSON.stringify(item);
+      }
+      return String(item);
+    }).join('\n');
+  }
+  
+  // Last resort: stringify the object
+  return JSON.stringify(diagnosisField);
+}
+
+/**
  * Email Service for sending coaching-related notifications
  */
 export class EmailService {
@@ -290,51 +337,55 @@ export class EmailService {
       `;
       
       // Add enhanced AI diagnosis if available - format differently based on follow-up type
-      if (followupType === 'pillar') {
-        // Pillar-specific diagnosis format
-        enhancedDiagnosis = `
-          <h3>Enhanced Pillar-Specific AI Diagnosis</h3>
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <h4>Progress Analysis</h4>
-            <p>${originalSubmission.diagnosis.situationAnalysis || 'No progress analysis available'}</p>
-            
-            <h4>Implementation Effectiveness</h4>
-            <p>${originalSubmission.diagnosis.strengthsAnalysis || 'No implementation analysis available'}</p>
-            
-            <h4>Adjusted Recommendations</h4>
-            <p>${originalSubmission.diagnosis.growthAreasAnalysis || 'No adjusted recommendations available'}</p>
-            
-            <h4>Continued Growth Plan</h4>
-            <p>${originalSubmission.diagnosis.actionableRecommendations || 'No growth plan available'}</p>
-            
-            <h4>Coaching Support Assessment</h4>
-            <p>${originalSubmission.diagnosis.followupRecommendation || 'No coaching assessment available'}</p>
-          </div>
-        `;
+      if (followupAssessment.diagnosis) {
+        if (followupType === 'pillar') {
+          // Pillar-specific diagnosis format
+          enhancedDiagnosis = `
+            <h3>Enhanced Pillar-Specific AI Diagnosis</h3>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              <h4>Progress Analysis</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.situationAnalysis) || 'No progress analysis available'}</p>
+              
+              <h4>Implementation Effectiveness</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.strengthsAnalysis) || 'No implementation analysis available'}</p>
+              
+              <h4>Adjusted Recommendations</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.growthAreasAnalysis) || 'No adjusted recommendations available'}</p>
+              
+              <h4>Continued Growth Plan</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.actionableRecommendations) || 'No growth plan available'}</p>
+              
+              <h4>Coaching Support Assessment</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.followupRecommendation) || 'No coaching assessment available'}</p>
+            </div>
+          `;
+        } else {
+          // Workbook-specific diagnosis format
+          enhancedDiagnosis = `
+            <h3>Enhanced Workbook Implementation AI Diagnosis</h3>
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+              <h4>Implementation Progress Analysis</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.situationAnalysis) || 'No progress analysis available'}</p>
+              
+              <h4>Cross-Pillar Integration</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.strengthsAnalysis) || 'No integration analysis available'}</p>
+              
+              <h4>Implementation Barriers</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.growthAreasAnalysis) || 'No barriers analysis available'}</p>
+              
+              <h4>Comprehensive Adjustment Plan</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.actionableRecommendations) || 'No adjustment plan available'}</p>
+              
+              <h4>Next Focus Areas</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.pillarRecommendations) || 'No focus areas available'}</p>
+              
+              <h4>Coaching Support Assessment</h4>
+              <p>${extractDiagnosisText(followupAssessment.diagnosis.followupRecommendation) || 'No coaching assessment available'}</p>
+            </div>
+          `;
+        }
       } else {
-        // Workbook-specific diagnosis format
-        enhancedDiagnosis = `
-          <h3>Enhanced Workbook Implementation AI Diagnosis</h3>
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <h4>Implementation Progress Analysis</h4>
-            <p>${originalSubmission.diagnosis.situationAnalysis || 'No progress analysis available'}</p>
-            
-            <h4>Cross-Pillar Integration</h4>
-            <p>${originalSubmission.diagnosis.strengthsAnalysis || 'No integration analysis available'}</p>
-            
-            <h4>Implementation Barriers</h4>
-            <p>${originalSubmission.diagnosis.growthAreasAnalysis || 'No barriers analysis available'}</p>
-            
-            <h4>Comprehensive Adjustment Plan</h4>
-            <p>${originalSubmission.diagnosis.actionableRecommendations || 'No adjustment plan available'}</p>
-            
-            <h4>Next Focus Areas</h4>
-            <p>${originalSubmission.diagnosis.pillarRecommendations || 'No focus areas available'}</p>
-            
-            <h4>Coaching Support Assessment</h4>
-            <p>${originalSubmission.diagnosis.followupRecommendation || 'No coaching assessment available'}</p>
-          </div>
-        `;
+        enhancedDiagnosis = `<p>No diagnosis available for this follow-up assessment.</p>`;
       }
     }
     

@@ -142,7 +142,7 @@ export async function prepareSubmissionContext(originalSubmission: any, followup
         console.log(`Using pillar submission with worksheetId: ${pillarSubmission.worksheetId}`);
         
         // Build context with the specific pillar submission data
-        const contextData = buildFollowupContext(
+        const contextData = await buildFollowupContext(
           followupType,
           pillarSubmission,
           parsedAnswers,
@@ -161,7 +161,7 @@ export async function prepareSubmissionContext(originalSubmission: any, followup
   // If we get here, either it's not a pillar follow-up or we couldn't find a specific pillar submission
   // Build context data with the original submission
   console.log('Building context with original submission data');
-  const contextData = buildFollowupContext(
+  const contextData = await buildFollowupContext(
     followupType,
     originalSubmission,
     parsedAnswers,
