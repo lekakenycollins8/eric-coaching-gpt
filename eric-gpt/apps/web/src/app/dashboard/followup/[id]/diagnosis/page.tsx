@@ -25,59 +25,75 @@ const SafeRender = ({ value }: { value: any }) => {
   }
   
   if (typeof value === 'object') {
-    // Handle specific object structures we know about
-    if ('fullText' in value) {
-      return <p className="whitespace-pre-wrap">{value.fullText}</p>;
+    try {
+      // Handle specific object structures we know about
+      if ('fullText' in value) {
+        return <p className="whitespace-pre-wrap">{value.fullText}</p>;
+      }
+      
+      if ('action' in value) {
+        // If only action has content and other fields are empty or undefined, just show the action
+        const hasOnlyAction = value.action && 
+          (!value.implementation || value.implementation === '') && 
+          (!value.outcome || value.outcome === '') && 
+          (!value.measurement || value.measurement === '');
+          
+        if (hasOnlyAction) {
+          return <p className="whitespace-pre-wrap">{value.action}</p>;
+        }
+        
+        return (
+          <div className="space-y-1">
+            {value.action && <p><strong>Action:</strong> {value.action}</p>}
+            {value.implementation && <p><strong>Implementation:</strong> {value.implementation}</p>}
+            {value.outcome && <p><strong>Outcome:</strong> {value.outcome}</p>}
+            {value.measurement && <p><strong>Measurement:</strong> {value.measurement}</p>}
+          </div>
+        );
+      }
+      
+      if ('strength' in value) {
+        return (
+          <div className="space-y-1">
+            {value.strength && <p><strong>Strength:</strong> {value.strength}</p>}
+            {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+            {value.leverage && <p><strong>Leverage:</strong> {value.leverage}</p>}
+          </div>
+        );
+      }
+      
+      if ('area' in value) {
+        return (
+          <div className="space-y-1">
+            {value.area && <p><strong>Area:</strong> {value.area}</p>}
+            {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
+            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+            {value.rootCause && <p><strong>Root Cause:</strong> {value.rootCause}</p>}
+          </div>
+        );
+      }
+      
+      if ('reason' in value) {
+        return (
+          <div className="space-y-1">
+            {value.title && <p><strong>Title:</strong> {value.title}</p>}
+            {value.reason && <p><strong>Reason:</strong> {value.reason}</p>}
+            {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
+            {value.exercise && <p><strong>Exercise:</strong> {value.exercise}</p>}
+            {value.connection && <p><strong>Connection:</strong> {value.connection}</p>}
+            {value.focus && <p><strong>Focus:</strong> {value.focus}</p>}
+          </div>
+        );
+      }
+      
+      // Fallback for unknown object structures
+      return <p className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</p>;
+    } catch (error) {
+      // If there's any error in rendering the object, fall back to a simple string representation
+      console.error('Error rendering complex object:', error);
+      return <p className="text-red-500">Error rendering content</p>;
     }
-    
-    if ('action' in value) {
-      return (
-        <div className="space-y-1">
-          {value.action && <p><strong>Action:</strong> {value.action}</p>}
-          {value.implementation && <p><strong>Implementation:</strong> {value.implementation}</p>}
-          {value.outcome && <p><strong>Outcome:</strong> {value.outcome}</p>}
-          {value.measurement && <p><strong>Measurement:</strong> {value.measurement}</p>}
-        </div>
-      );
-    }
-    
-    if ('strength' in value) {
-      return (
-        <div className="space-y-1">
-          {value.strength && <p><strong>Strength:</strong> {value.strength}</p>}
-          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
-          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-          {value.leverage && <p><strong>Leverage:</strong> {value.leverage}</p>}
-        </div>
-      );
-    }
-    
-    if ('area' in value) {
-      return (
-        <div className="space-y-1">
-          {value.area && <p><strong>Area:</strong> {value.area}</p>}
-          {value.evidence && <p><strong>Evidence:</strong> {value.evidence}</p>}
-          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-          {value.rootCause && <p><strong>Root Cause:</strong> {value.rootCause}</p>}
-        </div>
-      );
-    }
-    
-    if ('reason' in value) {
-      return (
-        <div className="space-y-1">
-          {value.title && <p><strong>Title:</strong> {value.title}</p>}
-          {value.reason && <p><strong>Reason:</strong> {value.reason}</p>}
-          {value.impact && <p><strong>Impact:</strong> {value.impact}</p>}
-          {value.exercise && <p><strong>Exercise:</strong> {value.exercise}</p>}
-          {value.connection && <p><strong>Connection:</strong> {value.connection}</p>}
-          {value.focus && <p><strong>Focus:</strong> {value.focus}</p>}
-        </div>
-      );
-    }
-    
-    // Fallback for unknown object structures
-    return <p className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</p>;
   }
   
   // Fallback for other types
@@ -105,7 +121,7 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
     
     // Log diagnosis data for debugging
     if (diagnosis) {
-      console.log(`${followupType} diagnosis loaded for ID ${id}:`, diagnosis);
+      console.log(`${followupType} diagnosis loaded successfully for ID ${id}`);
     }
   }, [isLoading, diagnosis, followupType, id]);
   

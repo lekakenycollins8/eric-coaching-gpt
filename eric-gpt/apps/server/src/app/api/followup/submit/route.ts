@@ -385,30 +385,78 @@ export async function POST(request: Request) {
       
       console.log('Enhanced AI diagnosis generated successfully');
       
-      // Create the follow-up assessment document with type-specific fields
-      followupAssessment = new FollowupAssessmentModel({
-        userId: user._id,
-        workbookSubmissionId: originalSubmissionId,
-        followupId,
-        followupType, // Using our new explicit followupType field
-        status: 'completed',
-        answers: parsedAnswers,
-        diagnosis: rawDiagnosisResponse,
-        diagnosisGeneratedAt: new Date(),
-        completedAt: new Date(),
-        // Add structured metadata using our new IFollowupMetadata interface
-        metadata: {
-          pillarId: pillarId || undefined, // Only for pillar follow-ups
-          timeElapsed,
-          originalTitle: contextData.worksheetTitle,
-          followupTitle: worksheetData.worksheet?.title || followupId,
-          improvementScore: calculateImprovementScore(rawDiagnosisResponse, followupType)
+      // Create or update the follow-up assessment document with type-specific fields
+      // Use findOneAndUpdate with upsert to prevent duplicate key errors
+      try {
+        followupAssessment = await FollowupAssessmentModel.findOneAndUpdate(
+          {
+            workbookSubmissionId: originalSubmissionId,
+            followupId
+          },
+          {
+            userId: user._id,
+            workbookSubmissionId: originalSubmissionId,
+            followupId,
+            followupType, // Using our new explicit followupType field
+            status: 'completed',
+            answers: parsedAnswers,
+            diagnosis: rawDiagnosisResponse,
+            diagnosisGeneratedAt: new Date(),
+            completedAt: new Date(),
+            // Add structured metadata using our new IFollowupMetadata interface
+            metadata: {
+              pillarId: pillarId || undefined, // Only for pillar follow-ups
+              timeElapsed,
+              originalTitle: contextData.worksheetTitle,
+              followupTitle: worksheetData.worksheet?.title || followupId,
+              improvementScore: calculateImprovementScore(rawDiagnosisResponse, followupType)
+            }
+          },
+          {
+            upsert: true, // Create if doesn't exist
+            new: true,    // Return the updated document
+            runValidators: true // Run schema validators
+          }
+        );
+      } catch (upsertError: any) {
+        // Handle duplicate key error specifically
+        if (upsertError.code === 11000) {
+          console.log('Duplicate key detected, attempting to update existing record...');
+          // Try to find and update the existing record
+          followupAssessment = await FollowupAssessmentModel.findOneAndUpdate(
+            {
+              workbookSubmissionId: originalSubmissionId,
+              followupId
+            },
+            {
+              status: 'completed',
+              answers: parsedAnswers,
+              diagnosis: rawDiagnosisResponse,
+              diagnosisGeneratedAt: new Date(),
+              completedAt: new Date(),
+              metadata: {
+                pillarId: pillarId || undefined,
+                timeElapsed,
+                originalTitle: contextData.worksheetTitle,
+                followupTitle: worksheetData.worksheet?.title || followupId,
+                improvementScore: calculateImprovementScore(rawDiagnosisResponse, followupType)
+              }
+            },
+            {
+              new: true,
+              runValidators: true
+            }
+          );
+          
+          if (!followupAssessment) {
+            throw new Error('Failed to update existing follow-up assessment');
+          }
+        } else {
+          throw upsertError;
         }
-      });
+      }
       
-      // Save the follow-up assessment to the database
-      await followupAssessment.save();
-      console.log(`Follow-up assessment saved with ID: ${followupAssessment._id}`);
+      console.log(`Follow-up assessment saved/updated with ID: ${followupAssessment._id}`);
       
       // Update the original submission with the enhanced diagnosis
       if (rawDiagnosisResponse && originalSubmission.diagnosis) {

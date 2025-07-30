@@ -23,7 +23,7 @@ export default function DiagnosisLandingPage() {
     queryFn: async () => {
       try {
         const result = await followupApi.getRecentFollowupSubmission();
-        console.log('Recent submission data:', result);
+        console.log('Recent submission data loaded successfully');
         return result;
       } catch (err) {
         console.error('Error fetching recent submission:', err);

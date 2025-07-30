@@ -101,7 +101,7 @@ export const followupApi = {
       }
       
       const result = await response.json();
-      console.log('Follow-up submission successful:', result);
+      console.log('Follow-up submission successful');
       return result;
     } catch (error) {
       console.error('Error in submitFollowup:', error);

@@ -227,7 +227,7 @@ export function WorkbookFollowup({ followupId }: WorkbookFollowupProps) {
       );
     }
     
-    console.log('Rendering form with worksheet:', typedResponse.worksheet);
+    console.log('Rendering form with worksheet');
     console.log('Using submission ID:', selectedSubmissionId);
     
     return (
