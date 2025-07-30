@@ -14,9 +14,10 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  // Extract followupId outside try/catch to make it available in catch block
+  const { id: followupId } = params;
+  
   try {
-    // Get the follow-up ID from the route params
-    const followupId = await params.id;
     
     if (!followupId) {
       return NextResponse.json({ error: 'Follow-up ID is required' }, { status: 400 });
@@ -94,9 +95,10 @@ export async function GET(
       processedDiagnosis = {
         summary: submission.diagnosis.summary || '',
         situationAnalysis: {
-          fullText: submission.diagnosis.situationAnalysis?.fullText || 
-                    submission.diagnosis.situationAnalysis || 
-                    ''
+          // Ensure situationAnalysis.fullText is always populated with a valid string
+          fullText: typeof submission.diagnosis.situationAnalysis === 'object' && submission.diagnosis.situationAnalysis?.fullText ? 
+                    submission.diagnosis.situationAnalysis.fullText : 
+                    (typeof submission.diagnosis.situationAnalysis === 'string' ? submission.diagnosis.situationAnalysis : '')
         },
         strengths: Array.isArray(submission.diagnosis.strengths) ? 
                   submission.diagnosis.strengths : 
@@ -111,11 +113,16 @@ export async function GET(
       
       // Add follow-up type specific fields
       if (submission.followupType === 'pillar') {
-        processedDiagnosis.progressAnalysis = submission.diagnosis.situationAnalysis?.fullText || 
-                                             submission.diagnosis.situationAnalysis || '';
+        // For pillar follow-ups, ensure all required fields are properly populated
+        processedDiagnosis.progressAnalysis = typeof submission.diagnosis.situationAnalysis === 'object' && submission.diagnosis.situationAnalysis?.fullText ? 
+                                             submission.diagnosis.situationAnalysis.fullText : 
+                                             (typeof submission.diagnosis.situationAnalysis === 'string' ? submission.diagnosis.situationAnalysis : '');
         processedDiagnosis.implementationEffectiveness = submission.diagnosis.strengthsAnalysis || '';
         processedDiagnosis.adjustedRecommendations = submission.diagnosis.growthAreasAnalysis || '';
-        processedDiagnosis.continuedGrowthPlan = submission.diagnosis.actionableRecommendations || '';
+        processedDiagnosis.continuedGrowthPlan = typeof submission.diagnosis.actionableRecommendations === 'string' ? 
+                                               submission.diagnosis.actionableRecommendations : 
+                                               (Array.isArray(submission.diagnosis.actionableRecommendations) ? 
+                                                submission.diagnosis.actionableRecommendations.join('\n') : '');
       } else {
         processedDiagnosis.implementationProgressAnalysis = submission.diagnosis.situationAnalysis?.fullText || 
                                                           submission.diagnosis.situationAnalysis || '';
@@ -127,7 +134,8 @@ export async function GET(
       
       // Add coaching support assessment
       processedDiagnosis.coachingSupportAssessment = submission.diagnosis.followupRecommendation || '';
-      if (submission.emailContent.implementationEffectiveness) {
+      // Safely access emailContent properties with null/undefined checks
+      if (submission.emailContent && submission.emailContent.implementationEffectiveness) {
         const impl = submission.emailContent.implementationEffectiveness;
         processedDiagnosis.summary = impl.strength || '';
         
@@ -138,14 +146,17 @@ export async function GET(
       }
       
       // Extract progress analysis
-      if (submission.emailContent.progressAnalysis && submission.emailContent.progressAnalysis.fullText) {
+      // Safely check all nested properties
+      if (submission.emailContent && 
+          submission.emailContent.progressAnalysis && 
+          submission.emailContent.progressAnalysis.fullText) {
         processedDiagnosis.situationAnalysis = {
           fullText: submission.emailContent.progressAnalysis.fullText
         };
       }
       
-      // Extract adjusted recommendations
-      if (submission.emailContent.adjustedRecommendations) {
+      // Extract adjusted recommendations - safely check emailContent
+      if (submission.emailContent && submission.emailContent.adjustedRecommendations) {
         const rec = submission.emailContent.adjustedRecommendations;
         if (rec.area) {
           processedRecommendations.push({
@@ -157,10 +168,10 @@ export async function GET(
         }
       }
       
-      // Extract continued growth plan
-      if (submission.emailContent.continuedGrowthPlan) {
+      // Extract continued growth plan - with additional null checks
+      if (submission.emailContent && submission.emailContent.continuedGrowthPlan) {
         const plan = submission.emailContent.continuedGrowthPlan;
-        if (plan.action) {
+        if (plan && plan.action) {
           processedRecommendations.push({
             action: plan.action,
             implementation: plan.implementation || '',
@@ -168,6 +179,16 @@ export async function GET(
             measurement: plan.measurement || ''
           });
         }
+      }
+      
+      // If we still don't have any recommendations, add a default one to prevent empty arrays
+      if (processedRecommendations.length === 0) {
+        processedRecommendations.push({
+          action: 'Continue working on your development areas',
+          implementation: '',
+          outcome: '',
+          measurement: ''
+        });
       }
     }
     
@@ -184,7 +205,8 @@ export async function GET(
     
     return NextResponse.json(diagnosisData);
   } catch (error) {
-    console.error('Error fetching follow-up diagnosis:', error);
+    console.error(`Error fetching follow-up diagnosis for ID ${followupId}:`, error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return NextResponse.json({ error: 'Failed to fetch follow-up diagnosis' }, { status: 500 });
   }
 }

@@ -27,22 +27,28 @@ export function convertToDatabaseFormat(
     followup: 'followup-assessment' // Default follow-up worksheet ID
   };
   
+  // Ensure all required fields have valid values to prevent validation errors
+  const situationAnalysisText = diagnosisResponse.situationAnalysis || '';
+  const strengthsAnalysisText = diagnosisResponse.strengthsAnalysis || '';
+  const growthAreasAnalysisText = diagnosisResponse.growthAreasAnalysis || '';
+  const actionableRecommendationsText = diagnosisResponse.actionableRecommendations || '';
+  
   // Create the diagnosis result object
   return {
-    summary: diagnosisResponse.summary,
-    strengths: [diagnosisResponse.strengthsAnalysis],
-    challenges: [diagnosisResponse.growthAreasAnalysis],
-    recommendations: [diagnosisResponse.actionableRecommendations],
+    summary: diagnosisResponse.summary || '',
+    strengths: [strengthsAnalysisText],
+    challenges: [growthAreasAnalysisText],
+    recommendations: [actionableRecommendationsText],
     followupWorksheets,
     createdAt: new Date(),
     
-    // Enhanced diagnosis fields
-    situationAnalysis: createSituationAnalysis(diagnosisResponse.situationAnalysis),
-    strengthsAnalysis: createStrengthsAnalysis(diagnosisResponse.strengthsAnalysis),
-    growthAreasAnalysis: createGrowthAreasAnalysis(diagnosisResponse.growthAreasAnalysis),
-    actionableRecommendations: createActionableRecommendations(diagnosisResponse.actionableRecommendations),
+    // Enhanced diagnosis fields - ensure all are properly initialized
+    situationAnalysis: createSituationAnalysis(situationAnalysisText),
+    strengthsAnalysis: createStrengthsAnalysis(strengthsAnalysisText),
+    growthAreasAnalysis: createGrowthAreasAnalysis(growthAreasAnalysisText),
+    actionableRecommendations: createActionableRecommendations(actionableRecommendationsText),
     pillarRecommendations: createPillarRecommendations(diagnosisResponse.pillarRecommendations),
-    followupRecommendation: createFollowupRecommendation(diagnosisResponse.followupRecommendation)
+    followupRecommendation: createFollowupRecommendation(diagnosisResponse.followupRecommendation || '')
   };
 }
 
@@ -68,8 +74,9 @@ function getRecommendedPillars(
  * @returns The situation analysis object
  */
 function createSituationAnalysis(situationAnalysis: string): ISituationAnalysis {
+  // Ensure we always have a valid string for fullText to satisfy schema validation
   return {
-    fullText: situationAnalysis,
+    fullText: situationAnalysis || '',
     // In a future enhancement, we could parse the text to extract
     // context, challenges, patterns, and impact
   };
@@ -81,7 +88,7 @@ function createSituationAnalysis(situationAnalysis: string): ISituationAnalysis 
  * @returns The strengths analysis array
  */
 function createStrengthsAnalysis(strengthsAnalysis: string): IStrengthAnalysis[] | undefined {
-  if (!strengthsAnalysis) return undefined;
+  if (!strengthsAnalysis) return [];
   
   return [{
     strength: strengthsAnalysis,
@@ -100,7 +107,7 @@ function createStrengthsAnalysis(strengthsAnalysis: string): IStrengthAnalysis[]
  * @returns The growth areas analysis array
  */
 function createGrowthAreasAnalysis(growthAreasAnalysis: string): IGrowthAreaAnalysis[] | undefined {
-  if (!growthAreasAnalysis) return undefined;
+  if (!growthAreasAnalysis) return [];
   
   return [{
     area: growthAreasAnalysis,
@@ -119,7 +126,7 @@ function createGrowthAreasAnalysis(growthAreasAnalysis: string): IGrowthAreaAnal
  * @returns The actionable recommendations array
  */
 function createActionableRecommendations(actionableRecommendations: string): IActionableRecommendation[] | undefined {
-  if (!actionableRecommendations) return undefined;
+  if (!actionableRecommendations) return [];
   
   return [{
     action: actionableRecommendations,
@@ -138,7 +145,7 @@ function createActionableRecommendations(actionableRecommendations: string): IAc
  * @returns The pillar recommendations array
  */
 function createPillarRecommendations(pillarRecommendations?: string): IPillarRecommendation[] | undefined {
-  if (!pillarRecommendations) return undefined;
+  if (!pillarRecommendations) return [];
   
   return [{
     id: '',
@@ -158,7 +165,16 @@ function createPillarRecommendations(pillarRecommendations?: string): IPillarRec
  * @returns The follow-up recommendation object
  */
 function createFollowupRecommendation(followupRecommendation: string): IFollowupRecommendation | undefined {
-  if (!followupRecommendation) return undefined;
+  if (!followupRecommendation) {
+    // Return a default object instead of undefined to avoid validation errors
+    return {
+      id: 'followup-assessment',
+      title: 'Follow-up Assessment',
+      reason: '',
+      connection: '',
+      focus: ''
+    };
+  }
   
   return {
     id: 'followup-assessment',
