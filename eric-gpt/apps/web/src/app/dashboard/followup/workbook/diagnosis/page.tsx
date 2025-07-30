@@ -212,40 +212,40 @@ export default function WorkbookDiagnosisPage() {
                           <SafeRender value={diagnosis.diagnosis.summary} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.implementationProgressAnalysis && (
+                      {diagnosis.diagnosis.situationAnalysis && (
                         <div>
                           <h4 className="font-medium">Implementation Progress Analysis:</h4>
-                          <SafeRender value={diagnosis.diagnosis.implementationProgressAnalysis} />
+                          <SafeRender value={diagnosis.diagnosis.situationAnalysis} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.crossPillarIntegration && (
+                      {diagnosis.diagnosis.strengthsAnalysis && diagnosis.diagnosis.strengthsAnalysis.length > 0 && (
                         <div>
                           <h4 className="font-medium">Cross-Pillar Integration:</h4>
-                          <SafeRender value={diagnosis.diagnosis.crossPillarIntegration} />
+                          <SafeRender value={diagnosis.diagnosis.strengthsAnalysis[0]} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.implementationBarriers && (
+                      {diagnosis.diagnosis.growthAreasAnalysis && diagnosis.diagnosis.growthAreasAnalysis.length > 0 && (
                         <div>
                           <h4 className="font-medium">Implementation Barriers:</h4>
-                          <SafeRender value={diagnosis.diagnosis.implementationBarriers} />
+                          <SafeRender value={diagnosis.diagnosis.growthAreasAnalysis[0]} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.comprehensiveAdjustmentPlan && (
+                      {diagnosis.diagnosis.actionableRecommendations && diagnosis.diagnosis.actionableRecommendations.length > 0 && (
                         <div>
                           <h4 className="font-medium">Comprehensive Adjustment Plan:</h4>
-                          <SafeRender value={diagnosis.diagnosis.comprehensiveAdjustmentPlan} />
+                          <SafeRender value={diagnosis.diagnosis.actionableRecommendations[0]} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.nextFocusAreas && (
+                      {diagnosis.diagnosis.pillarRecommendations && diagnosis.diagnosis.pillarRecommendations.length > 0 && (
                         <div>
                           <h4 className="font-medium">Next Focus Areas:</h4>
-                          <SafeRender value={diagnosis.diagnosis.nextFocusAreas} />
+                          <SafeRender value={diagnosis.diagnosis.pillarRecommendations[0]} />
                         </div>
                       )}
-                      {diagnosis.diagnosis.coachingSupportAssessment && (
+                      {diagnosis.diagnosis.followupRecommendation && (
                         <div>
                           <h4 className="font-medium">Coaching Support Assessment:</h4>
-                          <SafeRender value={diagnosis.diagnosis.coachingSupportAssessment} />
+                          <SafeRender value={diagnosis.diagnosis.followupRecommendation} />
                         </div>
                       )}
                       {diagnosis.diagnosis.situationAnalysis?.fullText && (

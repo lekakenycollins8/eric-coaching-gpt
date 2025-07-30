@@ -10,15 +10,49 @@ export interface PillarDiagnosis {
   situationAnalysis?: {
     fullText: string;
   };
+  // Original database field names
+  strengthsAnalysis?: Array<{
+    strength?: string;
+    evidence?: string;
+    impact?: string;
+    leverage?: string;
+  }>;
+  growthAreasAnalysis?: Array<{
+    area?: string;
+    evidence?: string;
+    impact?: string;
+    rootCause?: string;
+  }>;
+  actionableRecommendations?: Array<{
+    action?: string;
+    implementation?: string;
+    outcome?: string;
+    measurement?: string;
+  }>;
+  pillarRecommendations?: Array<{
+    id?: string;
+    title?: string;
+    reason?: string;
+    impact?: string;
+    exercise?: string;
+  }>;
+  followupRecommendation?: {
+    id?: string;
+    title?: string;
+    reason?: string;
+    connection?: string;
+    focus?: string;
+    implementationProgress?: string;
+  };
+  // Basic fields
   strengths?: string[];
   challenges?: string[];
-  actionableRecommendations?: string[];
   // Fields for pillar follow-ups
   progressAnalysis?: string;
   implementationEffectiveness?: string;
   adjustedRecommendations?: string;
   continuedGrowthPlan?: string;
-  // Fields for workbook follow-ups
+  // Fields for workbook follow-ups (renamed for UI)
   implementationProgressAnalysis?: string | { fullText: string };
   crossPillarIntegration?: string | { strength: string; evidence?: string; impact?: string; leverage?: string };
   implementationBarriers?: string | { area: string; evidence?: string; impact?: string; rootCause?: string };
