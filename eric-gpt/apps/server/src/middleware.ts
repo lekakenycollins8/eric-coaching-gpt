@@ -40,7 +40,6 @@ export async function middleware(request: NextRequest) {
     // Follow-up system routes
     '/api/followup',
     '/api/followup/worksheets',
-    '/api/followup/recommendations',
     '/api/followup/submit',
     // Dynamic routes with parameters - these cover routes like /api/followup/worksheets/[id]
     '/api/followup/worksheets/'

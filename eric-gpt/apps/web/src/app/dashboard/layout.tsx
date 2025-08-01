@@ -29,17 +29,27 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Memoize navigation items to prevent re-renders
+  // Navigation items arranged by priority and user journey flow
   const navigation = useMemo(() => [
+    // Primary navigation - core user journey
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-    { name: 'Profile', href: '/dashboard/profile', icon: UserIcon },
-    { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
     { name: 'Worksheets', href: '/dashboard/worksheets', icon: DocumentTextIcon },
     { name: 'My Submissions', href: '/dashboard/submissions', icon: ClipboardDocumentListIcon },
+    
+    // Follow-up and progress tracking - second priority
     { name: 'Follow-ups', href: '/dashboard/followup', icon: ClipboardIcon },
     { name: 'Trackers', href: '/dashboard/trackers', icon: ArrowTrendingUpIcon },
+    
+    // Coaching resources - third priority
     { name: 'Coaching', href: '/dashboard/coaching', icon: ChatBubbleLeftRightIcon },
     { name: 'Schedule Session', href: '/dashboard/coaching/schedule', icon: CalendarIcon },
+    
+    // Specialized content
     { name: 'Jackier Workbook', href: '/dashboard/jackier', icon: DocumentTextIcon },
+    
+    // User account management - moved lower as less frequently accessed
+    { name: 'Profile', href: '/dashboard/profile', icon: UserIcon },
+    { name: 'Subscription', href: '/dashboard/subscription', icon: CreditCardIcon },
   ], []);
   
   // Memoize the navigation rendering to prevent re-renders
@@ -74,16 +84,22 @@ export default function DashboardLayout({
               })}
             </ul>
           </li>
-          <li className="mt-auto">
-            <Link
-              href="/api/auth/signout"
-              className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-red-600"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400 group-hover:text-red-600">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
-              </svg>
-              Sign out
-            </Link>
+          {/* Navigation sections with headings for better organization */}
+          <li className="mt-6">
+            <div className="text-xs font-semibold leading-6 text-gray-400 pl-2">ACCOUNT</div>
+            <ul role="list" className="mt-2 -mx-2 space-y-1">
+              <li>
+                <Link
+                  href="/api/auth/signout"
+                  className="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-red-600"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-400 group-hover:text-red-600">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                  </svg>
+                  Sign out
+                </Link>
+              </li>
+            </ul>
           </li>
         </ul>
       </nav>
