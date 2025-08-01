@@ -11,22 +11,26 @@ import FollowupAssessment from '@/models/FollowupAssessment';
  */
 export async function GET(request: Request) {
   try {
-    // Get the authenticated user session
+    // Get user ID either from session or custom header
     const session = await getServerSession(authOptions);
+    const headerUserId = request.headers.get('X-User-Id');
     
-    if (!session?.user?.id) {
+    // Use either session user ID or header user ID
+    const userId = session?.user?.id || headerUserId;
+    
+    if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     
     // Connect to the database
     await connectToDatabase();
     
-    console.log(`Fetching workbook diagnosis for user ID: ${session.user.id}`);
+    console.log(`Fetching workbook diagnosis for user ID: ${userId}`);
     
     // Find the most recent workbook follow-up submission for this user
     // First try to find by explicit followupType
     let submission = await FollowupAssessment.findOne({
-      userId: session.user.id,
+      userId: userId,
       followupType: 'workbook'
     }).sort({ createdAt: -1 }); // Get the most recent submission
     
@@ -34,13 +38,13 @@ export async function GET(request: Request) {
     if (!submission) {
       console.log('No submission found with explicit workbook type, trying legacy approach');
       submission = await FollowupAssessment.findOne({
-        userId: session.user.id,
+        userId: userId,
         followupId: { $not: /pillar/i } // Regex to exclude pillar follow-ups
       }).sort({ createdAt: -1 });
     }
     
     if (!submission) {
-      console.log(`No workbook submission found for user ID: ${session.user.id}`);
+      console.log(`No workbook submission found for user ID: ${userId}`);
       return NextResponse.json({ error: 'Workbook follow-up submission not found' }, { status: 404 });
     }
     

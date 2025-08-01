@@ -23,17 +23,21 @@ export async function GET(
       return NextResponse.json({ error: 'Follow-up ID is required' }, { status: 400 });
     }
     
-    // Get the authenticated user session
+    // Get user ID either from session or custom header
     const session = await getServerSession(authOptions);
+    const headerUserId = request.headers.get('X-User-Id');
     
-    if (!session?.user?.id) {
+    // Use either session user ID or header user ID
+    const userId = session?.user?.id || headerUserId;
+    
+    if (!userId) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     
     // Connect to the database
     await connectToDatabase();
     
-    console.log(`Fetching diagnosis for follow-up ID: ${followupId} and user ID: ${session.user.id}`);
+    console.log(`Fetching diagnosis for follow-up ID: ${followupId} and user ID: ${userId}`);
     
     // Determine if this is a pillar follow-up
     const isPillar = followupId.includes('pillar') || /^(pillar-\d+|p\d+|[a-z]+-pillar)/.test(followupId);
@@ -41,21 +45,21 @@ export async function GET(
     // Find the follow-up submission for this user and follow-up ID
     let submission = await FollowupAssessment.findOne({
       followupId: followupId,
-      userId: session.user.id,
+      userId: userId,
     }).sort({ createdAt: -1 }); // Get the most recent submission
     
     // If not found and it's a pillar, try to find by followupType
     if (!submission && isPillar) {
       console.log(`No direct match found, trying to find by followupType='pillar' and pillar ID`);
       submission = await FollowupAssessment.findOne({
-        userId: session.user.id,
+        userId: userId,
         followupType: 'pillar',
         pillarId: followupId.replace(/^pillar-/, '') // Extract pillar number if present
       }).sort({ createdAt: -1 });
     }
     
     if (!submission) {
-      console.log(`No submission found for follow-up ID: ${followupId} and user ID: ${session.user.id}`);
+      console.log(`No submission found for follow-up ID: ${followupId} and user ID: ${userId}`);
       return NextResponse.json({ error: 'Follow-up submission not found' }, { status: 404 });
     }
     

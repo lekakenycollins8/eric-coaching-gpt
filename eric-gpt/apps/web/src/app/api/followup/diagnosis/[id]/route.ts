@@ -34,15 +34,23 @@ export async function GET(
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     console.log(`Web app: Forwarding to server URL: ${serverUrl}`);
     
-    // Forward the request with the session cookie and a timeout
+    // Forward the request with the session data and a timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
     
     try {
+      // Extract user ID and other session data for authorization
+      const userId = session.user.id;
+      
       const serverResponse = await fetch(`${serverUrl}/api/followup/diagnosis/${followupId}`, {
         headers: {
           'Content-Type': 'application/json',
-          // Pass along the cookie which contains the session information
+          // Pass user ID as a custom authorization header
+          'X-User-Id': userId,
+          // Add additional session data for verification
+          'X-Session-User-Email': session.user.email || '',
+          'X-Session-User-Name': session.user.name || '',
+          // Still include cookies for local development compatibility
           'Cookie': request.headers.get('cookie') || '',
         },
         signal: controller.signal,

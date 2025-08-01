@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     console.log('Web app: Forwarding to server URL:', serverUrl);
     
-    // Add the user ID to the body
+    // Add the user ID to the body and headers
     const userId = session.user.id;
     const bodyWithUserId = { ...body, userId };
     
@@ -34,8 +34,16 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // Pass user ID as a custom authorization header
+        'X-User-Id': userId,
+        // Add additional session data for verification
+        'X-Session-User-Email': session.user.email || '',
+        'X-Session-User-Name': session.user.name || '',
+        // Include cookies for local development compatibility
+        'Cookie': req.headers.get('cookie') || '',
       },
       body: JSON.stringify(bodyWithUserId),
+      credentials: 'include',
     });
 
     // Check if the response is valid JSON before parsing

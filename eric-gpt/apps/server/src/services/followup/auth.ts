@@ -41,7 +41,32 @@ export async function authenticateAndValidateUser(request: Request, bodyUserId?:
     return { error: null, user };
   }
   
-  // If no session but bodyUserId is provided, try to authenticate with that
+  // If no session, try to authenticate via X-User-Id header (for production cross-domain requests)
+  const headerUserId = request.headers.get('X-User-Id');
+  if (headerUserId) {
+    console.log(`Using X-User-Id header for authentication: ${headerUserId}`);
+    const user = await UserModel.findById(headerUserId) as User | null;
+    
+    if (!user) {
+      return {
+        error: NextResponse.json({ error: 'User not found with provided X-User-Id header' }, { status: 404 }),
+        user: null
+      };
+    }
+    
+    const hasSubscription = await hasActiveSubscription(user._id.toString());
+    
+    if (!hasSubscription) {
+      return {
+        error: NextResponse.json({ error: 'Active subscription required' }, { status: 403 }),
+        user: null
+      };
+    }
+    
+    return { error: null, user };
+  }
+  
+  // If no session or header but bodyUserId is provided, try to authenticate with that (backward compatibility)
   if (bodyUserId) {
     console.log(`Using userId parameter for authentication: ${bodyUserId}`);
     const user = await UserModel.findById(bodyUserId) as User | null;

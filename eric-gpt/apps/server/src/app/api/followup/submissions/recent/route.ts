@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get the authenticated user from session or query parameter
+    // Get the authenticated user from session, header, or query parameter
     let userId;
     
     // First try to get userId from the session
@@ -25,12 +25,18 @@ export async function GET(request: NextRequest) {
     if (session?.user?.id) {
       userId = session.user.id;
     } else {
-      // If no session, try to get userId from query parameters (for web app proxy requests)
-      const { searchParams } = new URL(request.url);
-      userId = searchParams.get('userId');
-      
-      if (!userId) {
-        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      // If no session, try to get userId from custom header (for production cross-domain requests)
+      const headerUserId = request.headers.get('X-User-Id');
+      if (headerUserId) {
+        userId = headerUserId;
+      } else {
+        // Finally, try to get userId from query parameters (backward compatibility)
+        const { searchParams } = new URL(request.url);
+        userId = searchParams.get('userId');
+        
+        if (!userId) {
+          return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+        }
       }
     }
 
