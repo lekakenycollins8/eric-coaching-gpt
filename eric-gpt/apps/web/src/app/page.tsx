@@ -12,6 +12,7 @@ import {
 import WelcomeHero from '@/components/dashboard/WelcomeHero';
 import FeaturedContent from '@/components/dashboard/FeaturedContent';
 import { WorkbookCallToAction } from '@/components/jackier/WorkbookCallToAction';
+import { JackierWorkbookHighlight } from '@/components/jackier/JackierWorkbookHighlight';
 import Link from 'next/link';
 import { useState } from 'react';
 import { 
@@ -38,6 +39,9 @@ export default function Home() {
             
             {/* Jackier Workbook Call to Action - Full Width */}
             <WorkbookCallToAction className="mb-8" />
+            
+            {/* Jackier Workbook Highlight - Full Width */}
+            <JackierWorkbookHighlight className="mb-8" />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left column - Featured Content */}
