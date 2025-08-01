@@ -201,17 +201,28 @@ export default function WorkbookPage() {
     }
   };
   
+  // State to track submission status
+  const [isSubmittingWorkbook, setIsSubmittingWorkbook] = useState(false);
+
   // Handle form submission
   const onSubmit = async (data: Record<string, unknown>) => {
     try {
+      setIsSubmittingWorkbook(true);
+      
+      // Show toast immediately to indicate submission started
+      toast({
+        title: "Submitting workbook",
+        description: "Your workbook is being submitted and analyzed...",
+      });
+      
       const result = await submitWorkbook(data);
       
       toast({
         title: "Workbook submitted",
-        description: "Your workbook has been submitted successfully.",
+        description: "Your workbook has been submitted successfully. Generating your diagnosis...",
       });
       
-      // Redirect to the diagnosis page
+      // Redirect to the diagnosis page which will handle polling for diagnosis
       router.push('/dashboard/jackier/diagnosis');
     } catch (err) {
       console.error('Submission error:', err);
@@ -220,6 +231,8 @@ export default function WorkbookPage() {
         description: "There was a problem submitting your workbook.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmittingWorkbook(false);
     }
   };
   

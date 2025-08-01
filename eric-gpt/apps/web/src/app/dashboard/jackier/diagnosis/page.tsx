@@ -44,11 +44,19 @@ export default function DiagnosisPage() {
     // Debug the userSubmission data
     console.log('Diagnosis page - userSubmission:', userSubmission);
     
-    if (userSubmission?.diagnosis && !userSubmission.diagnosisViewedAt) {
-      console.log('Marking diagnosis as viewed');
+    // Only attempt to mark diagnosis as viewed if:
+    // 1. We have a userSubmission with diagnosis
+    // 2. It hasn't been marked as viewed yet
+    // 3. We have a valid ID to send to the API
+    if (userSubmission?.diagnosis && 
+        !userSubmission.diagnosisViewedAt && 
+        userSubmission.id && 
+        // Prevent infinite loop by checking if we're already in the process of marking it viewed
+        !isLoading) {
+      console.log('Marking diagnosis as viewed with ID:', userSubmission.id);
       markDiagnosisViewed();
     }
-  }, [userSubmission, markDiagnosisViewed]);
+  }, [userSubmission?.id, userSubmission?.diagnosisViewedAt, userSubmission?.diagnosis, markDiagnosisViewed, isLoading]);
   
   // Handle starting a worksheet - route to correct path based on worksheet type
   const handleStartWorksheet = (worksheetId: string, variant: 'pillar' | 'followup') => {

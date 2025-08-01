@@ -178,22 +178,68 @@ export function useJackierWorkbook() {
       
       console.log('Jackier workbook submission API response:', responseData);
       
-      // Check if submission exists using the new format
+      // Check if submission exists
       if (!responseData.exists) {
         console.log('No submission found in API response');
         // No submission found, return null
         return null;
       }
       
-      // Log the diagnosis data specifically
-      if (responseData.data && responseData.data.diagnosis) {
-        console.log('Diagnosis found in submission:', responseData.data.diagnosis);
-      } else {
-        console.log('No diagnosis found in submission data');
+      // Handle the case where the API returns an array of submissions
+      if (responseData.submissions && Array.isArray(responseData.submissions) && responseData.submissions.length > 0) {
+        // Find the most recent submitted submission with a diagnosis
+        const submittedWithDiagnosis = responseData.submissions
+          .filter((sub: any) => sub.status === 'submitted' && sub.diagnosis)
+          .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        
+        if (submittedWithDiagnosis.length > 0) {
+          const latestSubmission = submittedWithDiagnosis[0];
+          console.log('Using latest submission with diagnosis:', latestSubmission._id);
+          
+          // Log the diagnosis data
+          if (latestSubmission.diagnosis) {
+            console.log('Diagnosis found in submission:', latestSubmission.diagnosis);
+          }
+          
+          // Convert _id to id if needed
+          return {
+            ...latestSubmission,
+            id: latestSubmission._id || latestSubmission.id
+          } as WorkbookSubmission;
+        } else {
+          // If no submissions with diagnosis, use the latest submitted one
+          const latestSubmitted = responseData.submissions
+            .filter((sub: any) => sub.status === 'submitted')
+            .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+            
+          if (latestSubmitted.length > 0) {
+            console.log('Using latest submitted submission (no diagnosis):', latestSubmitted[0]._id);
+            return {
+              ...latestSubmitted[0],
+              id: latestSubmitted[0]._id || latestSubmitted[0].id
+            } as WorkbookSubmission;
+          }
+        }
+        
+        console.log('No suitable submission found in the array');
+        return null;
       }
       
-      // Return the actual submission data
-      return responseData.data as WorkbookSubmission;
+      // Handle the case where a single data object is returned (old format)
+      if (responseData.data) {
+        // Log the diagnosis data specifically
+        if (responseData.data.diagnosis) {
+          console.log('Diagnosis found in submission:', responseData.data.diagnosis);
+        } else {
+          console.log('No diagnosis found in submission data');
+        }
+        
+        // Return the actual submission data
+        return responseData.data as WorkbookSubmission;
+      }
+      
+      console.log('Unexpected API response format');
+      return null;
     },
     enabled: !!session?.user,
   });
@@ -308,47 +354,73 @@ export function useJackierWorkbook() {
     mutationFn: async (submissionId: string) => {
       // The server API endpoint is /api/diagnosis with POST method
       // Our proxy route is /api/jackier/diagnosis/view
-      const response = await fetch(`/api/jackier/diagnosis/view`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          submissionId,
-        }),
-      });
-      
-      if (!response.ok) {
-        // Check if response is JSON or not
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-          const errorText = await response.text().catch(() => 'Could not read error response');
-          console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
-          throw new Error(`Server error: ${response.status}`);
+      try {
+        const response = await fetch(`/api/jackier/diagnosis/view`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            submissionId,
+          }),
+        });
+        
+        // Handle authentication errors (401) specially to prevent infinite loops
+        if (response.status === 401) {
+          console.warn('Authentication required to mark diagnosis as viewed');
+          // Return a fake success response to prevent retries
+          return { success: false, reason: 'auth_required' };
         }
-        throw new Error(`Failed to mark diagnosis as viewed: ${response.status}`);
+        
+        if (!response.ok) {
+          // Check if response is JSON or not
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const errorText = await response.text().catch(() => 'Could not read error response');
+            console.error('Server returned a non-JSON response:', response.status, contentType, errorText.substring(0, 200));
+            throw new Error(`Server error: ${response.status}`);
+          }
+          throw new Error(`Failed to mark diagnosis as viewed: ${response.status}`);
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error('Error in markDiagnosisViewed API call:', error);
+        // Return a fake success response to prevent retries
+        return { success: false, reason: 'error', error };
       }
-      
-      return response.json();
     },
     onSuccess: (data) => {
-      // Update the cached submission data with the new diagnosisViewedAt timestamp
-      queryClient.setQueryData<WorkbookSubmission | null>(
-        ['jackier', 'submission'], 
-        (oldData) => oldData ? {
-          ...oldData,
-          diagnosisViewedAt: data.diagnosisViewedAt,
-        } : null
-      );
+      // Only update the cache if we got a real success response with diagnosisViewedAt
+      if (data && data.diagnosisViewedAt) {
+        // Update the cached submission data with the new diagnosisViewedAt timestamp
+        queryClient.setQueryData<WorkbookSubmission | null>(
+          ['jackier', 'submission'], 
+          (oldData) => oldData ? {
+            ...oldData,
+            diagnosisViewedAt: data.diagnosisViewedAt,
+          } : null
+        );
+      }
     },
     onError: (err) => {
       console.error('Error marking diagnosis as viewed:', err);
     }
   });
   
+  // Track if we've already tried to mark as viewed to prevent infinite loops
+  const [hasTriedToMarkViewed, setHasTriedToMarkViewed] = useState(false);
+  
   const markDiagnosisViewed = async () => {
-    if (!userSubmission?.id) return;
-    await markDiagnosisViewedMutation.mutateAsync(userSubmission.id);
+    // Prevent multiple attempts in the same session
+    if (hasTriedToMarkViewed || !userSubmission?.id) return;
+    
+    setHasTriedToMarkViewed(true);
+    try {
+      await markDiagnosisViewedMutation.mutateAsync(userSubmission.id);
+    } catch (error) {
+      console.error('Failed to mark diagnosis as viewed:', error);
+    }
   };
 
   // Combine errors from both queries

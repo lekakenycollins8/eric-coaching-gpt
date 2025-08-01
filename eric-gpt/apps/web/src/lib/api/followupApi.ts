@@ -7,7 +7,6 @@ import type {
   FollowupSubmissionData, 
   FollowupCategoryType, 
   FollowupAssessment,
-  FollowupRecommendation,
   FollowupWorksheet,
   FollowupContextData
 } from '@/types/followup';
@@ -109,19 +108,7 @@ export const followupApi = {
     }
   },
   
-  /**
-   * Get follow-up recommendations for the current user
-   * @returns List of follow-up recommendations
-   */
-  async getRecommendations(): Promise<{ recommendations: FollowupRecommendation[] }> {
-    const response = await fetch('/api/followup/recommendations');
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch follow-up recommendations: ${response.status}`);
-    }
-    
-    return response.json();
-  },
+  // Recommendations feature removed
   
   /**
    * Get a follow-up worksheet by ID

@@ -350,33 +350,6 @@ export default function DiagnosisPage({ params }: DiagnosisPageProps) {
                 </AlertDescription>
               </Alert>
             ) : null}
-            
-            {diagnosis?.progressData && Object.keys(diagnosis.progressData).length > 0 ? (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <LineChart className="h-5 w-5 text-blue-600" />
-                  <h3 className="font-medium text-lg">Progress Overview:</h3>
-                </div>
-                <div className="p-4 bg-white rounded-md border">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(diagnosis.progressData).map(([key, value]: [string, string | number]) => (
-                      <div key={key} className="border rounded p-3 bg-blue-50 border-blue-200">
-                        <h4 className="font-medium text-blue-800">{key}</h4>
-                        <p className="text-sm text-gray-700">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : diagnosis?.diagnosis ? (
-              <Alert className="bg-blue-50 border-blue-200">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <AlertTitle>No Progress Data Available</AlertTitle>
-                <AlertDescription>
-                  Detailed progress metrics are not available for this follow-up assessment.
-                </AlertDescription>
-              </Alert>
-            ) : null}
           </CardContent>
           
           <CardFooter className="flex justify-between">

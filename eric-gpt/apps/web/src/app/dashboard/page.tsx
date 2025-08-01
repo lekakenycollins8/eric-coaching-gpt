@@ -10,6 +10,7 @@ import PlatformGuide from '@/components/dashboard/PlatformGuide';
 import UserStats from '@/components/dashboard/UserStats';
 import FeaturedContent from '@/components/dashboard/FeaturedContent';
 import { WorkbookCallToAction } from '@/components/jackier/WorkbookCallToAction';
+import { JackierWorkbookHighlight } from '@/components/jackier/JackierWorkbookHighlight';
 
 export default function Dashboard() {
   const { data: session, status } = useSession({
@@ -34,8 +35,11 @@ export default function Dashboard() {
         {/* Welcome Hero Section */}
         <WelcomeHero />
         
-        {/* Jackier Workbook Call to Action - Full Width */}
+        {/* Original Workbook Call to Action - Full Width */}
         <WorkbookCallToAction className="mt-6" />
+        
+        {/* Enhanced Jackier Workbook Highlight - Full Width */}
+        <JackierWorkbookHighlight className="mt-8" />
         
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content - Left 2/3 */}
