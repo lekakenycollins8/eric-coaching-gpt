@@ -15,10 +15,10 @@ export function useFollowupAssessments(userId?: string) {
   return useQuery({
     queryKey: ['followup-assessments', userId],
     queryFn: async () => {
-      // Use the recommendations endpoint as a proxy for assessments
-      // since we don't need a separate endpoint just for this
-      const { recommendations } = await followupApi.getRecommendations();
-      return { assessments: recommendations };
+      // Use the recent submission endpoint as a proxy for assessments
+      // since the recommendations feature was removed
+      const { submission } = await followupApi.getRecentFollowupSubmission();
+      return { assessments: submission ? [submission] : [] };
     }
   });
 }
@@ -48,16 +48,15 @@ export function useFollowupAssessment(assessmentId: string | null) {
         throw new Error('Assessment ID is required');
       }
       
-      // Since we don't have a direct endpoint for fetching a single assessment,
-      // we'll use the recommendations endpoint and filter by ID
-      const { recommendations } = await followupApi.getRecommendations();
-      const assessment = recommendations.find(r => r.followupId === assessmentId);
+      // Since the recommendations feature was removed, we'll use the diagnosis endpoint directly
+      // which provides assessment data for a specific followup ID
+      const diagnosisData = await followupApi.getFollowupDiagnosis(assessmentId);
       
-      if (!assessment) {
+      if (!diagnosisData) {
         throw new Error('Assessment not found');
       }
       
-      return assessment as unknown as FollowupAssessment;
+      return diagnosisData as unknown as FollowupAssessment;
     },
     enabled: !!assessmentId
   });

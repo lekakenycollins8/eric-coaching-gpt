@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
   try {
     // Get the authenticated user session
     const session = await getServerSession(authOptions);
@@ -21,7 +21,8 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    // Access params.id asynchronously to comply with Next.js 14+ requirements
+    const { id } = await params;
     if (!id) {
       return NextResponse.json(
         { error: 'Worksheet ID is required' },
